@@ -2,7 +2,13 @@
     "name": "flutter-wrapper",
     "displayName": "Flutter Wrapper",
     "description": "Extensions for wrap selected widget",
-    "version": "0.0.5",
+    "version": "0.0.10",
+    "publisher": "zhangzhihua",
+    "author": {
+        "name": "zhangzhihua",
+        "email": "zhangzhihua.email@gmail.com"
+    },
+    "icon": "logo.png",
     "engines": {
         "vscode": "^1.60.0"
     },
@@ -40,5 +46,9 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/ke112/vscode_plugins.git"
+    },
+    "homepage": "https://github.com/ke112/vscode_plugins",
+    "bugs": {
+        "url": "https://github.com/ke112/vscode_plugins/issues"
     }
 }

@@ -20,12 +20,11 @@ function activate(context) {
         editor.edit(editBuilder => {
             editBuilder.replace(fullRange, wrappedText);
         }).then(success => {
-            if (success) {
-                vscode.window.showInformationMessage('Widget wrapped with LayoutBuilder');
-            }
-            else {
-                vscode.window.showErrorMessage('Failed to wrap widget');
-            }
+            // if (success) {
+            //     vscode.window.showInformationMessage('Widget wrapped with LayoutBuilder');
+            // } else {
+            //     vscode.window.showErrorMessage('Failed to wrap widget');
+            // }
         });
     });
     context.subscriptions.push(codeActionProvider, disposable);
@@ -78,11 +77,10 @@ function getFullWidgetRange(document, range) {
 }
 function wrapWithLayoutBuilder(widget) {
     return `LayoutBuilder(
-  builder: (BuildContext context, BoxConstraints constraints) {
-    // You can use constraints.maxWidth and constraints.maxHeight here
-    return ${widget.trim()};
-  },
-)`;
+        builder: (BuildContext context, BoxConstraints constraints) {
+            return ${widget.trim()};
+        },
+    )`;
 }
 function deactivate() { }
 exports.deactivate = deactivate;

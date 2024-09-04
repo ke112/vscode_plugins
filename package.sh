@@ -17,5 +17,10 @@ sed -i '' "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" p
 
 echo "Version updated from $current_version to $new_version"
 
+# 删除旧版本的 .vsix 文件
+rm -f flutter-wrapper-*.vsix
+
 # 编译并打包，自动回答 "yes"
 yarn run compile && echo "y" | vsce package --no-yarn
+
+echo "Old .vsix files deleted and new package created."
