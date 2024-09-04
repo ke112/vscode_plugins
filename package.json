@@ -2,7 +2,7 @@
     "name": "flutter-layout-builder-wrapper",
     "displayName": "Flutter LayoutBuilder Wrapper",
     "description": "Wrap selected widget with LayoutBuilder",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "engines": {
         "vscode": "^1.60.0"
     },
@@ -10,7 +10,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.wrapWithLayoutBuilder"
+        "onLanguage:dart"
     ],
     "main": "./out/extension.js",
     "contributes": {

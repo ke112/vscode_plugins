@@ -1,26 +1,23 @@
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
-    let disposable = vscode.commands.registerCommand('extension.wrapWithLayoutBuilder', () => {
+    const codeActionProvider = vscode.languages.registerCodeActionsProvider(
+        { scheme: 'file', language: 'dart' },
+        new LayoutBuilderActionProvider()
+    );
+
+    const disposable = vscode.commands.registerCommand('extension.wrapWithLayoutBuilder', (document: vscode.TextDocument, range: vscode.Range) => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
             vscode.window.showErrorMessage('No active editor found');
             return;
         }
 
-        const document = editor.document;
-        const selection = editor.selection;
-
-        if (selection.isEmpty) {
-            vscode.window.showWarningMessage('Please select a widget to wrap');
-            return;
-        }
-
-        const selectedText = document.getText(selection);
+        const selectedText = document.getText(range);
         const wrappedText = wrapWithLayoutBuilder(selectedText);
 
         editor.edit(editBuilder => {
-            editBuilder.replace(selection, wrappedText);
+            editBuilder.replace(range, wrappedText);
         }).then(success => {
             if (success) {
                 vscode.window.showInformationMessage('Widget wrapped with LayoutBuilder');
@@ -30,7 +27,19 @@ export function activate(context: vscode.ExtensionContext) {
         });
     });
 
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(codeActionProvider, disposable);
+}
+
+class LayoutBuilderActionProvider implements vscode.CodeActionProvider {
+    provideCodeActions(document: vscode.TextDocument, range: vscode.Range): vscode.CodeAction[] {
+        const wrapAction = new vscode.CodeAction('Wrap with LayoutBuilder', vscode.CodeActionKind.RefactorRewrite);
+        wrapAction.command = {
+            command: 'extension.wrapWithLayoutBuilder',
+            title: 'Wrap with LayoutBuilder',
+            arguments: [document, range]
+        };
+        return [wrapAction];
+    }
 }
 
 function wrapWithLayoutBuilder(widget: string): string {
