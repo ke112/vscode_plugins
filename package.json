@@ -1,8 +1,8 @@
 {
-    "name": "flutter-layout-builder-wrapper",
-    "displayName": "Flutter LayoutBuilder Wrapper",
-    "description": "Wrap selected widget with LayoutBuilder",
-    "version": "0.0.2",
+    "name": "flutter-wrapper",
+    "displayName": "Flutter Wrapper",
+    "description": "Extensions for wrap selected widget",
+    "version": "0.0.5",
     "engines": {
         "vscode": "^1.60.0"
     },
@@ -36,5 +36,9 @@
         "@typescript-eslint/parser": "^4.x",
         "eslint": "^7.x",
         "typescript": "^4.x"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ke112/vscode_plugins.git"
     }
 }
