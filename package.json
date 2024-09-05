@@ -2,7 +2,7 @@
     "name": "flutter-wrapper",
     "displayName": "Flutter Wrapper",
     "description": "Extensions for wrap selected widget",
-    "version": "0.0.14",
+    "version": "0.0.21",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -13,7 +13,7 @@
         "vscode": "^1.60.0"
     },
     "categories": [
-        "Other"
+        "Snippets"
     ],
     "activationEvents": [
         "onLanguage:dart"

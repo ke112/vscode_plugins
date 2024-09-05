@@ -6,8 +6,6 @@ Flutter Wrapper 是一个 VS Code 扩展，用于快速包裹选中的 Flutter w
 
 - 拓展flutter基础库没有的常用组件。
 
-![Flutter Wrapper 示例](https://github.com/ke112/vscode_plugins/main/images/hit_image.jpg)
-
 ## 使用方法
 
 1. 选中想要包裹的 widget，然后按下 `提取列表` 快捷键，选择 `拓展的组件` 即可。

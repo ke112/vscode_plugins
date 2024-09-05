@@ -15,7 +15,7 @@ new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
 # 更新 package.json 中的版本号
 sed -i '' "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" package.json
 
-echo "Version updated from $current_version to $new_version"
+echo "版本升级 from $current_version to $new_version"
 
 # 删除旧版本的 .vsix 文件
 rm -f flutter-wrapper-*.vsix
@@ -23,4 +23,5 @@ rm -f flutter-wrapper-*.vsix
 # 编译并打包，自动回答 "yes"
 yarn run compile && echo "y" | vsce package --no-yarn
 
-echo "Old .vsix files deleted and new package created."
+# 打开新版本的 .vsix 文件
+open -R flutter-wrapper-*.vsix
