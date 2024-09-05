@@ -11,6 +11,7 @@ Flutter Wrapper 是一个 VS Code 扩展，拓展了用于快速包裹选中的 
 1. 选中想要包裹的 widget，然后按下 `提取列表`快捷键，选择 `拓展的组件` 即可。
 2. 目前支持的组件有：
     - `LayoutBuilder`
+    - `Obx`
 
 ## 贡献
 

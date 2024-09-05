@@ -2,7 +2,7 @@
     "name": "flutter-wrapper",
     "displayName": "Flutter Wrapper",
     "description": "Extensions for wrap selected widget",
-    "version": "0.0.10",
+    "version": "0.0.12",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -24,6 +24,10 @@
             {
                 "command": "extension.wrapWithLayoutBuilder",
                 "title": "Wrap with LayoutBuilder"
+            },
+            {
+                "command": "extension.wrapWithObx",
+                "title": "Wrap with Obx"
             }
         ]
     },

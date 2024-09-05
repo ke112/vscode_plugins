@@ -3,49 +3,63 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
     const codeActionProvider = vscode.languages.registerCodeActionsProvider(
         { scheme: 'file', language: 'dart' },
-        new LayoutBuilderActionProvider()
+        new FlutterWrapperActionProvider()
     );
 
-    const disposable = vscode.commands.registerCommand('extension.wrapWithLayoutBuilder', (document: vscode.TextDocument, range: vscode.Range) => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            vscode.window.showErrorMessage('No active editor found');
-            return;
-        }
-
-        const fullRange = getFullWidgetRange(document, range);
-        if (!fullRange) {
-            vscode.window.showErrorMessage('Unable to determine widget boundaries');
-            return;
-        }
-
-        const fullWidgetText = document.getText(fullRange);
-        const wrappedText = wrapWithLayoutBuilder(fullWidgetText);
-
-        editor.edit(editBuilder => {
-            editBuilder.replace(fullRange, wrappedText);
-        }).then(success => {
-            // if (success) {
-            //     vscode.window.showInformationMessage('Widget wrapped with LayoutBuilder');
-            // } else {
-            //     vscode.window.showErrorMessage('Failed to wrap widget');
-            // }
-        });
+    const layoutBuilderDisposable = vscode.commands.registerCommand('extension.wrapWithLayoutBuilder', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithLayoutBuilder);
     });
 
-    context.subscriptions.push(codeActionProvider, disposable);
+    const obxDisposable = vscode.commands.registerCommand('extension.wrapWithObx', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithObx);
+    });
+
+    context.subscriptions.push(codeActionProvider, layoutBuilderDisposable, obxDisposable);
 }
 
-class LayoutBuilderActionProvider implements vscode.CodeActionProvider {
+class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
     provideCodeActions(document: vscode.TextDocument, range: vscode.Range): vscode.CodeAction[] {
-        const wrapAction = new vscode.CodeAction('Wrap with LayoutBuilder', vscode.CodeActionKind.RefactorRewrite);
-        wrapAction.command = {
+        const actions = [];
+
+        const layoutBuilderAction = new vscode.CodeAction('Wrap with LayoutBuilder', vscode.CodeActionKind.RefactorRewrite);
+        layoutBuilderAction.command = {
             command: 'extension.wrapWithLayoutBuilder',
             title: 'Wrap with LayoutBuilder',
             arguments: [document, range]
         };
-        return [wrapAction];
+        actions.push(layoutBuilderAction);
+
+        const obxAction = new vscode.CodeAction('Wrap with Obx', vscode.CodeActionKind.RefactorRewrite);
+        obxAction.command = {
+            command: 'extension.wrapWithObx',
+            title: 'Wrap with Obx',
+            arguments: [document, range]
+        };
+        actions.push(obxAction);
+
+        return actions;
     }
+}
+
+function wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunction: (widget: string) => string) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        vscode.window.showErrorMessage('No active editor found');
+        return;
+    }
+
+    const fullRange = getFullWidgetRange(document, range);
+    if (!fullRange) {
+        vscode.window.showErrorMessage('Unable to determine widget boundaries');
+        return;
+    }
+
+    const fullWidgetText = document.getText(fullRange);
+    const wrappedText = wrapFunction(fullWidgetText);
+
+    editor.edit(editBuilder => {
+        editBuilder.replace(fullRange, wrappedText);
+    });
 }
 
 function getFullWidgetRange(document: vscode.TextDocument, range: vscode.Range): vscode.Range | null {
@@ -97,6 +111,10 @@ function wrapWithLayoutBuilder(widget: string): string {
             return ${widget.trim()};
         },
     )`;
+}
+
+function wrapWithObx(widget: string): string {
+    return `Obx(() => ${widget.trim()})`;
 }
 
 export function deactivate() { }
