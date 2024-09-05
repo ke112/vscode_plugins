@@ -2,7 +2,7 @@
     "name": "flutter-wrapper",
     "displayName": "Flutter Wrapper",
     "description": "Extensions for wrap selected widget",
-    "version": "0.0.21",
+    "version": "0.0.29",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -28,6 +28,38 @@
             {
                 "command": "extension.wrapWithObx",
                 "title": "Wrap with Obx"
+            },
+            {
+                "command": "extension.wrapWithGestureDetector",
+                "title": "Wrap with GestureDetector"
+            },
+            {
+                "command": "extension.wrapWithValueListenableBuilder",
+                "title": "Wrap with ValueListenableBuilder"
+            },
+            {
+                "command": "extension.wrapWithMediaQuery",
+                "title": "Wrap with MediaQuery"
+            },
+            {
+                "command": "extension.wrapWithAfterLayout",
+                "title": "Wrap with AfterLayout"
+            },
+            {
+                "command": "extension.wrapWithMeasureSize",
+                "title": "Wrap with MeasureSize"
+            },
+            {
+                "command": "extension.wrapWithVisibilityDetector",
+                "title": "Wrap with VisibilityDetector"
+            },
+            {
+                "command": "extension.wrapWithClipRRect",
+                "title": "Wrap with ClipRRect"
+            },
+            {
+                "command": "extension.wrapWithStack",
+                "title": "Wrap with Stack"
             }
         ]
     },

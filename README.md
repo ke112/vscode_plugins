@@ -4,7 +4,7 @@ Flutter Wrapper 是一个 VS Code 扩展，用于快速包裹选中的 Flutter w
 
 ## 功能
 
-- 拓展flutter基础库没有的常用组件。
+- 拓展flutter基础库没有的常用包裹组件。
 
 ## 使用方法
 
@@ -12,6 +12,14 @@ Flutter Wrapper 是一个 VS Code 扩展，用于快速包裹选中的 Flutter w
 2. 目前支持的组件有：
     - `LayoutBuilder`
     - `Obx`
+    - `GestureDetector`
+    - `ValueListenableBuilder`
+    - `MediaQuery`
+    - `AfterLayout`
+    - `MeasureSize`
+    - `VisibilityDetector`
+    - `ClipRRect`
+    - `Stack`
 
 ## 贡献
 

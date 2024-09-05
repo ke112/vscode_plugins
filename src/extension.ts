@@ -14,7 +14,39 @@ export function activate(context: vscode.ExtensionContext) {
         wrapWidget(document, range, wrapWithObx);
     });
 
-    context.subscriptions.push(codeActionProvider, layoutBuilderDisposable, obxDisposable);
+    const gestureDetectorDisposable = vscode.commands.registerCommand('extension.wrapWithGestureDetector', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithGestureDetector);
+    });
+
+    const valueListenableBuilderDisposable = vscode.commands.registerCommand('extension.wrapWithValueListenableBuilder', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithValueListenableBuilder);
+    });
+
+    const mediaQueryDisposable = vscode.commands.registerCommand('extension.wrapWithMediaQuery', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithMediaQuery);
+    });
+
+    const afterLayoutDisposable = vscode.commands.registerCommand('extension.wrapWithAfterLayout', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithAfterLayout);
+    });
+
+    const measureSizeDisposable = vscode.commands.registerCommand('extension.wrapWithMeasureSize', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithMeasureSize);
+    });
+
+    const visibilityDetectorDisposable = vscode.commands.registerCommand('extension.wrapWithVisibilityDetector', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithVisibilityDetector);
+    });
+
+    const clipRRectDisposable = vscode.commands.registerCommand('extension.wrapWithClipRRect', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithClipRRect);
+    });
+
+    const stackDisposable = vscode.commands.registerCommand('extension.wrapWithStack', (document: vscode.TextDocument, range: vscode.Range) => {
+        wrapWidget(document, range, wrapWithStack);
+    });
+
+    context.subscriptions.push(codeActionProvider, layoutBuilderDisposable, obxDisposable, gestureDetectorDisposable, valueListenableBuilderDisposable, mediaQueryDisposable, afterLayoutDisposable, measureSizeDisposable, visibilityDetectorDisposable, clipRRectDisposable, stackDisposable);
 }
 
 class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
@@ -36,6 +68,70 @@ class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
             arguments: [document, range]
         };
         actions.push(obxAction);
+
+        const gestureDetectorAction = new vscode.CodeAction('Wrap with GestureDetector', vscode.CodeActionKind.RefactorRewrite);
+        gestureDetectorAction.command = {
+            command: 'extension.wrapWithGestureDetector',
+            title: 'Wrap with GestureDetector',
+            arguments: [document, range]
+        };
+        actions.push(gestureDetectorAction);
+
+        const valueListenableBuilderAction = new vscode.CodeAction('Wrap with ValueListenableBuilder', vscode.CodeActionKind.RefactorRewrite);
+        valueListenableBuilderAction.command = {
+            command: 'extension.wrapWithValueListenableBuilder',
+            title: 'Wrap with ValueListenableBuilder',
+            arguments: [document, range]
+        };
+        actions.push(valueListenableBuilderAction);
+
+        const mediaQueryAction = new vscode.CodeAction('Wrap with MediaQuery', vscode.CodeActionKind.RefactorRewrite);
+        mediaQueryAction.command = {
+            command: 'extension.wrapWithMediaQuery',
+            title: 'Wrap with MediaQuery',
+            arguments: [document, range]
+        };
+        actions.push(mediaQueryAction);
+
+        const afterLayoutAction = new vscode.CodeAction('Wrap with AfterLayout', vscode.CodeActionKind.RefactorRewrite);
+        afterLayoutAction.command = {
+            command: 'extension.wrapWithAfterLayout',
+            title: 'Wrap with AfterLayout',
+            arguments: [document, range]
+        };
+        actions.push(afterLayoutAction);
+
+        const measureSizeAction = new vscode.CodeAction('Wrap with MeasureSize', vscode.CodeActionKind.RefactorRewrite);
+        measureSizeAction.command = {
+            command: 'extension.wrapWithMeasureSize',
+            title: 'Wrap with MeasureSize',
+            arguments: [document, range]
+        };
+        actions.push(measureSizeAction);
+
+        const visibilityDetectorAction = new vscode.CodeAction('Wrap with VisibilityDetector', vscode.CodeActionKind.RefactorRewrite);
+        visibilityDetectorAction.command = {
+            command: 'extension.wrapWithVisibilityDetector',
+            title: 'Wrap with VisibilityDetector',
+            arguments: [document, range]
+        };
+        actions.push(visibilityDetectorAction);
+
+        const clipRRectAction = new vscode.CodeAction('Wrap with ClipRRect', vscode.CodeActionKind.RefactorRewrite);
+        clipRRectAction.command = {
+            command: 'extension.wrapWithClipRRect',
+            title: 'Wrap with ClipRRect',
+            arguments: [document, range]
+        };
+        actions.push(clipRRectAction);
+
+        const stackAction = new vscode.CodeAction('Wrap with Stack', vscode.CodeActionKind.RefactorRewrite);
+        stackAction.command = {
+            command: 'extension.wrapWithStack',
+            title: 'Wrap with Stack',
+            arguments: [document, range]
+        };
+        actions.push(stackAction);
 
         return actions;
     }
@@ -115,6 +211,81 @@ function wrapWithLayoutBuilder(widget: string): string {
 
 function wrapWithObx(widget: string): string {
     return `Obx(() => ${widget.trim()})`;
+}
+
+function wrapWithGestureDetector(widget: string): string {
+    return `GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          //
+        },
+        child: ${widget.trim()},
+    )`;
+}
+
+function wrapWithValueListenableBuilder(widget: string): string {
+    return `ValueListenableBuilder(
+        valueListenable: null,
+        builder: (context, value, child) {
+            return ${widget.trim()};
+      },
+    )`;
+}
+
+function wrapWithMediaQuery(widget: string): string {
+    return `MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      removeBottom: true,
+        child: ${widget.trim()},
+    )`;
+}
+
+function wrapWithAfterLayout(widget: string): string {
+    return `AfterLayout(
+      callback: (RenderAfterLayout ral) {
+        // Add your callback logic here
+      },
+      child: ${widget.trim()},
+    )`;
+}
+
+function wrapWithMeasureSize(widget: string): string {
+    return `MeasureSize(
+      onChange: (Size size) {
+        // Add your size change logic here
+      },
+      child: ${widget.trim()},
+    )`;
+}
+
+function wrapWithVisibilityDetector(widget: string): string {
+    return `VisibilityDetector(
+      key: const Key('unique key'),
+      onVisibilityChanged: (VisibilityInfo info) {
+        // Add your visibility change logic here with info.visibleFraction
+      },
+      child: ${widget.trim()},
+    )`;
+}
+
+function wrapWithClipRRect(widget: string): string {
+    return `ClipRRect(
+      // borderRadius: BorderRadius.circular(16.w),
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(16.w),
+        topRight: Radius.circular(16.w),
+      ),
+      child: ${widget.trim()},
+    )`;
+}
+
+function wrapWithStack(widget: string): string {
+    return `Stack(
+      children: [
+        ${widget.trim()},
+      ],
+    )`;
 }
 
 export function deactivate() { }
