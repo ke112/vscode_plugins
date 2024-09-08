@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
+const child_process_1 = require("child_process");
+const path = require("path");
 const vscode = require("vscode");
 function activate(context) {
     const codeActionProvider = vscode.languages.registerCodeActionsProvider({ scheme: 'file', language: 'dart' }, new FlutterWrapperActionProvider());
@@ -34,7 +36,10 @@ function activate(context) {
     const stackDisposable = vscode.commands.registerCommand('extension.wrapWithStack', (document, range) => {
         wrapWidget(document, range, wrapWithStack);
     });
-    context.subscriptions.push(codeActionProvider, layoutBuilderDisposable, obxDisposable, gestureDetectorDisposable, valueListenableBuilderDisposable, mediaQueryDisposable, afterLayoutDisposable, measureSizeDisposable, visibilityDetectorDisposable, clipRRectDisposable, stackDisposable);
+    const quickBuildRunnerDisposable = vscode.commands.registerCommand('extension.quickBuildRunner', (uri) => {
+        quickBuildRunner(uri);
+    });
+    context.subscriptions.push(codeActionProvider, layoutBuilderDisposable, obxDisposable, gestureDetectorDisposable, valueListenableBuilderDisposable, mediaQueryDisposable, afterLayoutDisposable, measureSizeDisposable, visibilityDetectorDisposable, clipRRectDisposable, stackDisposable, quickBuildRunnerDisposable);
 }
 exports.activate = activate;
 class FlutterWrapperActionProvider {
@@ -240,6 +245,81 @@ function wrapWithStack(widget) {
         ${widget.trim()},
       ],
     )`;
+}
+async function quickBuildRunner(uri) {
+    const fsPath = uri.fsPath;
+    const stats = await vscode.workspace.fs.stat(uri);
+    const isDirectory = stats.type === vscode.FileType.Directory;
+    if (!isDirectory && !fsPath.endsWith('.dart')) {
+        vscode.window.showErrorMessage('Quick Build Runner only works with Dart files or directories.');
+        return;
+    }
+    try {
+        if (isDirectory) {
+            // 处理目录
+            await runBuildRunner(fsPath, true);
+        }
+        else {
+            // 处理单个文件
+            const originalDir = path.dirname(fsPath);
+            const originalFilename = path.basename(fsPath);
+            const tmpDir = path.join(originalDir, 'tmp');
+            // 创建临时目录
+            await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
+            // 复制原始文件到临时目录
+            await vscode.workspace.fs.copy(uri, vscode.Uri.file(path.join(tmpDir, originalFilename)));
+            await runBuildRunner(tmpDir, false);
+            // 将生成的 .g.dart 文件复制回原始目录
+            const generatedFile = `${path.parse(originalFilename).name}.g.dart`;
+            const generatedFilePath = path.join(tmpDir, generatedFile);
+            if (await fileExists(generatedFilePath)) {
+                console.log(`Copying generated file to: ${path.join(originalDir, generatedFile)}`);
+                await vscode.workspace.fs.copy(vscode.Uri.file(generatedFilePath), vscode.Uri.file(path.join(originalDir, generatedFile)), { overwrite: true });
+            }
+            // 清理临时目录
+            await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
+        }
+        vscode.window.showInformationMessage('Quick Build Runner completed successfully.');
+    }
+    catch (error) {
+        vscode.window.showErrorMessage(`Error during Quick Build Runner: ${error}`);
+    }
+}
+function runBuildRunner(workingDir, isDirectory) {
+    return new Promise((resolve, reject) => {
+        // 获取项目根目录
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(workingDir));
+        if (!workspaceFolder) {
+            reject(new Error('Unable to determine project root directory'));
+            return;
+        }
+        const projectRoot = workspaceFolder.uri.fsPath;
+        // 计算相对路径作为 build-filter
+        const relativePath = path.relative(projectRoot, workingDir);
+        const buildFilter = `${relativePath}/*`;
+        const command = `dart run build_runner build --delete-conflicting-outputs --build-filter=${buildFilter}`;
+        console.log(`Executing command: ${command} in directory: ${projectRoot}`);
+        vscode.window.showInformationMessage(`Executing command: ${command} in directory: ${projectRoot}`);
+        (0, child_process_1.exec)(command, { cwd: projectRoot }, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error: ${error}`);
+                reject(error);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
+            resolve();
+        });
+    });
+}
+async function fileExists(filePath) {
+    try {
+        await vscode.workspace.fs.stat(vscode.Uri.file(filePath));
+        return true;
+    }
+    catch {
+        return false;
+    }
 }
 function deactivate() { }
 exports.deactivate = deactivate;

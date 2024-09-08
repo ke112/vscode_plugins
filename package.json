@@ -2,7 +2,7 @@
     "name": "flutter-wrapper",
     "displayName": "Flutter Wrapper",
     "description": "Extensions for wrap selected widget",
-    "version": "0.0.29",
+    "version": "0.0.48",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -60,8 +60,21 @@
             {
                 "command": "extension.wrapWithStack",
                 "title": "Wrap with Stack"
+            },
+            {
+                "command": "extension.quickBuildRunner",
+                "title": "Quick Build Runner"
             }
-        ]
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "resourceLangId == dart || explorerResourceIsFolder",
+                    "command": "extension.quickBuildRunner",
+                    "group": "navigation"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
