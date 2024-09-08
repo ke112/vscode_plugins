@@ -2,7 +2,7 @@
     "name": "flutter-wrapper",
     "displayName": "Flutter Wrapper",
     "description": "Extensions for wrap selected widget",
-    "version": "0.0.48",
+    "version": "0.0.50",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -64,6 +64,10 @@
             {
                 "command": "extension.quickBuildRunner",
                 "title": "Quick Build Runner"
+            },
+            {
+                "command": "extension.buildRunner",
+                "title": "Run Build Runner"
             }
         ],
         "menus": {
@@ -71,6 +75,11 @@
                 {
                     "when": "resourceLangId == dart || explorerResourceIsFolder",
                     "command": "extension.quickBuildRunner",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceLangId == dart || explorerResourceIsFolder",
+                    "command": "extension.buildRunner",
                     "group": "navigation"
                 }
             ]

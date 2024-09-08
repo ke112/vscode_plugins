@@ -52,7 +52,11 @@ export function activate(context: vscode.ExtensionContext) {
         quickBuildRunner(uri);
     });
 
-    context.subscriptions.push(codeActionProvider, layoutBuilderDisposable, obxDisposable, gestureDetectorDisposable, valueListenableBuilderDisposable, mediaQueryDisposable, afterLayoutDisposable, measureSizeDisposable, visibilityDetectorDisposable, clipRRectDisposable, stackDisposable, quickBuildRunnerDisposable);
+    const buildRunnerDisposable = vscode.commands.registerCommand('extension.buildRunner', () => {
+        buildRunner();
+    });
+
+    context.subscriptions.push(codeActionProvider, layoutBuilderDisposable, obxDisposable, gestureDetectorDisposable, valueListenableBuilderDisposable, mediaQueryDisposable, afterLayoutDisposable, measureSizeDisposable, visibilityDetectorDisposable, clipRRectDisposable, stackDisposable, quickBuildRunnerDisposable, buildRunnerDisposable);
 }
 
 class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
@@ -305,37 +309,47 @@ async function quickBuildRunner(uri: vscode.Uri) {
     }
 
     try {
+        const originalDir = isDirectory ? fsPath : path.dirname(fsPath);
+        const tmpDir = path.join(originalDir, 'tmp');
+
+        // 创建临时目录
+        await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
+
         if (isDirectory) {
             // 处理目录
-            await runBuildRunner(fsPath, true);
+            const files = await vscode.workspace.fs.readDirectory(uri);
+            for (const [file, type] of files) {
+                if (type === vscode.FileType.File && file.endsWith('.dart') && !file.endsWith('.g.dart')) {
+                    await vscode.workspace.fs.copy(
+                        vscode.Uri.file(path.join(originalDir, file)),
+                        vscode.Uri.file(path.join(tmpDir, file))
+                    );
+                }
+            }
         } else {
             // 处理单个文件
-            const originalDir = path.dirname(fsPath);
             const originalFilename = path.basename(fsPath);
-            const tmpDir = path.join(originalDir, 'tmp');
-
-            // 创建临时目录
-            await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
-
-            // 复制原始文件到临时目录
             await vscode.workspace.fs.copy(uri, vscode.Uri.file(path.join(tmpDir, originalFilename)));
+        }
 
-            await runBuildRunner(tmpDir, false);
+        await runBuildRunner(tmpDir, isDirectory);
 
-            // 将生成的 .g.dart 文件复制回原始目录
-            const generatedFile = `${path.parse(originalFilename).name}.g.dart`;
-            const generatedFilePath = path.join(tmpDir, generatedFile);
-            if (await fileExists(generatedFilePath)) {
-                console.log(`Copying generated file to: ${path.join(originalDir, generatedFile)}`);
+        // 将生成的 .g.dart 文件复制回原始目录
+        const tmpFiles = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
+        for (const [file, type] of tmpFiles) {
+            if (type === vscode.FileType.File && file.endsWith('.g.dart')) {
+                const originalFile = path.join(originalDir, file);
+                const tmpFile = path.join(tmpDir, file);
                 await vscode.workspace.fs.copy(
-                    vscode.Uri.file(generatedFilePath),
-                    vscode.Uri.file(path.join(originalDir, generatedFile)),
+                    vscode.Uri.file(tmpFile),
+                    vscode.Uri.file(originalFile),
                     { overwrite: true }
                 );
             }
-            // 清理临时目录
-            await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
         }
+
+        // 清理临时目录
+        await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
 
         vscode.window.showInformationMessage('Quick Build Runner completed successfully.');
     } catch (error) {
@@ -345,7 +359,6 @@ async function quickBuildRunner(uri: vscode.Uri) {
 
 function runBuildRunner(workingDir: string, isDirectory: boolean): Promise<void> {
     return new Promise((resolve, reject) => {
-        // 获取项目根目录
         const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(workingDir));
         if (!workspaceFolder) {
             reject(new Error('Unable to determine project root directory'));
@@ -353,8 +366,6 @@ function runBuildRunner(workingDir: string, isDirectory: boolean): Promise<void>
         }
 
         const projectRoot = workspaceFolder.uri.fsPath;
-
-        // 计算相对路径作为 build-filter
         const relativePath = path.relative(projectRoot, workingDir);
         const buildFilter = `${relativePath}/*`;
 
@@ -382,6 +393,30 @@ async function fileExists(filePath: string): Promise<boolean> {
     } catch {
         return false;
     }
+}
+
+function buildRunner(): void {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+        vscode.window.showErrorMessage('No workspace folder found');
+        return;
+    }
+
+    const projectRoot = workspaceFolder.uri.fsPath;
+    const command = 'dart run build_runner build --delete-conflicting-outputs';
+
+    vscode.window.showInformationMessage(`Executing command: ${command} in directory: ${projectRoot}`);
+
+    exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
+        if (error) {
+            vscode.window.showErrorMessage(`Error during Build Runner: ${error.message}`);
+            console.error(`Error: ${error.message}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+        vscode.window.showInformationMessage('Build Runner completed successfully.');
+    });
 }
 
 export function deactivate() { }
