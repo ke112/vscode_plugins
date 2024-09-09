@@ -147,7 +147,7 @@ class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
     }
 }
 
-function wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunction: (widget: string) => string) {
+function wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunction: (widget: string, indentation: string) => string) {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
         vscode.window.showErrorMessage('No active editor found');
@@ -161,7 +161,9 @@ function wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunc
     }
 
     const fullWidgetText = document.getText(fullRange);
-    const wrappedText = wrapFunction(fullWidgetText);
+    const indentationMatch = document.lineAt(fullRange.start.line).text.match(/^\s*/);
+    const indentation = indentationMatch ? indentationMatch[0] : '';
+    const wrappedText = wrapFunction(fullWidgetText, indentation);
 
     editor.edit(editBuilder => {
         editBuilder.replace(fullRange, wrappedText);
@@ -205,97 +207,132 @@ function getFullWidgetRange(document: vscode.TextDocument, range: vscode.Range):
         return null; // 没有找到匹配的右括号
     }
 
+    // 检查右括号后是否有扩展方法
+    while (closeParenIndex < text.length) {
+        const char = text[closeParenIndex];
+        if (char === '.') {
+            // 找到扩展方法的结束位置
+            let methodEnd = closeParenIndex + 1;
+            while (methodEnd < text.length && /[a-zA-Z0-9_]/.test(text[methodEnd])) {
+                methodEnd++;
+            }
+            if (methodEnd < text.length && text[methodEnd] === '(') {
+                // 如果扩展方法后面跟着括号，继续查找匹配的右括号
+                openParenCount = 1;
+                closeParenIndex = methodEnd + 1;
+                while (closeParenIndex < text.length && openParenCount > 0) {
+                    if (text[closeParenIndex] === '(') {
+                        openParenCount++;
+                    } else if (text[closeParenIndex] === ')') {
+                        openParenCount--;
+                    }
+                    closeParenIndex++;
+                }
+                if (openParenCount !== 0) {
+                    return null; // 没有找到匹配的右括号
+                }
+            } else {
+                closeParenIndex = methodEnd;
+            }
+        } else if (/\s/.test(char)) {
+            // 跳过空白字符
+            closeParenIndex++;
+        } else {
+            break;
+        }
+    }
+
     return new vscode.Range(
         document.positionAt(widgetStart),
         document.positionAt(closeParenIndex)
     );
 }
 
-function wrapWithLayoutBuilder(widget: string): string {
+function wrapWithLayoutBuilder(widget: string, indentation: string): string {
     return `LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-            return ${widget.trim()};
-        },
-    )`;
+${indentation}  builder: (BuildContext context, BoxConstraints constraints) {
+${indentation}    return ${widget.trim()};
+${indentation}  },
+${indentation})`;
 }
 
-function wrapWithObx(widget: string): string {
+function wrapWithObx(widget: string, indentation: string): string {
     return `Obx(() => ${widget.trim()})`;
 }
 
-function wrapWithGestureDetector(widget: string): string {
+function wrapWithGestureDetector(widget: string, indentation: string): string {
     return `GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () {
-          //
-        },
-        child: ${widget.trim()},
-    )`;
+${indentation}  behavior: HitTestBehavior.translucent,
+${indentation}  onTap: () {
+${indentation}    //
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
 }
 
-function wrapWithValueListenableBuilder(widget: string): string {
+function wrapWithValueListenableBuilder(widget: string, indentation: string): string {
     return `ValueListenableBuilder(
-        valueListenable: null,
-        builder: (context, value, child) {
-            return ${widget.trim()};
-      },
-    )`;
+${indentation}  valueListenable: null,
+${indentation}  builder: (context, value, child) {
+${indentation}    return ${widget.trim()};
+${indentation}  },
+${indentation})`;
 }
 
-function wrapWithMediaQuery(widget: string): string {
+function wrapWithMediaQuery(widget: string, indentation: string): string {
     return `MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      removeBottom: true,
-        child: ${widget.trim()},
-    )`;
+${indentation}  context: context,
+${indentation}  removeTop: true,
+${indentation}  removeBottom: true,
+${indentation}    child: ${widget.trim()},
+${indentation})`;
 }
 
-function wrapWithAfterLayout(widget: string): string {
+function wrapWithAfterLayout(widget: string, indentation: string): string {
     return `AfterLayout(
-      callback: (RenderAfterLayout ral) {
-        // Add your callback logic here
-      },
-      child: ${widget.trim()},
-    )`;
+${indentation}  callback: (RenderAfterLayout ral) {
+${indentation}    // Add your callback logic here
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
 }
 
-function wrapWithMeasureSize(widget: string): string {
+function wrapWithMeasureSize(widget: string, indentation: string): string {
     return `MeasureSize(
-      onChange: (Size size) {
-        // Add your size change logic here
-      },
-      child: ${widget.trim()},
-    )`;
+${indentation}  onChange: (Size size) {
+${indentation}    // Add your size change logic here
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
 }
 
-function wrapWithVisibilityDetector(widget: string): string {
+function wrapWithVisibilityDetector(widget: string, indentation: string): string {
     return `VisibilityDetector(
-      key: const Key('unique key'),
-      onVisibilityChanged: (VisibilityInfo info) {
-        // Add your visibility change logic here with info.visibleFraction
-      },
-      child: ${widget.trim()},
-    )`;
+${indentation}  key: const Key('unique key'),
+${indentation}  onVisibilityChanged: (VisibilityInfo info) {
+${indentation}    // Add your visibility change logic here with info.visibleFraction
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
 }
 
-function wrapWithClipRRect(widget: string): string {
+function wrapWithClipRRect(widget: string, indentation: string): string {
     return `ClipRRect(
-      // borderRadius: BorderRadius.circular(16.w),
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(16.w),
-        topRight: Radius.circular(16.w),
-      ),
-      child: ${widget.trim()},
-    )`;
+${indentation}  // borderRadius: BorderRadius.circular(16.w),
+${indentation}  borderRadius: BorderRadius.only(
+${indentation}    topLeft: Radius.circular(16.w),
+${indentation}    topRight: Radius.circular(16.w),
+${indentation}  ),
+${indentation}  child: ${widget.trim()},
+${indentation})`;
 }
 
-function wrapWithStack(widget: string): string {
+function wrapWithStack(widget: string, indentation: string): string {
     return `Stack(
-      children: [
-        ${widget.trim()},
-      ],
-    )`;
+${indentation}  children: [
+${indentation}    ${widget.trim()},
+${indentation}  ],
+${indentation})`;
 }
 
 async function quickBuildRunner(uri: vscode.Uri) {

@@ -29,8 +29,8 @@ Flutter Wrapper 是一个 VS Code 扩展，封装一些常用的基础功能，�
 
 1. 鼠标右键工程项目，选择 `模版命令` 即可。
 2. 目前支持的命令有：
-    - `Quick Build Runner` (The selected file or directory About 10 seconds)
-    - `Run Build Runner` (The all for 3 minutes)
+    - `Quick Build Runner` (适用于快速生成部分model、repository) 
+    - `Run Build Runner` (适用于全部生成Model、repository、图片资源)
 
 ## 贡献
 

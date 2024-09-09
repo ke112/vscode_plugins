@@ -2,7 +2,7 @@
     "name": "flutter-wrapper",
     "displayName": "Flutter Wrapper",
     "description": "Extensions for wrap selected widget",
-    "version": "0.0.60",
+    "version": "0.0.67",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -67,7 +67,7 @@
             },
             {
                 "command": "extension.buildRunner",
-                "title": "Run Build Runner (The all for 3 minutes)"
+                "title": "Run Build Runner (The all About 3 minutes)"
             }
         ],
         "menus": {
