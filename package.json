@@ -2,7 +2,7 @@
     "name": "flutter-extension",
     "displayName": "Flutter Extension",
     "description": "提高flutter开发效率的vscode拓展",
-    "version": "0.0.10",
+    "version": "0.0.3",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -13,7 +13,10 @@
         "vscode": "^1.60.0"
     },
     "categories": [
-        "Snippets"
+        "Snippets",
+        "Debuggers",
+        "Programming Languages",
+        "Other"
     ],
     "activationEvents": [
         "onLanguage:dart"
@@ -110,7 +113,6 @@
         "url": "https://github.com/ke112/vscode_plugins/issues"
     },
     "files": [
-        "images",
-        "out"
+        "images"
     ]
 }

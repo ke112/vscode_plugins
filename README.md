@@ -27,16 +27,16 @@ Flutter Wrapper 是一个 VS Code 扩展，封装一些常用的基础功能，�
 
 ## 快捷键功能
 
-- 拓展鼠标右键工程项目增加自定义命令。
+- 拓展在工程项目右键增加快捷命令。
 
 ![Shortcut Feature](./images/hit_order.png)
 
 ## 使用方法
 
-1. 鼠标右键工程项目，选择 `模版命令` 即可。
+1. 右键工程项目，选择 `快捷命令` 即可。
 2. 目前支持的命令有：
-    - `Quick Build Runner` (适用于快速生成部分model、repository) 
-    - `Run Build Runner` (适用于全部生成Model、repository、图片资源)
+    - `Quick Build Runner` (适用于针对文件/目录快速生成Model、repository) 
+    - `Run Build Runner` (适用于全量生成Model、repository、图片资源)
 
 ## 贡献
 
