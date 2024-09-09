@@ -1,14 +1,14 @@
 {
-    "name": "flutter-wrapper",
-    "displayName": "Flutter Wrapper",
-    "description": "Extensions for wrap selected widget",
-    "version": "0.0.67",
+    "name": "flutter-extension",
+    "displayName": "Flutter Extension",
+    "description": "提高flutter开发效率的vscode拓展",
+    "version": "0.0.10",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
         "email": "zhangzhihua.email@gmail.com"
     },
-    "icon": "images/logo.png",
+    "icon": "images/logo.webp",
     "engines": {
         "vscode": "^1.60.0"
     },
@@ -63,11 +63,11 @@
             },
             {
                 "command": "extension.quickBuildRunner",
-                "title": "Quick Build Runner (The selected file or directory About 10 seconds)"
+                "title": "快速 Build Runner (针对文件/目录 大约10秒内完成)"
             },
             {
                 "command": "extension.buildRunner",
-                "title": "Run Build Runner (The all About 3 minutes)"
+                "title": "传统 Build Runner (大约3分钟)"
             }
         ],
         "menus": {
@@ -110,6 +110,7 @@
         "url": "https://github.com/ke112/vscode_plugins/issues"
     },
     "files": [
-        "images"
+        "images",
+        "out"
     ]
 }

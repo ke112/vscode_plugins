@@ -18,10 +18,10 @@ sed -i '' "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" p
 echo "版本升级 from $current_version to $new_version"
 
 # 删除旧版本的 .vsix 文件
-rm -f flutter-wrapper-*.vsix
+rm -f flutter-extension-*.vsix
 
 # 编译并打包，自动回答 "yes"
 yarn run compile && echo "y" | vsce package --no-yarn
 
 # 打开新版本的 .vsix 文件
-open -R flutter-wrapper-*.vsix
+open -R flutter-extension-*.vsix

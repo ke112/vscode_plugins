@@ -2,7 +2,7 @@
 
 Flutter Wrapper 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
 
-![Flutter Wrapper Logo](./images/logo.png)
+![Flutter Wrapper Logo](./images/logo.webp)
 
 ## 包裹功能
 
