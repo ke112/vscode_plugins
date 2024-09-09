@@ -2,7 +2,7 @@
 
 Flutter Wrapper 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
 
-## 功能
+## 包裹功能
 
 - 拓展用于快速包裹选中的 Flutter widget 的常用组件。
 
@@ -20,6 +20,8 @@ Flutter Wrapper 是一个 VS Code 扩展，封装一些常用的基础功能，�
     - `VisibilityDetector`
     - `ClipRRect`
     - `Stack`
+
+## 快捷键功能
 
 - 拓展鼠标右键工程项目增加自定义命令。
 
