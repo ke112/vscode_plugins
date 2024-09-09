@@ -258,10 +258,18 @@ async function quickBuildRunner(uri) {
         return;
     }
     try {
-        const originalDir = isDirectory ? fsPath : path.dirname(fsPath);
-        const tmpDir = path.join(originalDir, 'tmp');
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+        if (!workspaceFolder) {
+            vscode.window.showErrorMessage('Unable to determine project root directory');
+            return;
+        }
+        vscode.window.showInformationMessage(`Start Quick Build Runner`);
+        const projectRoot = workspaceFolder.uri.fsPath;
+        const libDir = path.join(projectRoot, 'lib');
+        const tmpDir = path.join(libDir, 'tmp');
         // 创建临时目录
         await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
+        const originalDir = isDirectory ? fsPath : path.dirname(fsPath);
         if (isDirectory) {
             // 处理目录
             const files = await vscode.workspace.fs.readDirectory(uri);
@@ -305,8 +313,8 @@ function runBuildRunner(workingDir, isDirectory) {
         const relativePath = path.relative(projectRoot, workingDir);
         const buildFilter = `${relativePath}/*`;
         const command = `dart run build_runner build --delete-conflicting-outputs --build-filter=${buildFilter}`;
-        console.log(`Executing command: ${command} in directory: ${projectRoot}`);
-        vscode.window.showInformationMessage(`Executing command: ${command} in directory: ${projectRoot}`);
+        // console.log(`Executing command: ${command} in directory: ${projectRoot}`);
+        // vscode.window.showInformationMessage(`Executing command: ${command} in directory: ${projectRoot}`);
         (0, child_process_1.exec)(command, { cwd: projectRoot }, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error: ${error}`);
@@ -328,24 +336,52 @@ async function fileExists(filePath) {
         return false;
     }
 }
-function buildRunner() {
+async function buildRunner() {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
         vscode.window.showErrorMessage('No workspace folder found');
         return;
     }
+    vscode.window.showInformationMessage(`Start Build Runner`);
     const projectRoot = workspaceFolder.uri.fsPath;
-    const command = 'dart run build_runner build --delete-conflicting-outputs';
-    vscode.window.showInformationMessage(`Executing command: ${command} in directory: ${projectRoot}`);
-    (0, child_process_1.exec)(command, { cwd: projectRoot }, (error, stdout, stderr) => {
-        if (error) {
-            vscode.window.showErrorMessage(`Error during Build Runner: ${error.message}`);
-            console.error(`Error: ${error.message}`);
-            return;
-        }
-        console.log(`stdout: ${stdout}`);
-        console.error(`stderr: ${stderr}`);
+    try {
+        // 删除所有 .g.dart 文件
+        // await deleteGeneratedFiles(projectRoot);
+        // 执行 build_runner 命令
+        await runBuildRunnerCommand(projectRoot);
         vscode.window.showInformationMessage('Build Runner completed successfully.');
+    }
+    catch (error) {
+        vscode.window.showErrorMessage(`Error during Build Runner: ${error}`);
+        console.error(`Error: ${error}`);
+    }
+}
+async function deleteGeneratedFiles(dir) {
+    const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(dir));
+    for (const [file, type] of files) {
+        const filePath = path.join(dir, file);
+        if (type === vscode.FileType.Directory) {
+            await deleteGeneratedFiles(filePath);
+        }
+        else if (type === vscode.FileType.File && file.endsWith('.g.dart')) {
+            await vscode.workspace.fs.delete(vscode.Uri.file(filePath));
+            console.log(`Deleted: ${filePath}`);
+        }
+    }
+}
+function runBuildRunnerCommand(projectRoot) {
+    return new Promise((resolve, reject) => {
+        const command = 'dart run build_runner build --delete-conflicting-outputs';
+        // vscode.window.showInformationMessage(`Executing command: ${command} in directory: ${projectRoot}`);
+        (0, child_process_1.exec)(command, { cwd: projectRoot }, (error, stdout, stderr) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
+            resolve();
+        });
     });
 }
 function deactivate() { }
