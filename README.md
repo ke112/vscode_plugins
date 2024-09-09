@@ -1,8 +1,8 @@
-# Flutter Wrapper
+# Flutter Plugins
 
-Flutter Wrapper 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
+Flutter Plugins 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
 
-![Flutter Wrapper Logo](./images/logo.webp)
+![Flutter Plugins Logo](./images/logo.webp)
 
 ## 包裹功能
 
@@ -55,4 +55,5 @@ Flutter Wrapper 是一个 VS Code 扩展，封装一些常用的基础功能，�
   
 
 ## 联系
+wechat : zhang1102d
 ![Wrap Feature](./images/wechat.JPG)
