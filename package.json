@@ -2,7 +2,7 @@
     "name": "flutter-wrapper",
     "displayName": "Flutter Wrapper",
     "description": "Extensions for wrap selected widget",
-    "version": "0.0.59",
+    "version": "0.0.60",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",

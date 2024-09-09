@@ -1,10 +1,10 @@
 # Flutter Wrapper
 
-Flutter Wrapper 是一个 VS Code 扩展，用于快速包裹选中的 Flutter widget 的常用组件。
+Flutter Wrapper 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
 
 ## 功能
 
-- 拓展flutter基础库没有的常用包裹组件。
+- 拓展用于快速包裹选中的 Flutter widget 的常用组件。
 
 ## 使用方法
 
@@ -20,6 +20,15 @@ Flutter Wrapper 是一个 VS Code 扩展，用于快速包裹选中的 Flutter w
     - `VisibilityDetector`
     - `ClipRRect`
     - `Stack`
+
+- 拓展鼠标右键工程项目增加自定义命令。
+
+## 使用方法
+
+1. 鼠标右键工程项目，选择 `模版命令` 即可。
+2. 目前支持的命令有：
+    - `Quick Build Runner` (The selected file or directory About 10 seconds)
+    - `Run Build Runner` (The all for 3 minutes)
 
 ## 贡献
 
