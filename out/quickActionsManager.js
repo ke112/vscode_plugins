@@ -12,7 +12,10 @@ class QuickActionsManager {
         const buildRunnerDisposable = vscode.commands.registerCommand('extension.buildRunner', () => {
             this.buildRunner();
         });
-        context.subscriptions.push(quickBuildRunnerDisposable, buildRunnerDisposable);
+        const createPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingPage', (uri) => {
+            this.createPageStructure(uri);
+        });
+        context.subscriptions.push(quickBuildRunnerDisposable, buildRunnerDisposable, createPageStructureDisposable);
     }
     async quickBuildRunner(uri) {
         const fsPath = uri.fsPath;
@@ -102,28 +105,6 @@ class QuickActionsManager {
             });
         });
     }
-    async fileExists(filePath) {
-        try {
-            await vscode.workspace.fs.stat(vscode.Uri.file(filePath));
-            return true;
-        }
-        catch {
-            return false;
-        }
-    }
-    async deleteGeneratedFiles(dir) {
-        const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(dir));
-        for (const [file, type] of files) {
-            const filePath = path.join(dir, file);
-            if (type === vscode.FileType.Directory) {
-                await this.deleteGeneratedFiles(filePath);
-            }
-            else if (type === vscode.FileType.File && file.endsWith('.g.dart')) {
-                await vscode.workspace.fs.delete(vscode.Uri.file(filePath));
-                console.log(`Deleted: ${filePath}`);
-            }
-        }
-    }
     runBuildRunnerCommand(projectRoot) {
         return new Promise((resolve, reject) => {
             const command = `dart run build_runner build --delete-conflicting-outputs`;
@@ -138,6 +119,105 @@ class QuickActionsManager {
                 resolve();
             });
         });
+    }
+    async createPageStructure(uri) {
+        const pageName = await vscode.window.showInputBox({
+            prompt: "Enter the page name",
+            placeHolder: "e.g. HomePage or homePage"
+        });
+        if (!pageName) {
+            return;
+        }
+        const snakeCaseName = this.toSnakeCase(pageName);
+        const pageDir = path.join(uri.fsPath, snakeCaseName);
+        try {
+            await vscode.workspace.fs.createDirectory(vscode.Uri.file(pageDir));
+            const subDirs = ['bindings', 'views', 'controllers', 'widgets'];
+            for (const dir of subDirs) {
+                await vscode.workspace.fs.createDirectory(vscode.Uri.file(path.join(pageDir, dir)));
+            }
+            const files = [
+                { name: `${snakeCaseName}_binding.dart`, dir: 'bindings', content: this.generateBindingContent(snakeCaseName) },
+                { name: `${snakeCaseName}_controller.dart`, dir: 'controllers', content: this.generateControllerContent(snakeCaseName) },
+                { name: `${snakeCaseName}_view.dart`, dir: 'views', content: this.generateViewContent(snakeCaseName) }
+            ];
+            for (const file of files) {
+                const filePath = path.join(pageDir, file.dir, file.name);
+                await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(file.content));
+            }
+            vscode.window.showInformationMessage(`Page structure for ${snakeCaseName} created successfully.`);
+        }
+        catch (error) {
+            vscode.window.showErrorMessage(`Error creating page structure: ${error}`);
+        }
+    }
+    toSnakeCase(str) {
+        return str
+            .replace(/([A-Z])/g, letter => `_${letter.toLowerCase()}`)
+            .replace(/^_/, '') // 移除开头的下划线
+            .toLowerCase();
+    }
+    generateBindingContent(pageName) {
+        const className = this.toPascalCase(pageName);
+        return `import 'package:get/get.dart';
+import '../controllers/${pageName}_controller.dart';
+
+class ${className}Binding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<${className}Controller>(() => ${className}Controller());
+  }
+}
+`;
+    }
+    generateControllerContent(pageName) {
+        const className = this.toPascalCase(pageName);
+        return `import 'package:get/get.dart';
+
+class ${className}Controller extends GetxController {
+  // TODO: Implement ${className}Controller
+
+  final count = 0.obs;
+
+  void increment() => count.value++;
+}
+`;
+    }
+    generateViewContent(pageName) {
+        const className = this.toPascalCase(pageName);
+        return `import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/${pageName}_controller.dart';
+
+class ${className}View extends GetView<${className}Controller> {
+  const ${className}View({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${className}'),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: Obx(
+          () => Text(
+            'Clicks: \${controller.count}',
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: controller.increment,
+      ),
+    );
+  }
+}
+`;
+    }
+    toPascalCase(str) {
+        return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
     }
 }
 exports.QuickActionsManager = QuickActionsManager;
