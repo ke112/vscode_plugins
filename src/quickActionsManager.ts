@@ -16,7 +16,11 @@ export class QuickActionsManager {
             this.createPageStructure(uri);
         });
 
-        context.subscriptions.push(quickBuildRunnerDisposable, buildRunnerDisposable, createPageStructureDisposable);
+        const createCustomPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingCustomPage', (uri: vscode.Uri) => {
+            this.createCustomPageStructure(uri);
+        });
+
+        context.subscriptions.push(quickBuildRunnerDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable);
     }
 
     private async quickBuildRunner(uri: vscode.Uri) {
@@ -194,6 +198,8 @@ export class QuickActionsManager {
     private generateBindingContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
         return `import 'package:get/get.dart';
+
+//自行转换绝对路径
 import '../controllers/${pageName}_controller.dart';
 
 class ${className}Binding extends Bindings {
@@ -210,11 +216,23 @@ class ${className}Binding extends Bindings {
         return `import 'package:get/get.dart';
 
 class ${className}Controller extends GetxController {
-  // TODO: Implement ${className}Controller
+  @override
+  void onInit() {
+    super.onInit();
+    //
+  }
 
-  final count = 0.obs;
+  @override
+  void onReady() {
+    super.onReady();
+    //
+  }
 
-  void increment() => count.value++;
+  @override
+  void onClose() {
+    super.onClose();
+    //
+  }
 }
 `;
     }
@@ -222,31 +240,42 @@ class ${className}Controller extends GetxController {
     private generateViewContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
         return `import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+//自行转换绝对路径
 import '../controllers/${pageName}_controller.dart';
 
 class ${className}View extends GetView<${className}Controller> {
-  const ${className}View({Key? key}) : super(key: key);
+  const ${className}View({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${className}'),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Obx(
-          () => Text(
-            'Clicks: \${controller.count}',
-            style: TextStyle(fontSize: 20),
+        title: Text(
+          '${className}Title',
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontFamily: 'PingFang SC',
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF000818),
+            height: 1.3,
           ),
         ),
+        centerTitle: true,
+        elevation: 0,
+        leading: Builder(builder: (context) {
+          return GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              Navigator.maybeOf(context)?.pop();
+            },
+            child: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          );
+        }),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: controller.increment,
-      ),
+      body: Container(),
     );
   }
 }
@@ -255,5 +284,68 @@ class ${className}View extends GetView<${className}Controller> {
 
     private toPascalCase(str: string): string {
         return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+    }
+
+    private async createCustomPageStructure(uri: vscode.Uri) {
+        const pageName = await vscode.window.showInputBox({
+            prompt: "Enter the page name",
+            placeHolder: "e.g. HomePage or homePage"
+        });
+
+        if (!pageName) {
+            return;
+        }
+
+        const snakeCaseName = this.toSnakeCase(pageName);
+        const pageDir = path.join(uri.fsPath, snakeCaseName);
+
+        try {
+            await vscode.workspace.fs.createDirectory(vscode.Uri.file(pageDir));
+
+            const subDirs = ['bindings', 'views', 'controllers', 'widgets'];
+            for (const dir of subDirs) {
+                await vscode.workspace.fs.createDirectory(vscode.Uri.file(path.join(pageDir, dir)));
+            }
+
+            const files = [
+                { name: `${snakeCaseName}_binding.dart`, dir: 'bindings', content: this.generateBindingContent(snakeCaseName) },
+                { name: `${snakeCaseName}_controller.dart`, dir: 'controllers', content: this.generateControllerContent(snakeCaseName) },
+                { name: `${snakeCaseName}_view.dart`, dir: 'views', content: this.generateCustomViewContent(snakeCaseName) }
+            ];
+
+            for (const file of files) {
+                const filePath = path.join(pageDir, file.dir, file.name);
+                await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(file.content));
+            }
+
+            vscode.window.showInformationMessage(`Custom page structure for ${snakeCaseName} created successfully.`);
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error creating custom page structure: ${error}`);
+        }
+    }
+
+    private generateCustomViewContent(pageName: string): string {
+        const className = this.toPascalCase(pageName);
+        return `import 'package:flutter/material.dart';
+import 'package:kunlun_ai/app/common/papge/base_page.dart';
+import 'package:kunlun_ai/app/common/widget/common_app_bar.dart';
+
+//自行转换绝对路径
+import '../controllers/${pageName}_controller.dart';
+
+class ${className}View extends BasePage<${className}Controller> {
+  const ${className}View({super.key});
+
+  @override
+  List<Widget> createBody() {
+    return [];
+  }
+
+  @override
+  AppBar createAppBar() {
+    return createCommonAppBar(title: '');
+  }
+}
+`;
     }
 }

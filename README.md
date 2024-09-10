@@ -35,8 +35,10 @@ Flutter Plugins 是一个 VS Code 扩展，封装一些常用的基础功能，�
 
 1. 右键工程项目，选择 `快捷命令` 即可。
 2. 目前支持的命令有：
-    - `Quick Build Runner` (适用于针对文件/目录快速生成Model、repository) 
+    - `Quick Build Runner` (适用于局部文件/目录快速生成Model、repository) 
     - `Run Build Runner` (适用于全量生成Model、repository、图片资源)
+    - `新建Getx界面 (Binding方式-内部)` (快速新建内部基类页面 - 限于目录右键)
+    - `新建Getx界面 (Binding方式)` (快速新建页面 - 限于目录右键)
 
 ## 贡献
 
@@ -50,6 +52,7 @@ Flutter Plugins 是一个 VS Code 扩展，封装一些常用的基础功能，�
 
 ## 更新日志
 
+- 2024-09-10 更新了新建界面的命令支持。
 - 2024-09-09 更新了快捷生成命令支持。
 - 2024-09-06 更新了8个包裹组件支持。
   
