@@ -1,12 +1,10 @@
 # Flutter Plugins
 
-Flutter Plugins 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
-
-![Flutter Plugins Logo](./images/logo.webp)
+Flutter Plugins by zhangzhihua 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
 
 ## 包裹功能
 
-- 拓展用于快速包裹选中的 Flutter widget 的常用组件。
+- 拓展实际开发中，使用频率高且使用不方便常用组件。
 
 ![hit_image](./images/hit_image.png)
 
@@ -21,16 +19,11 @@ Flutter Plugins 是一个 VS Code 扩展，封装一些常用的基础功能，�
     - `MeasureSize`
     - `MediaQuery`
     - `Obx`
-    - `GestureDetector`
-    - `ValueListenableBuilder`
-    - `MediaQuery`
-    - `AfterLayout`
-    - `MeasureSize`
-    - `VisibilityDetector`
-    - `ClipRRect`
     - `Stack`
+    - `ValueListenableBuilder`
+    - `VisibilityDetector`
 
-## 快捷键功能
+## 快捷功能
 
 - 拓展在工程项目右键增加快捷命令。
 
@@ -45,35 +38,49 @@ Flutter Plugins 是一个 VS Code 扩展，封装一些常用的基础功能，�
     - `新建Getx界面 (Binding方式-内部)` (快速新建内部基类页面 - 限于目录右键)
     - `新建Getx界面 (Binding方式)` (快速新建页面 - 限于目录右键)
 
+- 调用build_runner方式
+![new_getx_1](./images/build_runner.png)
 
-![hit_order](./images/new_getx_1.png)
-![hit_order](./images/new_getx_2.png)
-![hit_order](./images/new_getx_3.png)
-![hit_order](./images/new_getx_4.png)
-![hit_order](./images/new_getx_5.png)
+- 调用build_runner结果
+![new_getx_1](./images/build_runner2.png)
+
+- 生成的目录结构
+![new_getx_1](./images/new_getx_1.png)
+
+- 生成的bingding
+![new_getx_2](./images/new_getx_2.png)
+
+- 生成的controller
+![new_getx_3](./images/new_getx_3.png)
+
+- 生成的view
+![new_getx_4](./images/new_getx_4.png)
+
+- 生成的view (内部)
+![new_getx_5](./images/new_getx_5.png)
 
 ## 贡献
 
 如果对你有帮助，欢迎 star。
 
-此项目一直在更新，如果想新增功能，欢迎提交 issues 和 pull requests 到 [GitHub 仓库](https://github.com/ke112/vscode_plugins)。
+此项目会一直更新，如果想新增功能，欢迎提交 issues 和 pull requests 到 [GitHub 仓库](https://github.com/ke112/vscode_plugins)，在工作之余时，考虑是否加入新的feature。
 
 
 ## 联系
-wechat : zhang1102d
+WeChat : zhang1102d
 ![Wrap Feature](./images/wechat.JPG)
 
 ## 更新日志
 
-- 2024-09-10 更新了新建界面的命令支持。
-- 2024-09-09 更新了快捷生成命令支持。
-- 2024-09-06 更新了8个包裹组件支持。
+- 2024-09-10 v0.0.3 更新了新建界面的命令支持。
+- 2024-09-09 v0.0.2 更新了快捷生成命令支持。
+- 2024-09-06 v0.0.1 更新了8个包裹组件支持。
   
 ## 许可
 
 本项目采用 [MIT 许可证](LICENSE)。
 
-## TODO
+## TODO <s> </s>
 
-- 1. README图文显示
-- 2. 包裹组件widget判断
+- README图文显示
+- 包裹组件widget判断
