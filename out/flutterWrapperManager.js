@@ -197,7 +197,7 @@ ${indentation})`;
         return `VisibilityDetector(
 ${indentation}  key: const Key('unique key'),
 ${indentation}  onVisibilityChanged: (VisibilityInfo info) {
-${indentation}    // Add your visibility change logic here with info.visibleFraction
+${indentation}    // double value = info.visibleFraction;
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;

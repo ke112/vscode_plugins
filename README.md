@@ -13,8 +13,13 @@ Flutter Plugins 是一个 VS Code 扩展，封装一些常用的基础功能，�
 ## 使用方法
 
 1. 选中想要包裹的 widget，然后按下 `提取列表` 快捷键，选择 `拓展的组件` 即可。
-2. 目前支持的组件有：
+2. 目前支持的组件有：(升序)
+    - `AfterLayout`
+    - `ClipRRect`
+    - `GestureDetector`
     - `LayoutBuilder`
+    - `MeasureSize`
+    - `MediaQuery`
     - `Obx`
     - `GestureDetector`
     - `ValueListenableBuilder`
@@ -67,3 +72,8 @@ wechat : zhang1102d
 ## 许可
 
 本项目采用 [MIT 许可证](LICENSE)。
+
+## TODO
+
+- 1. README图文显示
+- 2. 包裹组件widget判断
