@@ -1,8 +1,8 @@
 {
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins by zhangzhihua",
-    "description": "提高flutter开发效率的vscode拓展",
-    "version": "0.0.3",
+    "description": "提高Flutter开发效率的vscode拓展",
+    "version": "0.0.4",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
