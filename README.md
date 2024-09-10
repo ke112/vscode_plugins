@@ -63,7 +63,7 @@ Flutter Plugins by zhangzhihua 是一个 VS Code 扩展，封装一些常用的�
 
 如果对你有帮助，欢迎 star。
 
-此项目会一直更新，如果想新增功能，欢迎提交 issues 和 pull requests 到 [GitHub 仓库](https://github.com/ke112/vscode_plugins)，在工作之余时，考虑是否加入新的feature。
+此项目会一直更新，如果想新增功能，欢迎提交 issues 或 pull requests 到 [GitHub 仓库](https://github.com/ke112/vscode_plugins)，我在工作之余时，增加新的feature。
 
 
 ## 联系
