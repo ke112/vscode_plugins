@@ -8,16 +8,17 @@ class FlutterWrapperManager {
         this.initializeWrappers();
     }
     initializeWrappers() {
-        this.wrappers.set('LayoutBuilder', this.wrapWithLayoutBuilder);
-        this.wrappers.set('Obx', this.wrapWithObx);
-        this.wrappers.set('GestureDetector', this.wrapWithGestureDetector);
-        this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
-        this.wrappers.set('MediaQuery', this.wrapWithMediaQuery);
+        //方法名按照字母顺序排列
         this.wrappers.set('AfterLayout', this.wrapWithAfterLayout);
-        this.wrappers.set('MeasureSize', this.wrapWithMeasureSize);
-        this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
         this.wrappers.set('ClipRRect', this.wrapWithClipRRect);
+        this.wrappers.set('GestureDetector', this.wrapWithGestureDetector);
+        this.wrappers.set('LayoutBuilder', this.wrapWithLayoutBuilder);
+        this.wrappers.set('MeasureSize', this.wrapWithMeasureSize);
+        this.wrappers.set('MediaQuery', this.wrapWithMediaQuery);
+        this.wrappers.set('Obx', this.wrapWithObx);
         this.wrappers.set('Stack', this.wrapWithStack);
+        this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
+        this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
     }
     registerCommands(context) {
         this.wrappers.forEach((wrapper, name) => {
@@ -124,62 +125,10 @@ class FlutterWrapperManager {
         }
         return new vscode.Range(document.positionAt(widgetStart), document.positionAt(closeParenIndex));
     }
-    wrapWithLayoutBuilder(widget, indentation) {
-        return `LayoutBuilder(
-${indentation}  builder: (BuildContext context, BoxConstraints constraints) {
-${indentation}    return ${widget.trim()};
-${indentation}  },
-${indentation})`;
-    }
-    wrapWithObx(widget, indentation) {
-        return `Obx(() => ${widget.trim()})`;
-    }
-    wrapWithGestureDetector(widget, indentation) {
-        return `GestureDetector(
-${indentation}  behavior: HitTestBehavior.translucent,
-${indentation}  onTap: () {
-${indentation}    //
-${indentation}  },
-${indentation}  child: ${widget.trim()},
-${indentation})`;
-    }
-    wrapWithValueListenableBuilder(widget, indentation) {
-        return `ValueListenableBuilder(
-${indentation}  valueListenable: null,
-${indentation}  builder: (context, value, child) {
-${indentation}    return ${widget.trim()};
-${indentation}  },
-${indentation})`;
-    }
-    wrapWithMediaQuery(widget, indentation) {
-        return `MediaQuery.removePadding(
-${indentation}  context: context,
-${indentation}  removeTop: true,
-${indentation}  removeBottom: true,
-${indentation}  child: ${widget.trim()},
-${indentation})`;
-    }
     wrapWithAfterLayout(widget, indentation) {
         return `AfterLayout(
 ${indentation}  callback: (RenderAfterLayout ral) {
 ${indentation}    // Add your callback logic here
-${indentation}  },
-${indentation}  child: ${widget.trim()},
-${indentation})`;
-    }
-    wrapWithMeasureSize(widget, indentation) {
-        return `MeasureSize(
-${indentation}  onChange: (Size size) {
-${indentation}    // Add your size change logic here
-${indentation}  },
-${indentation}  child: ${widget.trim()},
-${indentation})`;
-    }
-    wrapWithVisibilityDetector(widget, indentation) {
-        return `VisibilityDetector(
-${indentation}  key: const Key('unique key'),
-${indentation}  onVisibilityChanged: (VisibilityInfo info) {
-${indentation}    // Add your visibility change logic here with info.visibleFraction
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
@@ -194,11 +143,63 @@ ${indentation}  ),
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
+    wrapWithGestureDetector(widget, indentation) {
+        return `GestureDetector(
+${indentation}  behavior: HitTestBehavior.translucent,
+${indentation}  onTap: () {
+${indentation}    //
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+    wrapWithLayoutBuilder(widget, indentation) {
+        return `LayoutBuilder(
+${indentation}  builder: (BuildContext context, BoxConstraints constraints) {
+${indentation}    return ${widget.trim()};
+${indentation}  },
+${indentation})`;
+    }
+    wrapWithMeasureSize(widget, indentation) {
+        return `MeasureSize(
+${indentation}  onChange: (Size size) {
+${indentation}    // Add your size change logic here
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+    wrapWithMediaQuery(widget, indentation) {
+        return `MediaQuery.removePadding(
+${indentation}  context: context,
+${indentation}  removeTop: true,
+${indentation}  removeBottom: true,
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+    wrapWithObx(widget, indentation) {
+        return `Obx(() => ${widget.trim()})`;
+    }
     wrapWithStack(widget, indentation) {
         return `Stack(
 ${indentation}  children: [
 ${indentation}    ${widget.trim()},
 ${indentation}  ],
+${indentation})`;
+    }
+    wrapWithValueListenableBuilder(widget, indentation) {
+        return `ValueListenableBuilder(
+${indentation}  valueListenable: null,
+${indentation}  builder: (context, value, child) {
+${indentation}    return ${widget.trim()};
+${indentation}  },
+${indentation})`;
+    }
+    wrapWithVisibilityDetector(widget, indentation) {
+        return `VisibilityDetector(
+${indentation}  key: const Key('unique key'),
+${indentation}  onVisibilityChanged: (VisibilityInfo info) {
+${indentation}    // Add your visibility change logic here with info.visibleFraction
+${indentation}  },
+${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
 }

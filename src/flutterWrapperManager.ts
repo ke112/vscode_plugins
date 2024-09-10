@@ -8,16 +8,17 @@ export class FlutterWrapperManager {
     }
 
     private initializeWrappers() {
-        this.wrappers.set('LayoutBuilder', this.wrapWithLayoutBuilder);
-        this.wrappers.set('Obx', this.wrapWithObx);
-        this.wrappers.set('GestureDetector', this.wrapWithGestureDetector);
-        this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
-        this.wrappers.set('MediaQuery', this.wrapWithMediaQuery);
+        //方法名按照字母顺序排列
         this.wrappers.set('AfterLayout', this.wrapWithAfterLayout);
-        this.wrappers.set('MeasureSize', this.wrapWithMeasureSize);
-        this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
         this.wrappers.set('ClipRRect', this.wrapWithClipRRect);
+        this.wrappers.set('GestureDetector', this.wrapWithGestureDetector);
+        this.wrappers.set('LayoutBuilder', this.wrapWithLayoutBuilder);
+        this.wrappers.set('MeasureSize', this.wrapWithMeasureSize);
+        this.wrappers.set('MediaQuery', this.wrapWithMediaQuery);
+        this.wrappers.set('Obx', this.wrapWithObx);
         this.wrappers.set('Stack', this.wrapWithStack);
+        this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
+        this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
     }
 
     registerCommands(context: vscode.ExtensionContext) {
@@ -139,69 +140,10 @@ export class FlutterWrapperManager {
         );
     }
 
-    private wrapWithLayoutBuilder(widget: string, indentation: string): string {
-        return `LayoutBuilder(
-${indentation}  builder: (BuildContext context, BoxConstraints constraints) {
-${indentation}    return ${widget.trim()};
-${indentation}  },
-${indentation})`;
-    }
-
-    private wrapWithObx(widget: string, indentation: string): string {
-        return `Obx(() => ${widget.trim()})`;
-    }
-
-    private wrapWithGestureDetector(widget: string, indentation: string): string {
-        return `GestureDetector(
-${indentation}  behavior: HitTestBehavior.translucent,
-${indentation}  onTap: () {
-${indentation}    //
-${indentation}  },
-${indentation}  child: ${widget.trim()},
-${indentation})`;
-    }
-
-    private wrapWithValueListenableBuilder(widget: string, indentation: string): string {
-        return `ValueListenableBuilder(
-${indentation}  valueListenable: null,
-${indentation}  builder: (context, value, child) {
-${indentation}    return ${widget.trim()};
-${indentation}  },
-${indentation})`;
-    }
-
-    private wrapWithMediaQuery(widget: string, indentation: string): string {
-        return `MediaQuery.removePadding(
-${indentation}  context: context,
-${indentation}  removeTop: true,
-${indentation}  removeBottom: true,
-${indentation}  child: ${widget.trim()},
-${indentation})`;
-    }
-
     private wrapWithAfterLayout(widget: string, indentation: string): string {
         return `AfterLayout(
 ${indentation}  callback: (RenderAfterLayout ral) {
 ${indentation}    // Add your callback logic here
-${indentation}  },
-${indentation}  child: ${widget.trim()},
-${indentation})`;
-    }
-
-    private wrapWithMeasureSize(widget: string, indentation: string): string {
-        return `MeasureSize(
-${indentation}  onChange: (Size size) {
-${indentation}    // Add your size change logic here
-${indentation}  },
-${indentation}  child: ${widget.trim()},
-${indentation})`;
-    }
-
-    private wrapWithVisibilityDetector(widget: string, indentation: string): string {
-        return `VisibilityDetector(
-${indentation}  key: const Key('unique key'),
-${indentation}  onVisibilityChanged: (VisibilityInfo info) {
-${indentation}    // Add your visibility change logic here with info.visibleFraction
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
@@ -218,11 +160,70 @@ ${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
 
+    private wrapWithGestureDetector(widget: string, indentation: string): string {
+        return `GestureDetector(
+${indentation}  behavior: HitTestBehavior.translucent,
+${indentation}  onTap: () {
+${indentation}    //
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithLayoutBuilder(widget: string, indentation: string): string {
+        return `LayoutBuilder(
+${indentation}  builder: (BuildContext context, BoxConstraints constraints) {
+${indentation}    return ${widget.trim()};
+${indentation}  },
+${indentation})`;
+    }
+
+    private wrapWithMeasureSize(widget: string, indentation: string): string {
+        return `MeasureSize(
+${indentation}  onChange: (Size size) {
+${indentation}    // Add your size change logic here
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithMediaQuery(widget: string, indentation: string): string {
+        return `MediaQuery.removePadding(
+${indentation}  context: context,
+${indentation}  removeTop: true,
+${indentation}  removeBottom: true,
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithObx(widget: string, indentation: string): string {
+        return `Obx(() => ${widget.trim()})`;
+    }
+
     private wrapWithStack(widget: string, indentation: string): string {
         return `Stack(
 ${indentation}  children: [
 ${indentation}    ${widget.trim()},
 ${indentation}  ],
+${indentation})`;
+    }
+
+    private wrapWithValueListenableBuilder(widget: string, indentation: string): string {
+        return `ValueListenableBuilder(
+${indentation}  valueListenable: null,
+${indentation}  builder: (context, value, child) {
+${indentation}    return ${widget.trim()};
+${indentation}  },
+${indentation})`;
+    }
+
+    private wrapWithVisibilityDetector(widget: string, indentation: string): string {
+        return `VisibilityDetector(
+${indentation}  key: const Key('unique key'),
+${indentation}  onVisibilityChanged: (VisibilityInfo info) {
+${indentation}    // double value = info.visibleFraction;
+${indentation}  },
+${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
 }
