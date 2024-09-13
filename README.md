@@ -78,6 +78,10 @@ WeChat : zhang1102d
 | 2024-09-09 | v0.0.2 | 更新了快捷生成命令支持。   |
 | 2024-09-06 | v0.0.1 | 更新了8个包裹组件支持。    |
 
+
+## vscode应用市场直通车
+https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua
+
 ## 许可
 
 本项目采用 [MIT 许可证](LICENSE)。
