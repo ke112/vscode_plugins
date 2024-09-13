@@ -327,9 +327,7 @@ class ${className}View extends GetView<${className}Controller> {
     private generateCustomViewContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
         return `import 'package:flutter/material.dart';
-import 'package:kunlun_ai/app/common/papge/base_page.dart';
-import 'package:kunlun_ai/app/common/widget/common_app_bar.dart';
-
+//自行引入BasePage路径
 //自行转换绝对路径
 import '../controllers/${pageName}_controller.dart';
 
