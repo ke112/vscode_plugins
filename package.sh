@@ -13,7 +13,7 @@ IFS='.' read -ra version_parts <<<"$current_version"
 new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
 
 # 更新 package.json 中的版本号
-# sed -i '' "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" package.json
+sed -i '' "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" package.json
 
 echo "版本升级 from $current_version to $new_version"
 

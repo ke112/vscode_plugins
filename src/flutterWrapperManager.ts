@@ -79,6 +79,13 @@ export class FlutterWrapperManager {
             widgetStart--;
         }
 
+        // 检查是否有 'const' 修饰,一起带走
+        const constKeyword = 'const ';
+        if (widgetStart >= constKeyword.length &&
+            text.substring(widgetStart - constKeyword.length, widgetStart) === constKeyword) {
+            widgetStart -= constKeyword.length;
+        }
+
         let openParenIndex = endIndex;
         while (openParenIndex < text.length && text[openParenIndex] !== '(') {
             openParenIndex++;
