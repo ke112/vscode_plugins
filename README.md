@@ -2,6 +2,8 @@
 
 Flutter Plugins by zhangzhihua 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
 
+[README FOR EN](https://github.com/ke112/vscode_plugins/blob/main/README_EN.md)
+
 ## 包裹功能
 
 - 拓展实际开发中，使用频率高且使用不方便常用组件。
