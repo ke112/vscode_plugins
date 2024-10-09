@@ -43,8 +43,9 @@ export class QuickActionsManager {
             vscode.window.showInformationMessage(`Start Quick Build Runner`);
 
             const projectRoot = workspaceFolder.uri.fsPath;
-            const libDir = path.join(projectRoot, 'lib');
-            const tmpDir = path.join(libDir, 'tmp');
+
+            // 修改 tmpDir 的位置
+            const tmpDir = isDirectory ? path.join(fsPath, '.tmp') : path.join(path.dirname(fsPath), '.tmp');
 
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
 

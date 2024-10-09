@@ -150,7 +150,7 @@ export class FlutterWrapperManager {
     private wrapWithAfterLayout(widget: string, indentation: string): string {
         return `AfterLayout(
 ${indentation}  callback: (RenderAfterLayout ral) {
-${indentation}    // Add your callback logic here
+${indentation}    // ral.size;
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
@@ -170,7 +170,7 @@ ${indentation})`;
     private wrapWithGestureDetector(widget: string, indentation: string): string {
         return `GestureDetector(
 ${indentation}  behavior: HitTestBehavior.translucent,
-${indentation}  onTap: () {
+${indentation}  onTap: () async {
 ${indentation}    //
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
@@ -204,7 +204,9 @@ ${indentation})`;
     }
 
     private wrapWithObx(widget: string, indentation: string): string {
-        return `Obx(() => ${widget.trim()})`;
+        return `Obx(() {
+${indentation}  return ${widget.trim()};
+${indentation}})`;
     }
 
     private wrapWithStack(widget: string, indentation: string): string {
