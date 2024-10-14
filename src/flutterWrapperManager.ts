@@ -17,6 +17,7 @@ export class FlutterWrapperManager {
         this.wrappers.set('MediaQuery', this.wrapWithMediaQuery);
         this.wrappers.set('Obx', this.wrapWithObx);
         this.wrappers.set('Stack', this.wrapWithStack);
+        this.wrappers.set('Theme', this.wrapWithTheme);
         this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
         this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
     }
@@ -235,6 +236,17 @@ ${indentation}})`;
 ${indentation}  children: [
 ${indentation}    ${widget.trim()},
 ${indentation}  ],
+${indentation})`;
+    }
+
+    private wrapWithTheme(widget: string, indentation: string): string {
+        return `Theme(
+${indentation}  data: ThemeData(
+${indentation}    brightness: Brightness.light,
+${indentation}    splashColor: Colors.transparent,
+${indentation}    highlightColor: Colors.transparent,
+${indentation}  ),
+${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
 

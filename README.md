@@ -19,6 +19,7 @@ Flutter Plugins 是一个 VS Code 扩展，封装一些常用的基础功能，�
     - `MediaQuery`
     - `Obx`
     - `Stack`
+    - `Theme`
     - `ValueListenableBuilder`
     - `VisibilityDetector`
 
