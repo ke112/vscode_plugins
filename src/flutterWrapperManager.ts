@@ -32,18 +32,39 @@ export class FlutterWrapperManager {
 
     provideCodeActions(document: vscode.TextDocument, range: vscode.Range): vscode.CodeAction[] {
         const actions: vscode.CodeAction[] = [];
+        const lineText = document.lineAt(range.start.line).text;
+        const widgetName = this.extractWidgetName(lineText, range.start.character);
 
-        this.wrappers.forEach((_, name) => {
-            const action = new vscode.CodeAction(`Wrap with ${name}`, vscode.CodeActionKind.RefactorRewrite);
-            action.command = {
-                command: `extension.wrapWith${name}`,
-                title: `Wrap with ${name}`,
-                arguments: [document, range]
-            };
-            actions.push(action);
-        });
+        if (this.isPotentialWidget(widgetName)) {
+            this.wrappers.forEach((_, name) => {
+                const action = new vscode.CodeAction(`Wrap with ${name}`, vscode.CodeActionKind.RefactorRewrite);
+                action.command = {
+                    command: `extension.wrapWith${name}`,
+                    title: `Wrap with ${name}`,
+                    arguments: [document, range]
+                };
+                actions.push(action);
+            });
+        }
 
         return actions;
+    }
+
+    private extractWidgetName(lineText: string, cursorPosition: number): string {
+        // 从光标位置向前搜索可能的 Widget 名称或方法名
+        const beforeCursor = lineText.slice(0, cursorPosition);
+        const match = beforeCursor.match(/\b(_?[a-zA-Z][a-zA-Z0-9_]*)\s*$/);
+        return match ? match[1] : '';
+    }
+
+    private isPotentialWidget(name: string): boolean {
+        if (name.startsWith('_')) {
+            // 对于以下划线开头的名称，检查是否为小驼峰命名
+            return /^_[a-z][a-zA-Z0-9]*$/.test(name) && name.length > 2;
+        } else {
+            // 对于不以下划线开头的名称，检查是否为大驼峰命名
+            return /^[A-Z][a-zA-Z0-9]*$/.test(name) && name.length > 1;
+        }
     }
 
     private wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunction: (widget: string, indentation: string) => string) {

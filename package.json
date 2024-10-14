@@ -1,8 +1,8 @@
 {
     "name": "flutter-plugins-zhangzhihua",
-    "displayName": "Flutter Plugins by zhangzhihua",
-    "description": "提高Flutter开发效率的vscode拓展",
-    "version": "0.0.12",
+    "displayName": "Flutter Plugins",
+    "description": "提高Flutter开发效率的vscode插件, 支持快速生成Wrapper代码, 快速Build Runner, 快速新建Getx页面等",
+    "version": "0.0.18",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -66,11 +66,11 @@
             },
             {
                 "command": "extension.quickBuildRunner",
-                "title": "快速 Build Runner (局部文件/目录 大约10秒内完成)"
+                "title": "快速 Build Runner (指定文件/目录, 快捷生成)"
             },
             {
                 "command": "extension.buildRunner",
-                "title": "传统 Build Runner (大约3分钟)"
+                "title": "正常 Build Runner (时间比较长, 请耐心等待)"
             },
             {
                 "command": "extension.createGetxBindingPage",
