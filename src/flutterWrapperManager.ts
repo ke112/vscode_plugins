@@ -13,6 +13,7 @@ export class FlutterWrapperManager {
         this.wrappers.set('AnimatedBuilder', this.wrapWithAnimatedBuilder);
         this.wrappers.set('ClipRRect', this.wrapWithClipRRect);
         this.wrappers.set('GestureDetector', this.wrapWithGestureDetector);
+        this.wrappers.set('InkWell', this.wrapWithInkWell);
         this.wrappers.set('LayoutBuilder', this.wrapWithLayoutBuilder);
         this.wrappers.set('MeasureSize', this.wrapWithMeasureSize);
         this.wrappers.set('MediaQuery', this.wrapWithMediaQuery);
@@ -243,6 +244,16 @@ ${indentation})`;
 
     private wrapWithGestureDetector(widget: string, indentation: string): string {
         return `GestureDetector(
+${indentation}  behavior: HitTestBehavior.translucent,
+${indentation}  onTap: () async {
+${indentation}    //
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithInkWell(widget: string, indentation: string): string {
+        return `InkWell(
 ${indentation}  behavior: HitTestBehavior.translucent,
 ${indentation}  onTap: () async {
 ${indentation}    //

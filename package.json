@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "提高Flutter开发效率的vscode插件, 支持快速生成Wrapper代码, 快速Build Runner, 快速新建Getx页面等",
-    "version": "0.0.7",
+    "version": "0.0.9",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -37,6 +37,10 @@
                 "title": "Wrap with GestureDetector"
             },
             {
+                "command": "extension.wrapWithInkWell",
+                "title": "Wrap with InkWell"
+            },
+            {
                 "command": "extension.wrapWithValueListenableBuilder",
                 "title": "Wrap with ValueListenableBuilder"
             },
@@ -47,6 +51,10 @@
             {
                 "command": "extension.wrapWithAfterLayout",
                 "title": "Wrap with AfterLayout"
+            },
+            {
+                "command": "extension.wrapWithAnimatedBuilder",
+                "title": "Wrap with AnimatedBuilder"
             },
             {
                 "command": "extension.wrapWithMeasureSize",
@@ -65,12 +73,16 @@
                 "title": "Wrap with Stack"
             },
             {
+                "command": "extension.wrapWithTheme",
+                "title": "Wrap with Theme"
+            },
+            {
                 "command": "extension.quickBuildRunner",
-                "title": "快速 Build Runner (指定文件/目录, 快捷生成)"
+                "title": "Build Runner Quick (指定文件/目录)"
             },
             {
                 "command": "extension.buildRunner",
-                "title": "正常 Build Runner (时间比较长, 请耐心等待)"
+                "title": "Build Runner Normal (项目全量)"
             },
             {
                 "command": "extension.createGetxBindingPage",
