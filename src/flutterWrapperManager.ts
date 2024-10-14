@@ -10,6 +10,7 @@ export class FlutterWrapperManager {
     private initializeWrappers() {
         //方法名按照字母顺序排列
         this.wrappers.set('AfterLayout', this.wrapWithAfterLayout);
+        this.wrappers.set('AnimatedBuilder', this.wrapWithAnimatedBuilder);
         this.wrappers.set('ClipRRect', this.wrapWithClipRRect);
         this.wrappers.set('GestureDetector', this.wrapWithGestureDetector);
         this.wrappers.set('LayoutBuilder', this.wrapWithLayoutBuilder);
@@ -173,6 +174,57 @@ export class FlutterWrapperManager {
         return `AfterLayout(
 ${indentation}  callback: (RenderAfterLayout ral) {
 ${indentation}    // ral.size;
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithAnimatedBuilder(widget: string, indentation: string): string {
+        return `AnimatedBuilder(
+${indentation}  animation: controller.animationController,
+${indentation}  builder: (BuildContext context, Widget? child) {
+${indentation}    //Opacity 透明度 opacity:_container.value,
+${indentation}    //Transform.rotate 旋转 angle: controller.animation.value,
+${indentation}    //Transform.translate 平移 Offset(0, 200 * controller.animation.value),
+${indentation}    //Transform.scale 缩放  scale: _container.value,
+${indentation}    //FadeTransition 透明度 opacity: _container,
+${indentation}    //RotationTransition 旋转 turns: _container,
+${indentation}    //SlideTransition 平移 position: _container.drive(Tween(begin: const Offset(0, 0), end: const Offset(0.5, 0.5))),
+${indentation}    //ScaleTransition 缩放 scale: _container,
+${indentation}    //SizeTransition 上下收缩 sizeFactor: _container,
+${indentation}    //SliverFadeTransition 一组widget的透明组切换的效果
+${indentation}    //PositionedTransition 绝对定位的动画实现, 需要Stack包裹
+${indentation}    //RelativePositionedTransition 缩放动画
+${indentation}    //DecoratedBoxTransition 修改decoration盒子动画
+${indentation}    //AlignTransition 修改Alignment的相对位置动画
+${indentation}    //DefaultTextStyleTransition 修改TextStyle的动画
+${indentation}    return FadeTransition(
+${indentation}      opacity: controller.animation,
+${indentation}      child: ScaleTransition(
+${indentation}        scale: controller.animation,
+${indentation}        child: SlideTransition(
+${indentation}          position: controller.animationController.drive(Tween(begin: const Offset(0, 0), end: const Offset(1, 1))),
+${indentation}          child: RotationTransition(
+${indentation}            turns: controller.animation,
+${indentation}            //以上是隐士动画,以下是显示动画
+${indentation}            child: Opacity(
+${indentation}              opacity: controller.animationController.value,
+${indentation}              child: Transform.scale(
+${indentation}                scale: controller.animationController.value,
+${indentation}                child: Transform.translate(
+${indentation}                  offset: Offset(
+${indentation}                      controller.animationController.value * 200, (controller.animationController.value) * 200),
+${indentation}                  child: Transform.rotate(
+${indentation}                    angle: controller.animationController.value * 2 * 3.14,
+${indentation}                    child: child ?? const SizedBox.shrink(),
+${indentation}                  ),
+${indentation}                ),
+${indentation}              ),
+${indentation}            ),
+${indentation}          ),
+${indentation}        ),
+${indentation}      ),
+${indentation}    );
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
