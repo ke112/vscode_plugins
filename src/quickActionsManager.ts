@@ -200,7 +200,7 @@ export class QuickActionsManager {
         const className = this.toPascalCase(pageName);
         return `import 'package:get/get.dart';
 
-//自行转换绝对路径
+//Convert absolute paths yourself
 import '../controllers/${pageName}_controller.dart';
 
 class ${className}Binding extends Bindings {
@@ -244,7 +244,7 @@ class ${className}Controller extends GetxController {
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-//自行转换绝对路径
+//Convert absolute paths yourself
 import '../controllers/${pageName}_controller.dart';
 
 class ${className}View extends GetView<${className}Controller> {
@@ -328,8 +328,8 @@ class ${className}View extends GetView<${className}Controller> {
     private generateCustomViewContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
         return `import 'package:flutter/material.dart';
-//自行引入BasePage路径
-//自行转换绝对路径
+//Introduce the BasePage path yourself
+//Convert absolute paths yourself
 import '../controllers/${pageName}_controller.dart';
 
 class ${className}View extends BasePage<${className}Controller> {
