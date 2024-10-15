@@ -10,13 +10,16 @@ export class FlutterWrapperManager {
     private initializeWrappers() {
         //方法名按照字母顺序排列
         this.wrappers.set('AfterLayout', this.wrapWithAfterLayout);
+        this.wrappers.set('AnimatedBuilder', this.wrapWithAnimatedBuilder);
         this.wrappers.set('ClipRRect', this.wrapWithClipRRect);
         this.wrappers.set('GestureDetector', this.wrapWithGestureDetector);
+        this.wrappers.set('InkWell', this.wrapWithInkWell);
         this.wrappers.set('LayoutBuilder', this.wrapWithLayoutBuilder);
         this.wrappers.set('MeasureSize', this.wrapWithMeasureSize);
         this.wrappers.set('MediaQuery', this.wrapWithMediaQuery);
         this.wrappers.set('Obx', this.wrapWithObx);
         this.wrappers.set('Stack', this.wrapWithStack);
+        this.wrappers.set('Theme', this.wrapWithTheme);
         this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
         this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
     }
@@ -32,18 +35,39 @@ export class FlutterWrapperManager {
 
     provideCodeActions(document: vscode.TextDocument, range: vscode.Range): vscode.CodeAction[] {
         const actions: vscode.CodeAction[] = [];
+        const lineText = document.lineAt(range.start.line).text;
+        const widgetName = this.extractWidgetName(lineText, range.start.character);
 
-        this.wrappers.forEach((_, name) => {
-            const action = new vscode.CodeAction(`Wrap with ${name}`, vscode.CodeActionKind.RefactorRewrite);
-            action.command = {
-                command: `extension.wrapWith${name}`,
-                title: `Wrap with ${name}`,
-                arguments: [document, range]
-            };
-            actions.push(action);
-        });
+        if (this.isPotentialWidget(widgetName)) {
+            this.wrappers.forEach((_, name) => {
+                const action = new vscode.CodeAction(`Wrap with ${name}`, vscode.CodeActionKind.RefactorRewrite);
+                action.command = {
+                    command: `extension.wrapWith${name}`,
+                    title: `Wrap with ${name}`,
+                    arguments: [document, range]
+                };
+                actions.push(action);
+            });
+        }
 
         return actions;
+    }
+
+    private extractWidgetName(lineText: string, cursorPosition: number): string {
+        // 从光标位置向前搜索可能的 Widget 名称或方法名
+        const beforeCursor = lineText.slice(0, cursorPosition);
+        const match = beforeCursor.match(/\b(_?[a-zA-Z][a-zA-Z0-9_]*)\s*$/);
+        return match ? match[1] : '';
+    }
+
+    private isPotentialWidget(name: string): boolean {
+        if (name.startsWith('_')) {
+            // 对于以下划线开头的名称，检查是否为小驼峰命名
+            return /^_[a-z][a-zA-Z0-9]*$/.test(name) && name.length > 2;
+        } else {
+            // 对于不以下划线开头的名称，检查是否为大驼峰命名
+            return /^[A-Z][a-zA-Z0-9]*$/.test(name) && name.length > 1;
+        }
     }
 
     private wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunction: (widget: string, indentation: string) => string) {
@@ -150,7 +174,58 @@ export class FlutterWrapperManager {
     private wrapWithAfterLayout(widget: string, indentation: string): string {
         return `AfterLayout(
 ${indentation}  callback: (RenderAfterLayout ral) {
-${indentation}    // Add your callback logic here
+${indentation}    // ral.size;
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithAnimatedBuilder(widget: string, indentation: string): string {
+        return `AnimatedBuilder(
+${indentation}  animation: controller.animationController,
+${indentation}  builder: (BuildContext context, Widget? child) {
+${indentation}    //Opacity 透明度 opacity:_container.value,
+${indentation}    //Transform.rotate 旋转 angle: controller.animation.value,
+${indentation}    //Transform.translate 平移 Offset(0, 200 * controller.animation.value),
+${indentation}    //Transform.scale 缩放  scale: _container.value,
+${indentation}    //FadeTransition 透明度 opacity: _container,
+${indentation}    //RotationTransition 旋转 turns: _container,
+${indentation}    //SlideTransition 平移 position: _container.drive(Tween(begin: const Offset(0, 0), end: const Offset(0.5, 0.5))),
+${indentation}    //ScaleTransition 缩放 scale: _container,
+${indentation}    //SizeTransition 上下收缩 sizeFactor: _container,
+${indentation}    //SliverFadeTransition 一组widget的透明组切换的效果
+${indentation}    //PositionedTransition 绝对定位的动画实现, 需要Stack包裹
+${indentation}    //RelativePositionedTransition 缩放动画
+${indentation}    //DecoratedBoxTransition 修改decoration盒子动画
+${indentation}    //AlignTransition 修改Alignment的相对位置动画
+${indentation}    //DefaultTextStyleTransition 修改TextStyle的动画
+${indentation}    return FadeTransition(
+${indentation}      opacity: controller.animation,
+${indentation}      child: ScaleTransition(
+${indentation}        scale: controller.animation,
+${indentation}        child: SlideTransition(
+${indentation}          position: controller.animationController.drive(Tween(begin: const Offset(0, 0), end: const Offset(1, 1))),
+${indentation}          child: RotationTransition(
+${indentation}            turns: controller.animation,
+${indentation}            //以上是隐士动画,以下是显示动画
+${indentation}            child: Opacity(
+${indentation}              opacity: controller.animationController.value,
+${indentation}              child: Transform.scale(
+${indentation}                scale: controller.animationController.value,
+${indentation}                child: Transform.translate(
+${indentation}                  offset: Offset(
+${indentation}                      controller.animationController.value * 200, (controller.animationController.value) * 200),
+${indentation}                  child: Transform.rotate(
+${indentation}                    angle: controller.animationController.value * 2 * 3.14,
+${indentation}                    child: child ?? const SizedBox.shrink(),
+${indentation}                  ),
+${indentation}                ),
+${indentation}              ),
+${indentation}            ),
+${indentation}          ),
+${indentation}        ),
+${indentation}      ),
+${indentation}    );
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
@@ -170,7 +245,17 @@ ${indentation})`;
     private wrapWithGestureDetector(widget: string, indentation: string): string {
         return `GestureDetector(
 ${indentation}  behavior: HitTestBehavior.translucent,
-${indentation}  onTap: () {
+${indentation}  onTap: () async {
+${indentation}    //
+${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithInkWell(widget: string, indentation: string): string {
+        return `InkWell(
+${indentation}  behavior: HitTestBehavior.translucent,
+${indentation}  onTap: () async {
 ${indentation}    //
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
@@ -204,7 +289,9 @@ ${indentation})`;
     }
 
     private wrapWithObx(widget: string, indentation: string): string {
-        return `Obx(() => ${widget.trim()})`;
+        return `Obx(() {
+${indentation}  return ${widget.trim()};
+${indentation}})`;
     }
 
     private wrapWithStack(widget: string, indentation: string): string {
@@ -212,6 +299,17 @@ ${indentation})`;
 ${indentation}  children: [
 ${indentation}    ${widget.trim()},
 ${indentation}  ],
+${indentation})`;
+    }
+
+    private wrapWithTheme(widget: string, indentation: string): string {
+        return `Theme(
+${indentation}  data: ThemeData(
+${indentation}    brightness: Brightness.light,
+${indentation}    splashColor: Colors.transparent,
+${indentation}    highlightColor: Colors.transparent,
+${indentation}  ),
+${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
 

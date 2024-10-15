@@ -1,14 +1,14 @@
 {
     "name": "flutter-plugins-zhangzhihua",
-    "displayName": "Flutter Plugins by zhangzhihua",
-    "description": "提高Flutter开发效率的vscode拓展",
-    "version": "0.0.6",
+    "displayName": "Flutter Plugins",
+    "description": "To improve the efficiency of Flutter development, support fast Wrapper code generation, fast Build Runner, fast new Getx page, etc",
+    "version": "0.0.7",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
         "email": "zhangzhihua.email@gmail.com"
     },
-    "icon": "images/logo.webp",
+    "icon": "images/logo.png",
     "engines": {
         "vscode": "^1.60.0"
     },
@@ -37,6 +37,10 @@
                 "title": "Wrap with GestureDetector"
             },
             {
+                "command": "extension.wrapWithInkWell",
+                "title": "Wrap with InkWell"
+            },
+            {
                 "command": "extension.wrapWithValueListenableBuilder",
                 "title": "Wrap with ValueListenableBuilder"
             },
@@ -47,6 +51,10 @@
             {
                 "command": "extension.wrapWithAfterLayout",
                 "title": "Wrap with AfterLayout"
+            },
+            {
+                "command": "extension.wrapWithAnimatedBuilder",
+                "title": "Wrap with AnimatedBuilder"
             },
             {
                 "command": "extension.wrapWithMeasureSize",
@@ -65,20 +73,24 @@
                 "title": "Wrap with Stack"
             },
             {
+                "command": "extension.wrapWithTheme",
+                "title": "Wrap with Theme"
+            },
+            {
                 "command": "extension.quickBuildRunner",
-                "title": "快速 Build Runner (局部文件/目录 大约10秒内完成)"
+                "title": "Build Runner Quick"
             },
             {
                 "command": "extension.buildRunner",
-                "title": "传统 Build Runner (大约3分钟)"
+                "title": "Build Runner Normal"
             },
             {
                 "command": "extension.createGetxBindingPage",
-                "title": "新建Getx界面 (Binding方式)"
+                "title": "Create Getx Page (Binding)"
             },
             {
                 "command": "extension.createGetxBindingCustomPage",
-                "title": "新建Getx界面 (Binding方式-内部)"
+                "title": "Create Getx Page (Binding-Internal)"
             }
         ],
         "menus": {

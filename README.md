@@ -1,96 +1,105 @@
 # Flutter Plugins
 
-Flutter Plugins by zhangzhihua 是一个 VS Code 扩展，封装一些常用的基础功能，提高开发效率。
+Flutter Plugins is a VS Code extension that encapsulates some commonly used basic functions to improve development efficiency.
 
-[README FOR EN](https://github.com/ke112/vscode_plugins/blob/main/README_EN.md)
+## Widget Extend
 
-## 包裹功能
-
-- 拓展实际开发中，使用频率高且使用不方便常用组件。
+- Expand the commonly used components that are frequently used and inconvenient to use in actual development。
 
 ![hit_image](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEJgUY9CkCuzICNYVn05iYHAejHuWhwz4G6JPwvXLO0EoLcfdJ2KJppMv9S4xbYVDwmr28An.wEy.A9lcpWsc*QE!/b&bo=dgHPAQAAAAADF4s!&rf=viewer_4)
-## 使用方法
 
-1. 选中想要包裹的 widget，然后按下 `提取列表` 快捷键，选择 `拓展的组件` 即可。
-2. 目前支持的组件有：(升序)
+## How to use
+
+1. Select the widget you want to wrap, then press the `Extract List` shortcut key, and select `Extended Widgets` to wrap.
+2. Currently supported widgets: (in ascending order)
     - `AfterLayout`
+    - `AnimatedBuilder`
     - `ClipRRect`
     - `GestureDetector`
+    - `InkWell`
     - `LayoutBuilder`
     - `MeasureSize`
     - `MediaQuery`
     - `Obx`
     - `Stack`
+    - `Theme`
     - `ValueListenableBuilder`
     - `VisibilityDetector`
 
-## 快捷功能
+## Quick Function
 
-- 拓展在工程项目右键增加快捷命令。
+- Add shortcut commands to the right-click menu of the project.
 
 ![hit_order](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEJgUY9CkCuzICNYVn05iYHD.lhmdZiS80y7mzMAOg.lVmbf2uId5Ey3viPG*EaocOCQL7l6BowiM25fmSJR67lM!/b&bo=JQKRAAAAAAADF4Q!&rf=viewer_4)
 
 
-## 使用方法
+## How to use
 
-1. 右键工程项目，选择 `快捷命令` 即可。
-2. 目前支持的命令有：
-    - `Quick Build Runner` (适用于局部文件/目录快速生成Model、repository) 
-    - `Run Build Runner` (适用于全量生成Model、repository、图片资源)
-    - `新建Getx界面 (Binding方式-内部)` (快速新建内部基类页面 - 限于目录右键)
-    - `新建Getx界面 (Binding方式)` (快速新建页面 - 限于目录右键)
+1. Right-click the project, select `Quick Command` to use.
+2. Currently supported commands:
+    - `Quick Build Runner` (Applicable to quickly generate Model and repository from local files/directories) 
+    - `Run Build Runner` (Applicable to fully generate Model, repository, and image resources)
+    - `Create Getx Page (Binding)` (Quickly create internal base pages - applicable to directory right-click)
+    - `Create Getx Page (Binding-Internal)` (Quickly create internal base pages - applicable to directory right-click)
 
-- 调用build_runner方式
+- Call build_runner method
 ![new_getx_1](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEJgUY9CkCuzICNYVn05iYHBszHAYqex*nghI79thS4*7Wz0vvnYBMVLC2Fy.yUeNH67q5I79ykt9SE8wjxKqEXI!/b&bo=8AKsAQAAAAADB30!&rf=viewer_4)
 
-- 调用build_runner结果
+- Call build_runner result
 ![new_getx_1](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEJgUY9CkCuzICNYVn05iYHBj63.EAi1dnrF1UdWyXZhOCfW65iAUjb2EAjFsQkMkUZtH*w8ezTV8dPJAT4cB*6A!/b&bo=DAQ5AgAAAAADFwE!&rf=viewer_4)
 
-- 生成的目录结构
+- Generate directory structure
 ![new_getx_1](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEOnhRa1ObNeut5ljc0i0D.YgIRJvQk8K462OhcbBU1l1NlJMfHsERzSPaSXzXdHxf2TRjVPPrK7KdmrAouGiBJo!/b&bo=UwGyAAAAAAADF9I!&rf=viewer_4)
 
-- 生成的bingding
+- Generate binding
 ![new_getx_2](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEOnhRa1ObNeut5ljc0i0D.ah15XlEZAI4TK*GHHgYka10AekVf0.DT5GPM.okJGPJmXXMfWMod4DUl0GghOmKJE!/b&bo=6ALwAAAAAAADFyg!&rf=viewer_4)
 
-- 生成的controller
+- Generate binding
 ![new_getx_3](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEOnhRa1ObNeut5ljc0i0D.bbpi*YApI46yRqK66.*SDm*0Rwn6nI*eQ73q23AkRkEI2yy.sLyJQGBYiHsVfXzSI!/b&bo=8wG6AQAAAAADF3s!&rf=viewer_4)
 
-- 生成的view
+- Generate view
 ![new_getx_4](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEOnhRa1ObNeut5ljc0i0D.Zbi*0gaHD9xWovrIiPIYnb1h8fnf.l4hESLLOMq18ie.ndFgg69QDT0GvN93L.fls!/b&bo=wwJRAwAAAAADJ5E!&rf=viewer_4)
 
-- 生成的view (内部)
+- Generate view (internal)
 ![new_getx_5](https://m.qpic.cn/psc?/V51FA3BJ32r9zS4Pz0IS028JeT229j0A/TmEUgtj9EK6.7V8ajmQrEGOD9DSw4C1bXrlrYUUuWfXvyGcOXSo8Lt4VtWBMSl4lIKJVYCcwITQ2YYX7qXpvHQZyJeIzWyrd4Ra*XDodj4Y!/b&bo=YwKaAQAAAAADB9g!&rf=viewer_4)
 
-## 贡献
+## Contribution
 
-如果对你有帮助，欢迎 star。
+If you find it helpful, please star it.
 
-此项目会一直更新，如果想新增功能，欢迎提交 issues 或 pull requests 到 [GitHub 仓库](https://github.com/ke112/vscode_plugins)，我会在工作之余时，增加新的feature。
-
-
-## 联系
-WeChat : zhang1102d
-
-## 更新日志
-
-| 日期       | 版本   | 更新内容                    |
-| ---------- | ------ | --------------------------- |
-| 2024-09-13 | v0.0.6 | 去掉一些预制import的处理。  |
-| 2024-09-13 | v0.0.5 | 增加提取包裹时const的处理。 |
-| 2024-09-10 | v0.0.4 | 更新了README图文显示。      |
-| 2024-09-10 | v0.0.3 | 更新了新建界面的命令支持。  |
-| 2024-09-09 | v0.0.2 | 更新了快捷生成命令支持。    |
-| 2024-09-06 | v0.0.1 | 更新了8个包裹组件支持。     |
-
-## vscode应用市场直通车
-[跳转vscode应用市场](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
+This project will be updated all the time. If you want to add new features, please submit issues or pull requests to the [GitHub repository](https://github.com/ke112/vscode_plugins). I will add new features in my spare time.
 
 
-## 许可
 
-本项目采用 [MIT 许可证](LICENSE)。
+## Contact
+Nick Name : 徐凤年
 
-## TODO  </s>
+Weixin ID : zhang1102d
+
+Facebook : https://www.facebook.com/zhihua.zhang.3958
+
+## Update Log
+
+| Date       | Version | Update Content                                  |
+| ---------- | ------- | ----------------------------------------------- |
+| 2024-10-15 | v0.0.7  | Updated 3 widget support.         |
+| 2024-09-13 | v0.0.6  | Removed some pre-set import processing.         |
+| 2024-09-13 | v0.0.5  | Added const processing when extracting widgets. |
+| 2024-09-10 | v0.0.4  | Updated README image display.                   |
+| 2024-09-10 | v0.0.3  | Updated new interface command support.          |
+| 2024-09-09 | v0.0.2  | Updated quick generate command support.         |
+| 2024-09-06 | v0.0.1  | Updated 8 widget support.                       |
+
+
+## VSCode App Market
+[Jump to VSCode App Market](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
+
+
+## License
+
+This project is licensed under the MIT License.
+
+## TODO 
 
 - ~~README图文显示~~
-- 包裹组件widget判断
+- ~~包裹组件widget判断~~
