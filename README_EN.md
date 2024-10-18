@@ -71,14 +71,14 @@ WeChat : zhang1102d
 
 ## Changelog
 
-| Date       | Version   | Updates             |
-| ---------- | --------- | -------------------- |
-| 2024-09-13 | v0.0.6 | Remove some prefabricated import processing. |
-| 2024-09-13 | v0.0.5 | Added const handling when extracting packages. |
-| 2024-09-10 | v0.0.4 | Updated README text and graphics.      |
-| 2024-09-10 | v0.0.3 | Updated command support for new interfaces.  |
-| 2024-09-09 | v0.0.2 | Updated quick generate command support.    |
-| 2024-09-06 | v0.0.1 | Updated 8 package component support.    |
+| Date       | Version | Updates                                        |
+| ---------- | ------- | ---------------------------------------------- |
+| 2024-09-13 | v0.0.6  | Remove some prefabricated import processing.   |
+| 2024-09-13 | v0.0.5  | Added const handling when extracting packages. |
+| 2024-09-10 | v0.0.4  | Updated README text and graphics.              |
+| 2024-09-10 | v0.0.3  | Updated command support for new interfaces.    |
+| 2024-09-09 | v0.0.2  | Updated quick generate command support.        |
+| 2024-09-06 | v0.0.1  | Updated 8 package component support.           |
 
 ## vscode application market through train
 [Jump to vscode application market](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
@@ -87,8 +87,3 @@ WeChat : zhang1102d
 ## license
 
 This project uses the [MIT License](LICENSE)。
-
-## TODO
-
-- ~~README graphic display~~
-- Package component widget judgment

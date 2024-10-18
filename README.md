@@ -82,7 +82,7 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 
 | Date       | Version | Update Content                                  |
 | ---------- | ------- | ----------------------------------------------- |
-| 2024-10-15 | v0.0.7  | Updated 3 widget support.         |
+| 2024-10-15 | v0.0.7  | Updated 3 widget support.                       |
 | 2024-09-13 | v0.0.6  | Removed some pre-set import processing.         |
 | 2024-09-13 | v0.0.5  | Added const processing when extracting widgets. |
 | 2024-09-10 | v0.0.4  | Updated README image display.                   |
@@ -98,8 +98,3 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 ## License
 
 This project is licensed under the MIT License.
-
-## TODO 
-
-- ~~README图文显示~~
-- ~~包裹组件widget判断~~
