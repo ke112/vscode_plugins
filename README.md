@@ -2,7 +2,7 @@
 
 Flutter Plugins is an extension of VS Code that helps you improve development efficiency.
 
-If you want to read the Chinese version of README, [请点击这里](https://github.com/ke112/vscode_plugins/blob/main/README_EN.md)
+If you want to read the Chinese version of README, [查看中文点击这里](https://github.com/ke112/vscode_plugins/blob/main/README_CN.md)
 
 ## Widget Extend
 
