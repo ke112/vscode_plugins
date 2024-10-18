@@ -10,6 +10,7 @@ export class FlutterWrapperManager {
     private initializeWrappers() {
         //方法名按照字母顺序排列
         this.wrappers.set('AfterLayout', this.wrapWithAfterLayout);
+        this.wrappers.set('AnnotatedRegion', this.wrapWithAnnotatedRegion);
         this.wrappers.set('AnimatedBuilder', this.wrapWithAnimatedBuilder);
         this.wrappers.set('ClipRRect', this.wrapWithClipRRect);
         this.wrappers.set('GestureDetector', this.wrapWithGestureDetector);
@@ -18,9 +19,11 @@ export class FlutterWrapperManager {
         this.wrappers.set('MeasureSize', this.wrapWithMeasureSize);
         this.wrappers.set('MediaQuery', this.wrapWithMediaQuery);
         this.wrappers.set('Obx', this.wrapWithObx);
+        this.wrappers.set('PreferredSize', this.wrapWithPreferredSize);
         this.wrappers.set('Stack', this.wrapWithStack);
         this.wrappers.set('Theme', this.wrapWithTheme);
         this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
+        this.wrappers.set('ValueListenableListBuilder', this.wrapWithValueListenableListBuilder);
         this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
     }
 
@@ -180,6 +183,16 @@ ${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
 
+    private wrapWithAnnotatedRegion(widget: string, indentation: string): string {
+        return `AnnotatedRegion<SystemUiOverlayStyle>(
+${indentation}  value: const SystemUiOverlayStyle(
+${indentation}    statusBarColor: Colors.transparent,
+${indentation}    statusBarIconBrightness: Brightness.dark,
+${indentation}  ),
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
     private wrapWithAnimatedBuilder(widget: string, indentation: string): string {
         return `AnimatedBuilder(
 ${indentation}  animation: controller.animationController,
@@ -294,6 +307,13 @@ ${indentation}  return ${widget.trim()};
 ${indentation}})`;
     }
 
+    private wrapWithPreferredSize(widget: string, indentation: string): string {
+        return `PreferredSize(
+${indentation}  preferredSize: Size.fromHeight(55),
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
     private wrapWithStack(widget: string, indentation: string): string {
         return `Stack(
 ${indentation}  children: [
@@ -316,6 +336,15 @@ ${indentation})`;
     private wrapWithValueListenableBuilder(widget: string, indentation: string): string {
         return `ValueListenableBuilder(
 ${indentation}  valueListenable: null,
+${indentation}  builder: (context, value, child) {
+${indentation}    return ${widget.trim()};
+${indentation}  },
+${indentation})`;
+    }
+
+    private wrapWithValueListenableListBuilder(widget: string, indentation: string): string {
+        return `ValueListenableListBuilder(
+${indentation}  valueListenables: [],
 ${indentation}  builder: (context, value, child) {
 ${indentation}    return ${widget.trim()};
 ${indentation}  },
