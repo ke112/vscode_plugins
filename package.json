@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "To improve the efficiency of Flutter development, support fast Wrapper code generation, fast Build Runner, fast new Getx page, etc",
-    "version": "0.0.7",
+    "version": "0.0.34",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -48,5 +48,49 @@
     },
     "files": [
         "images"
-    ]
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.buildRunnerQuick",
+                "title": "Build Runner Quick "
+            },
+            {
+                "command": "extension.buildRunner",
+                "title": "Build Runner"
+            },
+            {
+                "command": "extension.createGetxBindingPage",
+                "title": "Create Getx Page (Binding)"
+            },
+            {
+                "command": "extension.createGetxBindingCustomPage",
+                "title": "Create Getx Page (Binding-Internal)"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "resourceLangId == dart || explorerResourceIsFolder",
+                    "command": "extension.buildRunnerQuick",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceLangId == dart || explorerResourceIsFolder",
+                    "command": "extension.buildRunner",
+                    "group": "navigation"
+                },
+                {
+                    "when": "explorerResourceIsFolder",
+                    "command": "extension.createGetxBindingPage",
+                    "group": "navigation"
+                },
+                {
+                    "when": "explorerResourceIsFolder",
+                    "command": "extension.createGetxBindingCustomPage",
+                    "group": "navigation"
+                }
+            ]
+        }
+    }
 }

@@ -80,4 +80,4 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 
 
 ## Marketplace
-[Go to VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
+[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)

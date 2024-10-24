@@ -77,4 +77,4 @@ Flutter Plugins是VS Code的扩展，可以帮助你提高开发效率。
 | 2024-09-06 | v0.0.1 | 更新8个组件支持。                              |
 
 ## 插件市场
-[跳转到 VSCode 插件市场](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
+[VSCode插件市场](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
