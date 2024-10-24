@@ -63,7 +63,12 @@ export class FlutterWrapperManager {
         return match ? match[1] : '';
     }
 
+    // 判断是否为潜在的 Widget 名称
+    // 以下划线开头的名称，检查是否为小驼峰命名
+    // 不以下划线开头的名称，检查是否为大驼峰命名
     private isPotentialWidget(name: string): boolean {
+        // 暂时默认返回 true
+        return true;
         if (name.startsWith('_')) {
             // 对于以下划线开头的名称，检查是否为小驼峰命名
             return /^_[a-z][a-zA-Z0-9]*$/.test(name) && name.length > 2;
