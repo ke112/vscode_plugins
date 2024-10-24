@@ -37,7 +37,7 @@ If you want to read the Chinese version of README, [查看中文点击这里](/R
 
 1. Right-click the project, select `Quick Command` to use.
 2. Currently supported commands:
-    - `Build Runner Normal` (Applicable to general generation of Model, repository, and image resources) 
+    - `Build Runner` (Applicable to general generation of Model, repository, and image resources) 
     - `Build Runner Quick` (Generate Model, repository, and image resources for local files, faster)
     - `Create Getx Page (Binding)` (Quickly create internal base pages - applicable to directory right-click)
     - `Create Getx Page (Binding-Internal)` (Quickly create internal base pages - applicable to directory right-click)
@@ -48,8 +48,8 @@ If you want to read the Chinese version of README, [查看中文点击这里](/R
 
 ## How to use
 
-1. Output keywords naturally, such as `sb` for `SizedBox`, `spacer` for `Spacer`, etc.
-2. Currently supported code snippets, the recognition features are all Chinese descriptions, convenient for quick selection, and may be replaced with a unified prefix later.
+1. Output keywords naturally, such as `fsb` for `SizedBox`, `fspacer` for `Spacer`, etc.
+2. Currently supported code snippets all have identification features starting with `f` and are accompanied by Chinese descriptions for quick and easy selection. A unified prefix may be used to replace them in the future.
 
 ## Contribution
 

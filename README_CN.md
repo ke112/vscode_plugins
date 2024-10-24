@@ -35,7 +35,7 @@ Flutter Plugins是VS Code的扩展，可以帮助你提高开发效率。
 
 1. 右键项目，选择 `快速命令` 即可。
 2. 目前支持的命令有：
-    - `Build Runner Normal`(适用于常规生成Model， repository， 和 image资源)
+    - `Build Runner`(适用于常规生成Model， repository， 和 image资源)
     - `Build Runner Quick` (针对局部文件/目录生成Model， repository， 和 image资源，速度更快)
     - `Create Getx Page (Binding)` (适用于快速创建内部基础类页面 - 仅限目录右键)
     - `Create Getx Page (Binding-Internal)` (适用于快速创建页面 - 仅限目录右键)
@@ -46,8 +46,8 @@ Flutter Plugins是VS Code的扩展，可以帮助你提高开发效率。
 
 ## 使用方法
 
-1. 自然的输出关键词，比如 `sb` 代表 `SizedBox`， `spacer` 代表 `Spacer` 等。
-2. 目前支持的代码片段，识别特征都是有中文的描述，方便快速选择，后期可能使用统一的前缀替换。
+1. 自然的输出关键词，比如 `fsb` 代表 `SizedBox`， `fspacer` 代表 `Spacer` 等。
+2. 目前支持的代码片段，识别特征都是以`f`开头，伴有中文的描述，方便快速选择，后期可能使用统一的前缀替换。
 
 ## 贡献
 

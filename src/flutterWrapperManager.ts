@@ -272,7 +272,6 @@ ${indentation})`;
 
     private wrapWithInkWell(widget: string, indentation: string): string {
         return `InkWell(
-${indentation}  behavior: HitTestBehavior.translucent,
 ${indentation}  onTap: () async {
 ${indentation}    //
 ${indentation}  },

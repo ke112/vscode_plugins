@@ -4,8 +4,8 @@ import * as vscode from 'vscode';
 
 export class QuickActionsManager {
     registerCommands(context: vscode.ExtensionContext) {
-        const quickBuildRunnerDisposable = vscode.commands.registerCommand('extension.quickBuildRunner', (uri: vscode.Uri) => {
-            this.quickBuildRunner(uri);
+        const buildRunnerQuickDisposable = vscode.commands.registerCommand('extension.buildRunnerQuick', (uri: vscode.Uri) => {
+            this.buildRunnerQuick(uri);
         });
 
         const buildRunnerDisposable = vscode.commands.registerCommand('extension.buildRunner', () => {
@@ -20,10 +20,10 @@ export class QuickActionsManager {
             this.createCustomPageStructure(uri);
         });
 
-        context.subscriptions.push(quickBuildRunnerDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable);
+        context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable);
     }
 
-    private async quickBuildRunner(uri: vscode.Uri) {
+    private async buildRunnerQuick(uri: vscode.Uri) {
         const fsPath = uri.fsPath;
         const stats = await vscode.workspace.fs.stat(uri);
         const isDirectory = stats.type === vscode.FileType.Directory;
