@@ -374,6 +374,7 @@ class ${className}View extends BasePage<${className}Controller> {
             const dimensions = await this.getImageDimensions(filePath);
             if (dimensions.width !== 1024 || dimensions.height !== 1024) {
                 vscode.window.showWarningMessage('The selected image is not 1024x1024. The result may not be optimal.');
+                return;
             }
 
             const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
