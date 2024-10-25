@@ -5,14 +5,14 @@ import { SnippetManager } from './snippetManager';
 
 export function activate(context: vscode.ExtensionContext) {
     const flutterWrapperManager = new FlutterWrapperManager();
-    const quickActionsManager = new QuickActionsManager();
+    const quickActionsManager = new QuickActionsManager(context);
     const snippetManager = new SnippetManager();
 
     // 注册flutter包裹组件命令
     flutterWrapperManager.registerCommands(context);
 
     // 注册快速操作命令
-    quickActionsManager.registerCommands(context);
+    quickActionsManager.registerCommands();
 
     // 注册代码片段命令和自动完成
     snippetManager.registerCommands(context);

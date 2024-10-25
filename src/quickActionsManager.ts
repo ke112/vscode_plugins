@@ -3,7 +3,13 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 export class QuickActionsManager {
-    registerCommands(context: vscode.ExtensionContext) {
+    private context: vscode.ExtensionContext;
+
+    constructor(context: vscode.ExtensionContext) {
+        this.context = context;
+    }
+
+    registerCommands() {
         const buildRunnerQuickDisposable = vscode.commands.registerCommand('extension.buildRunnerQuick', (uri: vscode.Uri) => {
             this.buildRunnerQuick(uri);
         });
@@ -20,7 +26,11 @@ export class QuickActionsManager {
             this.createCustomPageStructure(uri);
         });
 
-        context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable);
+        const generateAppIconsDisposable = vscode.commands.registerCommand('extension.generateAppIcons', (uri: vscode.Uri) => {
+            this.generateAppIcons(uri);
+        });
+
+        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable);
     }
 
     private async buildRunnerQuick(uri: vscode.Uri) {
@@ -346,5 +356,53 @@ class ${className}View extends BasePage<${className}Controller> {
   }
 }
 `;
+    }
+
+    private async generateAppIcons(uri: vscode.Uri) {
+        if (!uri) {
+            vscode.window.showErrorMessage('Please select a PNG file.');
+            return;
+        }
+
+        const filePath = uri.fsPath;
+        if (!filePath.toLowerCase().endsWith('.png')) {
+            vscode.window.showErrorMessage('The selected file is not a PNG image.');
+            return;
+        }
+
+        try {
+            const dimensions = await this.getImageDimensions(filePath);
+            if (dimensions.width !== 1024 || dimensions.height !== 1024) {
+                vscode.window.showWarningMessage('The selected image is not 1024x1024. The result may not be optimal.');
+            }
+
+            const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
+
+            exec(`bash "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
+                if (error) {
+                    vscode.window.showErrorMessage(`Error generating app icons: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    console.error(`stderr: ${stderr}`);
+                }
+                vscode.window.showInformationMessage('App icons generated successfully.');
+            });
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error processing image: ${error}`);
+        }
+    }
+
+    private getImageDimensions(filePath: string): Promise<{ width: number, height: number }> {
+        return new Promise((resolve, reject) => {
+            const sizeOf = require('image-size');
+            sizeOf(filePath, (error: Error, dimensions: { width: number, height: number }) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(dimensions);
+                }
+            });
+        });
     }
 }
