@@ -1,4 +1,5 @@
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
@@ -10,27 +11,36 @@ export class QuickActionsManager {
     }
 
     registerCommands() {
+        //快速build runner
         const buildRunnerQuickDisposable = vscode.commands.registerCommand('extension.buildRunnerQuick', (uri: vscode.Uri) => {
             this.buildRunnerQuick(uri);
         });
 
+        //全量build runner
         const buildRunnerDisposable = vscode.commands.registerCommand('extension.buildRunner', () => {
             this.buildRunner();
         });
 
+        //创建Getx Binding界面
         const createPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingPage', (uri: vscode.Uri) => {
             this.createPageStructure(uri);
         });
 
+        //创建Getx Binding界面 (内部)
         const createCustomPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingCustomPage', (uri: vscode.Uri) => {
             this.createCustomPageStructure(uri);
         });
 
-        const generateAppIconsDisposable = vscode.commands.registerCommand('extension.generateAppIcons', (uri: vscode.Uri) => {
+        //生成iOS所有icon
+        const generateAppIconsDisposable = vscode.commands.registerCommand('extension.generateIOSAppIcons', (uri: vscode.Uri) => {
             this.generateAppIcons(uri);
         });
 
-        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable);
+        //将图片转成webp
+        const compressToWebP = vscode.commands.registerCommand('extension.compressToWebP', this.compressToWebP.bind(this));
+
+
+        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable, compressToWebP,);
     }
 
     private async buildRunnerQuick(uri: vscode.Uri) {
@@ -50,12 +60,17 @@ export class QuickActionsManager {
                 return;
             }
 
-            vscode.window.showInformationMessage(`Start Quick Build Runner`);
+            vscode.window.showInformationMessage(`Start Build Runner Quick`);
 
             const projectRoot = workspaceFolder.uri.fsPath;
 
             // 修改 tmpDir 的位置
             const tmpDir = isDirectory ? path.join(fsPath, '.tmp') : path.join(path.dirname(fsPath), '.tmp');
+
+            // const existDirs = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
+            // if (existDirs.length !== 0) {
+            //     await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
+            // }
 
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
 
@@ -387,7 +402,7 @@ class ${className}View extends BasePage<${className}Controller> {
                 if (stderr) {
                     console.error(`stderr: ${stderr}`);
                 }
-                vscode.window.showInformationMessage('App icons generated successfully.');
+                vscode.window.showInformationMessage('iOS app icons generated successfully. Please check it on the desktop');
             });
         } catch (error) {
             vscode.window.showErrorMessage(`Error processing image: ${error}`);
@@ -405,5 +420,26 @@ class ${className}View extends BasePage<${className}Controller> {
                 }
             });
         });
+    }
+
+    private compressToWebP(uri: vscode.Uri) {
+        if (uri && uri.fsPath) {
+            const folderPath = uri.fsPath;
+            const scriptPath = path.join(this.context.extensionPath, 'scripts', 'compress_to_webp.sh');
+
+            if (fs.existsSync(scriptPath)) {
+                try {
+                    execSync(`bash "${scriptPath}" "${folderPath}"`, { stdio: 'inherit' });
+                    vscode.window.showInformationMessage('Images compressed to webp successfully! It has been automatically replaced');
+                } catch (error) {
+                    vscode.window.showErrorMessage('Failed to compress images to webp. Check the output for details.');
+                    console.error(error);
+                }
+            } else {
+                vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
+            }
+        } else {
+            vscode.window.showErrorMessage('Please select a folder to compress images.');
+        }
     }
 }

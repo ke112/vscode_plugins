@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "To improve the efficiency of Flutter development, support fast Wrapper code generation, fast Build Runner, fast new Getx page, etc",
-    "version": "0.0.46",
+    "version": "0.0.58",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -53,23 +53,27 @@
         "commands": [
             {
                 "command": "extension.buildRunnerQuick",
-                "title": "Build Runner Quick "
+                "title": "A_Build Runner Quick "
             },
             {
                 "command": "extension.buildRunner",
-                "title": "Build Runner"
+                "title": "A_Build Runner"
             },
             {
                 "command": "extension.createGetxBindingPage",
-                "title": "Create Getx Page (Binding)"
+                "title": "A_Create Getx Page (Binding)"
             },
             {
                 "command": "extension.createGetxBindingCustomPage",
-                "title": "Create Getx Page (Binding-Internal)"
+                "title": "A_Create Getx Page (Binding-Internal)"
             },
             {
-                "command": "extension.generateAppIcons",
-                "title": "Generate App Icons"
+                "command": "extension.generateIOSAppIcons",
+                "title": "A_Generate iOS app icons"
+            },
+            {
+                "command": "extension.compressToWebP",
+                "title": "A_Compress to webP"
             }
         ],
         "menus": {
@@ -96,8 +100,13 @@
                 },
                 {
                     "when": "resourceExtname == '.png'",
-                    "command": "extension.generateAppIcons",
+                    "command": "extension.generateIOSAppIcons",
                     "group": "YourExtensionGroup@5"
+                },
+                {
+                    "when": "explorerResourceIsFolder",
+                    "command": "extension.compressToWebP",
+                    "group": "navigation"
                 }
             ]
         }

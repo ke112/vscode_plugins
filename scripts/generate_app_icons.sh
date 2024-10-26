@@ -12,19 +12,19 @@ DEST_FOLDER="$HOME/Desktop/AppIcon.appiconset"
 sizes=(20 29 38 40 60 64 68 76 83.5)
 
 if [ ! -f "$SOURCE_ICON" ]; then
-    echo "源图标文件不存在！"
-    exit
+  echo "源图标文件不存在！"
+  exit
 fi
 
 if [[ ${SOURCE_ICON##*.} != "png" || $(identify -format "%w %h" $SOURCE_ICON) != "1024 1024" ]]; then
-    echo "源图标文件不是png格式或分辨率不是1024*1024！"
-    exit
+  echo "源图标文件不是png格式或分辨率不是1024*1024！"
+  exit
 fi
 
 # 检查ImageMagick是否安装
 if ! command -v convert &>/dev/null; then
-    echo "ImageMagick (convert) 未安装，请先安装 ImageMagick"
-    exit
+  echo "ImageMagick (convert) 未安装，请先安装 ImageMagick"
+  exit
 fi
 
 rm -rf "$DEST_FOLDER"
@@ -42,11 +42,11 @@ json_content='{
 
 # 遍历尺寸并生成2x和3x的图标
 for size in "${sizes[@]}"; do
-    # 生成2x图标
-    size2x=$(echo "$size * 2" | bc)
-    convert "$SOURCE_ICON" -resize "${size2x}x${size2x}" "$DEST_FOLDER/icon-${size}@2x.png"
-    echo "生成 $DEST_FOLDER/icon-${size}@2x.png 尺寸: ${size2x}x${size2x}"
-    json_content+='    {
+  # 生成2x图标
+  size2x=$(echo "$size * 2" | bc)
+  convert "$SOURCE_ICON" -resize "${size2x}x${size2x}" "$DEST_FOLDER/icon-${size}@2x.png"
+  echo "生成 $DEST_FOLDER/icon-${size}@2x.png 尺寸: ${size2x}x${size2x}"
+  json_content+='    {
       "filename" : "icon-'${size}'@2x.png",
       "idiom" : "universal",
       "platform" : "ios",
@@ -55,13 +55,13 @@ for size in "${sizes[@]}"; do
     },
 '
 
-    # 生成3x图标，处理特殊情况
-    # iPad 不需要3.0x的图标
-    if [ "$size" != "83.5" ]; then
-        size3x=$(echo "$size * 3" | bc)
-        convert "$SOURCE_ICON" -resize "${size3x}x${size3x}" "$DEST_FOLDER/icon-${size}@3x.png"
-        echo "生成 $DEST_FOLDER/icon-${size}@3x.png 尺寸: ${size3x}x${size3x}"
-        json_content+='    {
+  # 生成3x图标，处理特殊情况
+  # iPad 不需要3.0x的图标
+  if [ "$size" != "83.5" ]; then
+    size3x=$(echo "$size * 3" | bc)
+    convert "$SOURCE_ICON" -resize "${size3x}x${size3x}" "$DEST_FOLDER/icon-${size}@3x.png"
+    echo "生成 $DEST_FOLDER/icon-${size}@3x.png 尺寸: ${size3x}x${size3x}"
+    json_content+='    {
       "filename" : "icon-'${size}'@3x.png",
       "idiom" : "universal",
       "platform" : "ios",
@@ -69,7 +69,7 @@ for size in "${sizes[@]}"; do
       "size" : "'${size}'x'${size}'"
     },
 '
-    fi
+  fi
 
 done
 

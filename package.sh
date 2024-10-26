@@ -21,7 +21,7 @@ echo "版本升级 from $current_version to $new_version"
 rm -f flutter-plugins-*.vsix
 
 # 确保库都已经安装
-yarn install
+# yarn install
 
 # 编译并打包，自动回答 "yes"
 yarn run compile && echo "y" | vsce package --no-yarn
