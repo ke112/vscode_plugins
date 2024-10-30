@@ -37,10 +37,12 @@ If you want to read the Chinese version of README, [查看中文点击这里](/R
 
 1. Right-click the project, select `Quick Command` to use.
 2. Currently supported commands:
-    - `Build Runner` (Applicable to general generation of Model, repository, and image resources) 
-    - `Build Runner Quick` (Generate Model, repository, and image resources for local files, faster)
-    - `Create Getx Page (Binding)` (Quickly create internal base pages - applicable to directory right-click)
-    - `Create Getx Page (Binding-Internal)` (Quickly create internal base pages - applicable to directory right-click)
+    - `F_Build Runner` is suitable for general generation of Model, repository, and image resources
+    - `F_Build Runner Quick` generates Model, repository, and image resources for local files/directories, which is faster
+    - `F_Create Getx Page (Binding)` is suitable for quick creation of internal base class pages - only right click on the directory
+    - `F_Create Getx Page (Binding-Internal)` is suitable for quick creation of pages - only right click on the directory
+    - `F_Generate iOS app icons` is used to generate icons of various sizes required by iOS - Only 1024*1024.png
+    - `F_Compress to webP` selects non-webp images in the directory and converts them to webp
 
 ## Snippet
 

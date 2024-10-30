@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "To improve the efficiency of Flutter development, support fast Wrapper code generation, fast Build Runner, fast new Getx page, etc",
-    "version": "0.0.58",
+    "version": "0.0.60",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -53,27 +53,27 @@
         "commands": [
             {
                 "command": "extension.buildRunnerQuick",
-                "title": "A_Build Runner Quick "
+                "title": "F_Build Runner Quick "
             },
             {
                 "command": "extension.buildRunner",
-                "title": "A_Build Runner"
+                "title": "F_Build Runner"
             },
             {
                 "command": "extension.createGetxBindingPage",
-                "title": "A_Create Getx Page (Binding)"
+                "title": "F_Create Getx Page (Binding)"
             },
             {
                 "command": "extension.createGetxBindingCustomPage",
-                "title": "A_Create Getx Page (Binding-Internal)"
+                "title": "F_Create Getx Page (Binding-Internal)"
             },
             {
                 "command": "extension.generateIOSAppIcons",
-                "title": "A_Generate iOS app icons"
+                "title": "F_Generate iOS app icons"
             },
             {
                 "command": "extension.compressToWebP",
-                "title": "A_Compress to webP"
+                "title": "F_Compress to webP"
             }
         ],
         "menus": {

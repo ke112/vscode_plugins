@@ -35,10 +35,12 @@ Flutter Plugins是VS Code的扩展，可以帮助你提高开发效率。
 
 1. 右键项目，选择 `快速命令` 即可。
 2. 目前支持的命令有：
-    - `Build Runner`(适用于常规生成Model， repository， 和 image资源)
-    - `Build Runner Quick` (针对局部文件/目录生成Model， repository， 和 image资源，速度更快)
-    - `Create Getx Page (Binding)` (适用于快速创建内部基础类页面 - 仅限目录右键)
-    - `Create Getx Page (Binding-Internal)` (适用于快速创建页面 - 仅限目录右键)
+    - `F_Build Runner` 适用于常规生成Model， repository， 和 image资源
+    - `F_Build Runner Quick` 针对局部文件/目录生成Model， repository， 和 image资源，速度更快
+    - `F_Create Getx Page (Binding)` 适用于快速创建内部基础类页面 - 仅限目录右键
+    - `F_Create Getx Page (Binding-Internal)` 适用于快速创建页面 - 仅限目录右键
+    - `F_Generate iOS app icons` 适用于生成iOS需要各尺寸icon - 仅限1024*1024.png
+    - `F_Compress to webP` 选择目录下非webp图片转换为webp
   
 ## 代码片段
 

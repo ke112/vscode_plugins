@@ -88,27 +88,27 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: 'await 延迟执行'
     },
     'fedgeInsets only 生成间距': {
-      snippet: `EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '生成间距'
     },
     'fedgeInsets all 生成间距': {
-      snippet: `EdgeInsets.all(16.w),`,
+      snippet: `EdgeInsets.all(16.w)`,
       description: '生成间距'
     },
     'fmargin all 设置外边距': {
-      snippet: `margin: EdgeInsets.all(16.w),`,
+      snippet: `margin: EdgeInsets.all(16.w)`,
       description: '设置外边距'
     },
     'fmargin only 设置外边距': {
-      snippet: `margin: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `margin: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置外边距'
     },
     'fpadding all 设置内边距': {
-      snippet: `padding: EdgeInsets.all(16.w),`,
+      snippet: `padding: EdgeInsets.all(16.w)`,
       description: '设置内边距'
     },
     'fpadding only 设置内边距': {
-      snippet: `padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置内边距'
     },
     'ftop 设置顶部': {
@@ -592,11 +592,10 @@ bool get wantKeepAlive => true;`,
     },
     'fbox gradient 设置线性渐变': {
       snippet: `gradient: LinearGradient(
-  begin: Alignment(0.91, -0.40),
-  end: Alignment(-0.91, 0.4),
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
   colors: [
     Color(0xFF5E4FF5),
-    Color(0xFF5272F4),
     Color(0xFF58A9F7),
   ],
 ),`,
@@ -938,33 +937,33 @@ while (i < 10) {
       description: 'jsonKey 不包含'
     },
     "fjsonKey string 重命名": {
-      snippet: `@JsonKey(name: 'content')
-String content = '';`,
+      snippet: `@JsonKey(name: 'content', defaultValue: '')
+String? content;`,
       description: 'jsonKey string 重命名'
     },
     "fjsonKey int 重命名": {
-      snippet: `@JsonKey(name: 'count')
-int count = 0;`,
+      snippet: `@JsonKey(name: 'count', defaultValue: 0)
+int? count;`,
       description: 'jsonKey int 重命名'
     },
     "fjsonKey double 重命名": {
-      snippet: `@JsonKey(name: 'size')
-double size = 0;`,
+      snippet: `@JsonKey(name: 'size', defaultValue: 0.0)
+double? size;`,
       description: 'jsonKey double 重命名'
     },
     "fjsonKey bool 重命名": {
-      snippet: `@JsonKey(name: 'isShow')
-bool isShow = false;`,
+      snippet: `@JsonKey(name: 'isShow', defaultValue: false)
+bool? isShow;`,
       description: 'jsonKey bool 重命名'
     },
     "fjsonKey list 重命名": {
-      snippet: `@JsonKey(name: 'list')
-List<String> list = [];`,
+      snippet: `@JsonKey(name: 'list', defaultValue: [])
+List<String>? list;`,
       description: 'jsonKey list 重命名'
     },
     "fjsonKey map 重命名": {
-      snippet: `@JsonKey(name: 'map')
-Map<String, dynamic> map = {};`,
+      snippet: `@JsonKey(name: 'map', defaultValue: {})
+Map<String, dynamic>? map;`,
       description: 'jsonKey map 重命名'
     },
     'fjson with class 生成': {
@@ -974,8 +973,8 @@ part '$${1}.g.dart';
 
 @JsonSerializable()
 class $${1} {
-  @JsonKey(name: 'content')
-  String content = '';
+  @JsonKey(name: 'content', defaultValue: '')
+  String? content;
 
   $${1}(this.content);
 
