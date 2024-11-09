@@ -290,7 +290,7 @@ ${indentation})`;
     private wrapWithMeasureSize(widget: string, indentation: string): string {
         return `MeasureSize(
 ${indentation}  onChange: (Size size) {
-${indentation}    // Add your size change logic here
+${indentation}    //
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
@@ -313,7 +313,7 @@ ${indentation}})`;
 
     private wrapWithPreferredSize(widget: string, indentation: string): string {
         return `PreferredSize(
-${indentation}  preferredSize: Size.fromHeight(55),
+${indentation}  preferredSize: Size.fromHeight(55.w),
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
@@ -357,9 +357,9 @@ ${indentation})`;
 
     private wrapWithVisibilityDetector(widget: string, indentation: string): string {
         return `VisibilityDetector(
-${indentation}  key: const Key('unique key'),
+${indentation}  key: Key(),
 ${indentation}  onVisibilityChanged: (VisibilityInfo info) {
-${indentation}    // double value = info.visibleFraction;
+${indentation}    double value = info.visibleFraction;
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;

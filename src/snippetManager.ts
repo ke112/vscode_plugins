@@ -7,147 +7,139 @@ interface SnippetInfo {
 
 export class SnippetManager implements vscode.CompletionItemProvider {
   private snippets: { [key: string]: SnippetInfo } = {
-    'fcontainer 盒子': {
+    'container 容器': {
       snippet: `Container($1)`,
       description: 'Container'
     },
-    'fsb SizedBox 16 设置宽高': {
+    'sb 设置宽高': {
       snippet: `SizedBox(width: 16.w, height: 16.w),`,
       description: '固定大小的 SizedBox'
     },
-    'fsbh SizedBox 设置高度': {
+    'sbh 设置高度': {
       snippet: `SizedBox(height: 16.w),`,
       description: '固定高度的 SizedBox'
     },
-    'fsbw SizedBox 设置宽度': {
+    'sbw 设置宽度': {
       snippet: `SizedBox(width: 16.w),`,
       description: '固定宽度的 SizedBox'
     },
-    'fspacer 弹性空间': {
+    'spacer 弹性空间': {
       snippet: `const Spacer(),`,
       description: '弹性空间'
     },
-    'fwidth 设置宽度 100': {
-      snippet: `width: 100.w,`,
-      description: '设置宽度 100'
-    },
-    'fheight 设置高度 100': {
-      snippet: `height: 100.w,`,
-      description: '设置高度 100'
-    },
-    'fphysics neverScrollable 禁用滚动物理效果': {
+    'physics neverScrollable 禁用滚动物理效果': {
       snippet: `physics: const NeverScrollableScrollPhysics(),`,
       description: '禁用滚动物理效果'
     },
-    'fphysics: const BouncingScrollPhysics() iOS效果 弹簧': {
+    'physics: const BouncingScrollPhysics() iOS效果 弹簧': {
       snippet: `physics: const BouncingScrollPhysics(),`,
       description: '设置滚动物理效果 iOS效果 弹簧'
     },
-    'fphysics: const ClampingScrollPhysics() 安卓效果 不弹簧': {
+    'physics: const ClampingScrollPhysics() 安卓效果 不弹簧': {
       snippet: `physics: const ClampingScrollPhysics(),`,
       description: '设置滚动物理效果 安卓效果 不弹簧'
     },
-    'fscrollDirection horizontal 设置水平滚动方向': {
+    'scrollDirection horizontal 设置水平滚动方向': {
       snippet: `scrollDirection: Axis.horizontal,`,
       description: '设置水平滚动方向'
     },
-    'fshrinkWrap true 设置启用收缩包裹': {
+    'shrinkWrap true 设置启用收缩包裹': {
       snippet: `shrinkWrap: true,`,
       description: '设置启用收缩包裹'
     },
-    'fbehavior translucent 设置命中测试行为穿透': {
+    'behavior translucent 设置命中测试行为穿透': {
       snippet: `behavior: HitTestBehavior.translucent,`,
       description: '设置命中测试行为穿透'
     },
-    'falignment center 设置居中对齐': {
+    'alignment center 设置居中对齐': {
       snippet: `alignment: Alignment.center,`,
       description: '设置居中对齐'
     },
-    'fmainAxisAlignment: 设置主轴方式': {
+    'mainAxisAlignment: 设置主轴方式': {
       snippet: `mainAxisAlignment: MainAxisAlignment.spaceBetween,`,
       description: '设置主轴方式'
     },
-    'fcrossAxisAlignment: 设置交叉轴方式': {
+    'crossAxisAlignment: 设置交叉轴方式': {
       snippet: `crossAxisAlignment: CrossAxisAlignment.start,`,
       description: '设置交叉轴方式'
     },
-    'faddPostFrameCallback 获取当前帧结束后回调': {
+    'addPostFrameCallback 获取当前帧结束后回调': {
       snippet: `WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
   $0
 });`,
       description: '获取当前帧结束后回调'
     },
-    'fdelayed future延迟执行': {
+    'delayed future延迟执行': {
       snippet: `Future.delayed(const Duration(milliseconds: 1000)).then((value) async {
   $0
 });`,
       description: 'future延迟执行'
     },
-    'fdelayed await 延迟执行': {
+    'delayed await 延迟执行': {
       snippet: `await Future.delayed(const Duration(milliseconds: 1000));`,
       description: 'await 延迟执行'
     },
-    'fedgeInsets only 生成间距': {
+    'edgeInsets only 生成间距': {
       snippet: `EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '生成间距'
     },
-    'fedgeInsets all 生成间距': {
+    'edgeInsets all 生成间距': {
       snippet: `EdgeInsets.all(16.w)`,
       description: '生成间距'
     },
-    'fmargin all 设置外边距': {
+    'margin all 设置外边距': {
       snippet: `margin: EdgeInsets.all(16.w)`,
       description: '设置外边距'
     },
-    'fmargin only 设置外边距': {
+    'margin only 设置外边距': {
       snippet: `margin: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置外边距'
     },
-    'fpadding all 设置内边距': {
+    'padding all 设置内边距': {
       snippet: `padding: EdgeInsets.all(16.w)`,
       description: '设置内边距'
     },
-    'fpadding only 设置内边距': {
+    'padding only 设置内边距': {
       snippet: `padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置内边距'
     },
-    'ftop 设置顶部': {
+    'top 设置顶部': {
       snippet: `top: 16.w,`,
       description: '设置顶部'
     },
-    'fleft 设置左边': {
+    'left 设置左边': {
       snippet: `left: 16.w,`,
       description: '设置左边'
     },
-    'fbottom 设置底部': {
+    'bottom 设置底部': {
       snippet: `bottom: 16.w,`,
       description: '设置底部'
     },
-    'fright 设置右边': {
+    'right 设置右边': {
       snippet: `right: 16.w,`,
       description: '设置右边'
     },
-    'fcolor 设置红色': {
+    'color 设置红色': {
       snippet: `color: Colors.red,`,
       description: '设置红色'
     },
-    'fcolor 设置绿色': {
+    'color 设置绿色': {
       snippet: `color: Colors.green,`,
       description: '设置绿色'
     },
-    'fcolor 设置蓝色': {
+    'color 设置蓝色': {
       snippet: `color: Colors.blue,`,
       description: '设置蓝色'
     },
-    'fcolor 设置黄色': {
+    'color 设置黄色': {
       snippet: `color: Colors.yellow,`,
       description: '设置黄色'
     },
-    'fchild text 设置子组件 文本': {
+    'child text 设置子组件 文本': {
       snippet: `child: Text('Hello World'),`,
       description: '设置子组件 文本'
     },
-    'ftext 生成文本组件': {
+    'text 生成文本组件': {
       snippet: `Text(
   'Hello World',
   style: TextStyle(
@@ -160,7 +152,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
 ),`,
       description: '生成文本组件'
     },
-    "fstyle: 设置样式": {
+    "style: 设置样式": {
       snippet: `style: TextStyle(
   fontSize: 15.sp,
   fontFamily: 'PingFang SC',
@@ -170,7 +162,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
 ),`,
       description: '设置样式'
     },
-    'frichText 生成富文本': {
+    'richText 生成富文本': {
       snippet: `RichText(
   textAlign: TextAlign.center,
   text: TextSpan(
@@ -197,7 +189,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
 ),`,
       description: '生成富文本'
     },
-    'foverlay 添加悬浮窗口': {
+    'overlay 添加悬浮窗口': {
       snippet: `if (controller.overlayEntry != null) return; // 防止重复插入
 OverlayState? overlayState = Overlay.of(context);
 controller.overlayEntry = OverlayEntry(
@@ -214,151 +206,151 @@ controller.overlayEntry = OverlayEntry(
 overlayState.insert(controller.overlayEntry!);`,
       description: '添加悬浮窗口'
     },
-    'fpush Widget 打开界面': {
+    'push Widget 打开界面': {
       snippet: `Navigator.of(context).push(MaterialPageRoute(builder: (context) => $0),);`,
       description: '打开界面'
     },
-    'fpush Widget 打开弹起界面': {
+    'push Widget 打开弹起界面': {
       snippet: `Navigator.of(context).push(MaterialPageRoute(builder: (context) => $0,fullscreenDialog: true,));`,
       description: '打开弹起界面'
     },
-    'fpop 关闭界面': {
+    'pop 关闭界面': {
       snippet: `Navigator.maybeOf(context)?.pop();`,
       description: '关闭界面'
     },
-    'fpop 关闭界面并传递数据': {
+    'pop 关闭界面并传递数据': {
       snippet: `Navigator.maybeOf(context)?.pop(data);`,
       description: '关闭界面并传递数据'
     },
-    'fgetx pop 关闭界面': {
+    'getx pop 关闭界面': {
       snippet: `Get.back();`,
       description: '关闭界面'
     },
-    'fgetx pop 关闭界面并传递数据': {
+    'getx pop 关闭界面并传递数据': {
       snippet: `Get.back(result: data);`,
       description: '关闭界面并传递数据'
     },
-    'fgetx find 获取实例': {
+    'getx context ': {
+      snippet: `Get.context!`,
+      description: 'Get context 全局对象'
+    },
+    'getx find 获取实例': {
       snippet: `if (Get.isRegistered<$${0}>()) {
   Get.find<$${0}>();
 }`,
       description: 'getx find 获取实例'
     },
-    "fgetApplicationCacheDirectory 沙盒路径": {
+    "getApplicationCacheDirectory 沙盒路径": {
       snippet: `final directory = await getApplicationCacheDirectory();
 debugPrint('沙盒路径: \${directory.path}');`,
       description: '沙盒路径'
     },
-    "ftimer periodic 定时器": {
+    "timer periodic 定时器": {
       snippet: `final periodicTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
   debugPrint('定时器');
 });`,
       description: '定时器'
     },
-    'funfocus cancel keyboard 取消键盘': {
+    'unfocus cancel keyboard 取消键盘': {
       snippet: `FocusManager.instance.primaryFocus?.unfocus();`,
       description: '取消焦点'
     },
-    'fdebugPrint 调试打印': {
+    'debugPrint 调试打印': {
       snippet: `debugPrint('$${1}');`,
       description: '调试打印'
     },
-    'fmap 映射': {
+    'map 映射': {
       snippet: `Map<String, dynamic> params = {
   '$${1}': '$${2}',
 };`,
       description: '映射'
     },
-    'flist 列表': {
+    'list 列表': {
       snippet: `List<dynamic> list = [];`,
       description: '列表'
     },
-    'fstring s1 字符串': {
+    'string s1 字符串': {
       snippet: `String s1 = '';`,
       description: '字符串'
     },
-    'fint i1 整数': {
+    'int i1 整数': {
       snippet: `int i1 = -1;`,
       description: '整数'
     },
-    'fdouble d1 浮点数': {
+    'double d1 浮点数': {
       snippet: `double d1 = 0.0;`,
       description: '浮点数'
     },
-    'fbool b1 布尔值': {
+    'bool b1 布尔值': {
       snippet: `bool b1 = false;`,
       description: '布尔值'
     },
-    'fstatic const String globalString = 全局字符串': {
+    'static const String globalString = 全局字符串': {
       snippet: `static const String globalString = '${1}';`,
       description: '全局字符串'
     },
-    'fduration 设置持续时间': {
+    'duration 设置持续时间': {
       snippet: `duration: const Duration(milliseconds: \$0),`,
       description: '设置持续时间'
     },
-    'fduration 表示持续时间': {
+    'duration 表示持续时间': {
       snippet: `Duration(milliseconds: \$0),`,
       description: '表示持续时间'
     },
-    'fwidth 设置屏幕宽度': {
+    'width 设置宽度': {
       snippet: `width: ScreenUtil().screenWidth,`,
       description: '设置屏幕宽度'
     },
-    'fheight 设置屏幕高度': {
+    'height 设置高度': {
       snippet: `height: ScreenUtil().screenWidth,`,
       description: '设置屏幕高度'
     },
-    'fbottomPadding 获取底部安全区域': {
+    'bottomPadding 获取底部安全区域': {
       snippet: `ScreenUtil().bottomBarHeight,`,
       description: '获取底部安全区域'
     },
-    'ftopPadding 获取顶部安全区域': {
+    'topPadding 获取顶部安全区域': {
       snippet: `ScreenUtil().statusBarHeight,`,
       description: '获取顶部安全区域'
     },
-    'fscreenWidth 获取屏幕宽度': {
+    'screenWidth 获取屏幕宽度': {
       snippet: `ScreenUtil().screenWidth,`,
       description: '获取屏幕宽度'
     },
-    'fscreenHeight 获取屏幕高度': {
+    'screenHeight 获取屏幕高度': {
       snippet: `ScreenUtil().screenHeight,`,
       description: '获取屏幕高度'
     },
-    'fsliver adapter class 适配器': {
-      snippet: `SliverAdapter`,
-      description: 'sliver adapter 适配器'
-    },
-    'fsliver adapter with child 适配器': {
+    'sliver adapter with child 适配器': {
       snippet: `SliverAdapter(child: $${1}),`,
       description: 'sliver adapter with child 适配器'
     },
-    'ftypedef callback 定义回调': {
+    'typedef callback 定义回调': {
       snippet: `typedef Callback = void Function(String res);`,
       description: '定义回调'
     },
-    'ftypedef enum 定义枚举': {
+    'typedef enum 定义枚举': {
       snippet: `enum LoadingStateEnum { loading, success, error, empty }`,
       description: '定义枚举'
     },
-    'fsetState 安全刷新状态': {
+    'setState 安全刷新状态': {
       snippet: `if (mounted) setState(() {});`,
       description: '判断是否挂载，并设置状态'
     },
-    'fwantKeepAlive 保持状态': {
+    'wantKeepAlive 保持状态': {
       snippet: `@override
 bool get wantKeepAlive => true;`,
       description: '保持状态'
     },
-    'fkey 修饰Class': {
+    'key 修饰Class': {
       snippet: `const Class({Key? key}) : super(key: key);`,
       description: 'key修饰Class'
     },
-    'fsuper 调用父类': {
+    'super 调用父类': {
       snippet: `super(key: key);`,
       description: '调用父类'
     },
-    'fswitch 开关': {
+    'switch 开关': {
       snippet: `switch ($1) {
   case 0:
     {}
@@ -368,7 +360,7 @@ bool get wantKeepAlive => true;`,
 }`,
       description: 'switch 开关'
     },
-    'fonNotification 滚动通知': {
+    'onNotification 滚动通知': {
       snippet: `onNotification: (ScrollNotification notification) {
   if (notification is ScrollStartNotification) {
     debugPrint('开始滚动');
@@ -384,7 +376,7 @@ bool get wantKeepAlive => true;`,
 },`,
       description: 'onNotification 滚动通知'
     },
-    'fimage.file 图片': {
+    'image.file 图片': {
       snippet: `Image.file(
   File('assets/images/flutter_logo.png'),
   fit: BoxFit.contain,
@@ -393,26 +385,26 @@ bool get wantKeepAlive => true;`,
 )`,
       description: 'Image.file 图片'
     },
-    'fline 左右分割线': {
+    'line 左右分割线': {
       snippet: `Container(width: 0.5.w, color: const Color(0xFFE8EAEF)),`,
       description: 'line 左右分割线'
     },
-    'fline 上下分割线': {
+    'line 上下分割线': {
       snippet: `Container(height: 0.5.w, color: const Color(0xFFE8EAEF)),`,
       description: 'line 上下分割线'
     },
-    'ficon 系统图标': {
+    'icon 系统图标': {
       snippet: `const Icon(Icons.add),`,
       description: 'icon 系统图标'
     },
-    'ficon 自定义图标事件': {
+    'icon 自定义图标事件': {
       snippet: `IconButton(
   icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
   onPressed: () => Navigator.of(context).pop(),
 )`,
       description: 'icon 自定义图标事件'
     },
-    'fscaffold 生成页面': {
+    'scaffold 生成页面': {
       snippet: `Scaffold(
   extendBodyBehindAppBar: false,
   appBar: AppBar(
@@ -429,7 +421,7 @@ bool get wantKeepAlive => true;`,
   body: Container(),
 )`, description: 'scaffold 生成页面'
     },
-    'flistview builder 列表': {
+    'listview builder 列表': {
       snippet: `ListView.builder(
   padding: EdgeInsets.zero,
   scrollDirection: Axis.vertical,
@@ -446,7 +438,7 @@ bool get wantKeepAlive => true;`,
   },
 )`, description: 'listview builder 列表'
     },
-    'flistview separated 列表': {
+    'listview separated 列表': {
       snippet: `ListView.separated(
   padding: EdgeInsets.zero,
   scrollDirection: Axis.vertical,
@@ -468,7 +460,7 @@ bool get wantKeepAlive => true;`,
   },
 )`, description: 'listview separated 列表'
     },
-    'fgridview builder 固定列数,自动撑开高度': {
+    'gridview builder 固定列数,自动撑开高度': {
       snippet: `GridView.builder(
   scrollDirection: Axis.vertical,
   physics: const NeverScrollableScrollPhysics(),
@@ -486,7 +478,7 @@ bool get wantKeepAlive => true;`,
   },
 )`, description: 'gridview builder 固定列数,自动撑开高度'
     },
-    'fgridview builder 固定宽度,需要计算高度': {
+    'gridview builder 固定宽度,需要计算高度': {
       snippet: `GridView.builder(
   scrollDirection: Axis.vertical,
   physics: const NeverScrollableScrollPhysics(),
@@ -505,7 +497,7 @@ bool get wantKeepAlive => true;`,
   },
 )`, description: 'gridview builder 固定宽度,自动撑开高度'
     },
-    'fgridview 固定宽度,自动撑开高度': {
+    'gridview 固定宽度,自动撑开高度': {
       snippet: `GridView(
   shrinkWrap: true,
   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
@@ -525,7 +517,7 @@ bool get wantKeepAlive => true;`,
   ),
 )`, description: 'gridview 固定宽度,自动撑开高度'
     },
-    'fwrap 自动换行': {
+    'wrap 自动换行': {
       snippet: `Wrap(
   direction: Axis.horizontal,
   runSpacing: 20.w,
@@ -540,7 +532,7 @@ bool get wantKeepAlive => true;`,
   },
 )`, description: 'wrap 自动换行'
     },
-    'flist generate 循环生成Widget数组': {
+    'list generate 循环生成Widget数组': {
       snippet: `List.generate(
   15,
   (index) {
@@ -550,25 +542,25 @@ bool get wantKeepAlive => true;`,
   },
 )`, description: 'list generate 循环生成Widget数组'
     },
-    'fdecoration 设置修饰边框': {
+    'decoration 设置修饰': {
       snippet: `decoration: BoxDecoration(
   color: Colors.white,
   border: Border.all(width: 0.5.w, color: const Color(0xFF999999)),
   borderRadius: BorderRadius.all(Radius.circular(8.w)),
 ),`, description: 'decoration 设置修饰边框'
     },
-    'fconstraints 设置约束': {
+    'constraints 设置约束': {
       snippet: `constraints: BoxConstraints(
   maxWidth: 100.w,
   maxHeight: 100.w,
 ),`,
       description: 'constraints 设置约束'
     },
-    'fborder 设置全部边框': {
+    'border 设置全部边框': {
       snippet: `border: Border.all(width: 0.5.w, color: Color(0xFF333333)),`,
       description: 'border 设置全部边框'
     },
-    'fborder 设置各个边框': {
+    'border 设置各个边框': {
       snippet: `border: Border(
   top: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
   bottom: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
@@ -577,11 +569,11 @@ bool get wantKeepAlive => true;`,
 ),`,
       description: 'border 设置各个边框'
     },
-    'fborderRadius 设置全部圆角': {
+    'borderRadius 设置全部圆角': {
       snippet: `borderRadius: BorderRadius.circular(4.w),`,
       description: 'borderRadius 设置全部圆角'
     },
-    'fborderRadius 设置单个圆角': {
+    'borderRadius 设置单个圆角': {
       snippet: `borderRadius: BorderRadius.only(
   topLeft: Radius.circular(4.w),
   topRight: Radius.circular(4.w),
@@ -590,7 +582,7 @@ bool get wantKeepAlive => true;`,
 ),`,
       description: 'borderRadius 设置单个圆角'
     },
-    'fbox gradient 设置线性渐变': {
+    'box gradient 设置线性渐变': {
       snippet: `gradient: LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
@@ -601,7 +593,7 @@ bool get wantKeepAlive => true;`,
 ),`,
       description: 'box gradient 设置线性渐变'
     },
-    'fbox shadow 设置阴影': {
+    'box shadow 设置阴影': {
       snippet: `boxShadow: [
   BoxShadow(
     color: Color(0x0D000000),
@@ -612,25 +604,25 @@ bool get wantKeepAlive => true;`,
 ],`,
       description: 'box shadow 设置阴影'
     },
-    'fbox image 设置本地图片': {
+    'box image 设置本地图片': {
       snippet: `image: DecorationImage(
   image: AssetImage('assets/images/flutter_logo.png'),
   fit: BoxFit.cover,
 ),`,
       description: 'box image 设置本地图片'
     },
-    'fbox url 设置网络图片': {
+    'box url 设置网络图片': {
       snippet: `image: DecorationImage(
   image: NetworkImage('https:images/flutter_logo.png'),
   fit: BoxFit.cover,
 ),`,
       description: 'box url 设置网络图片'
     },
-    'fbox shape 设置形状': {
+    'box shape 设置形状': {
       snippet: `shape: BoxShape.circle,`,
       description: 'box shape 设置形状'
     },
-    'fshowModalBottomSheet 展示底部弹窗': {
+    'show bottom sheet 展示底部弹窗': {
       snippet: `showModalBottomSheet(
   context: context,
   isDismissible: true,
@@ -643,7 +635,7 @@ bool get wantKeepAlive => true;`,
 );`,
       description: 'showModalBottomSheet 展示底部弹窗'
     },
-    'fshowDialog 展示中心弹窗': {
+    'show dialog 展示中心弹窗': {
       snippet: `showDialog(
   context: context,
   builder: (context) {
@@ -659,12 +651,12 @@ bool get wantKeepAlive => true;`,
 );`,
       description: 'showDialog 展示中心弹窗'
     },
-    'fanimation 动画声明': {
+    'animation 动画声明': {
       snippet: `late AnimationController controller;
 late Animation<double> animation;`,
       description: '动画声明'
     },
-    'fanimation 动画初始化': {
+    'animation 动画初始化': {
       snippet: `AnimationController(
   vsync: this,
   duration: const Duration(milliseconds: 1000),
@@ -688,22 +680,20 @@ animation = Tween(begin: 0.0, end: 1.0)
     `,
       description: '动画'
     },
-    'frandom 随机数': {
-      snippet: `Random random = Random();
-int randomNumber = random.nextInt(100);`,
+    'random 随机数': {
+      snippet: `Random().nextInt(100);`,
       description: '随机数'
     },
-    'frandom 随机颜色': {
-      snippet: `Random random = Random();
-Color randomColor = Color.fromARGB(
+    'random 随机颜色': {
+      snippet: `Color.fromARGB(
   255,
-  random.nextInt(256),
-  random.nextInt(256),
-  random.nextInt(256),
+  Random().nextInt(256),
+  Random().nextInt(256),
+  Random().nextInt(256),
 );`,
       description: '随机颜色'
     },
-    'fnested 嵌套': {
+    'nested 嵌套': {
       snippet: `NestedScrollView(
   headerSliverBuilder: (context, innerBoxIsScrolled) {
     return [
@@ -737,7 +727,7 @@ Color randomColor = Color.fromARGB(
 )`,
       description: 'nested 嵌套'
     },
-    'fnested delegate 自定义': {
+    'nested delegate 自定义': {
       snippet: `class CommonSliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double minHeight;
   final double maxHeight;
@@ -762,7 +752,7 @@ Color randomColor = Color.fromARGB(
 }`,
       description: 'nested delegate 自定义'
     },
-    'fnested 吸顶': {
+    'nested 吸顶': {
       snippet: `NestedScrollView(
   headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
     double topWeightH = 50;
@@ -813,7 +803,7 @@ Color randomColor = Color.fromARGB(
   ),`,
       description: 'nested 吸顶'
     },
-    'fpreferredSize 自定义': {
+    'preferredSize 自定义': {
       snippet: `PreferredSize(
   preferredSize: Size(double.infinity, 55),
   child: Container(
@@ -823,47 +813,51 @@ Color randomColor = Color.fromARGB(
 ),`,
       description: 'preferredSize 自定义'
     },
-    'fmaterial 材料': {
+    'material 材料': {
       snippet: `import 'package:flutter/material.dart';`,
       description: 'material 材料'
     },
-    'ffoundation 基础': {
+    'foundation 基础': {
       snippet: `import 'package:flutter/foundation.dart';`,
       description: 'foundation 基础'
     },
-    'fdart:convert 转换': {
+    'dart:convert 转换': {
       snippet: `import 'dart:convert' as convert;`,
       description: 'dart:convert 转换'
     },
-    'fdart:math 数学': {
+    'dart:math 数学': {
       snippet: `import 'dart:math' as math;`,
       description: 'dart:math 数学'
     },
-    'fdart:io 文件': {
+    'dart:io 文件': {
       snippet: `import 'dart:io' as io;`,
       description: 'dart:io 文件'
     },
-    'fdart:async 异步': {
+    'dart:async 异步': {
       snippet: `import 'dart:async' as async;`,
       description: 'dart:async 异步'
     },
-    'fdart:typed_data 类型数据': {
+    'dart:typed_data 类型数据': {
       snippet: `import 'dart:typed_data' as typed_data;`,
       description: 'dart:typed_data 类型数据'
     },
-    'fdart:html 网页': {
+    'dart:html 网页': {
       snippet: `import 'dart:html' as html;`,
       description: 'dart:html 网页'
     },
-    'fdart:svg 矢量图': {
+    'dart:svg 矢量图': {
       snippet: `import 'dart:svg' as svg;`,
       description: 'dart:svg 矢量图'
     },
-    'fdart:ui 界面': {
+    'dart:ui 界面': {
       snippet: `import 'dart:ui' as ui;`,
       description: 'dart:ui 界面'
     },
-    'fsingleton 单例': {
+    'getx 引入': {
+      snippet: `import 'package:get/get.dart';`,
+      description: 'getx 引入'
+    },
+    'singleton 单例': {
       snippet: `class Singleton {
   // 私有的命名构造函数
   Singleton._internal();
@@ -874,31 +868,31 @@ Color randomColor = Color.fromARGB(
 }`,
       description: 'singleton 单例'
     },
-    'fglobalKey 全局key': {
+    'globalkey 初始化': {
       snippet: `final GlobalKey globalKey = GlobalKey();`,
       description: 'globalKey 全局key'
     },
-    'fglobalKey 获取widget': {
+    'globalkey 获取widget': {
       snippet: `globalKey.currentWidget`,
       description: 'globalKey 获取widget'
     },
-    'fglobalkey 获取state': {
+    'globalkey 获取state': {
       snippet: `State globalState = _globalKey.currentState as State;`,
       description: 'globalkey 获取state'
     },
-    'fglobalKey 获取height': {
+    'globalkey 获取height': {
       snippet: `var renderBox = globalKey.currentContext?.findRenderObject() as RenderBox;
 double dy = renderBox.localToGlobal(Offset.zero).dy;
 double height = renderBox.size.height;`,
       description: 'globalKey 获取height'
     },
-    'fglobalKey 获取width': {
+    'globalkey 获取width': {
       snippet: `var renderBox = globalKey.currentContext?.findRenderObject() as RenderBox;
 double dx = renderBox.localToGlobal(Offset.zero).dx;
 double width = renderBox.size.width;`,
       description: 'globalKey 获取width'
     },
-    'fwhile 循环': {
+    'while 循环': {
       snippet: `int i = 0;
 while (i < 10) {
     print(i);
@@ -906,67 +900,67 @@ while (i < 10) {
 }`,
       description: 'while 循环'
     },
-    'ffor 循环': {
+    'for 循环': {
       snippet: `for (int i = 0; i < 10; i++) {
     print(i);
 }`,
       description: 'for 循环'
     },
-    'fvoid 方法': {
+    'void 方法': {
       snippet: `void function() {$0}`,
       description: 'void 方法'
     },
-    'fchannel method通道': {
+    'channel method 通道': {
       snippet: `static const MethodChannel _channel = MethodChannel('work_channel');`,
       description: 'channel method通道'
     },
-    'fchannel 退出app安卓': {
+    'channel pop 退出app安卓': {
       snippet: `SystemNavigator.pop();`,
       description: 'channel 退出app安卓'
     },
-    'fvalue notifier 不为空': {
+    'value notifier 不为空': {
       snippet: `ValueNotifier<int> lister = ValueNotifier<int>(0);`,
       description: 'value notifier 不为空'
     },
-    'fvalue notifier 为空': {
+    'value notifier 为空': {
       snippet: `ValueNotifier<int?> lister = ValueNotifier<int?>(null);`,
       description: 'value notifier 为空'
     },
-    'fjsonKey 不包含': {
+    'jsonkey 不包含': {
       snippet: `@JsonKey(includeFromJson: false, includeToJson: false)`,
       description: 'jsonKey 不包含'
     },
-    "fjsonKey string 重命名": {
+    "jsonkey string 重命名": {
       snippet: `@JsonKey(name: 'content', defaultValue: '')
-String? content;`,
+String content;`,
       description: 'jsonKey string 重命名'
     },
-    "fjsonKey int 重命名": {
+    "jsonkey int 重命名": {
       snippet: `@JsonKey(name: 'count', defaultValue: 0)
-int? count;`,
+int count;`,
       description: 'jsonKey int 重命名'
     },
-    "fjsonKey double 重命名": {
+    "jsonkey double 重命名": {
       snippet: `@JsonKey(name: 'size', defaultValue: 0.0)
-double? size;`,
+double size;`,
       description: 'jsonKey double 重命名'
     },
-    "fjsonKey bool 重命名": {
+    "jsonkey bool 重命名": {
       snippet: `@JsonKey(name: 'isShow', defaultValue: false)
-bool? isShow;`,
+bool isShow;`,
       description: 'jsonKey bool 重命名'
     },
-    "fjsonKey list 重命名": {
+    "jsonkey list 重命名": {
       snippet: `@JsonKey(name: 'list', defaultValue: [])
-List<String>? list;`,
+List<String> list;`,
       description: 'jsonKey list 重命名'
     },
-    "fjsonKey map 重命名": {
+    "jsonkey map 重命名": {
       snippet: `@JsonKey(name: 'map', defaultValue: {})
 Map<String, dynamic>? map;`,
       description: 'jsonKey map 重命名'
     },
-    'fjson with class 生成': {
+    'json with class 生成': {
       snippet: `import 'package:json_annotation/json_annotation.dart';
 
 part '$${1}.g.dart';
@@ -983,25 +977,25 @@ class $${1} {
 }`,
       description: 'json with class 生成'
     },
-    'fdebounce 防抖': {
+    'debounce 防抖': {
       snippet: `EasyThrottle.throttle(hashCode.toString(), const Duration(milliseconds: 500), () async {
   $1
 });`,
       description: 'debounce 防抖'
     },
-    'fimage assets package 图片': {
+    'image assets package 图片': {
       snippet: `Assets.images.$1.image(width: 24.w, height: 24.w)`,
       description: 'image assets package 图片'
     },
-    'fcopy 复制': {
+    'copy 复制': {
       snippet: `Clipboard.setData(ClipboardData(text: '我是复制内容'));`,
       description: 'copy 复制'
     },
-    'ftoast 吐司': {
+    'toast 吐司': {
       snippet: `ToastUtil.showTip('我是吐司');`,
       description: 'toast 吐司'
     },
-    'ffeed back 反馈': {
+    'feed back 反馈': {
       snippet: `if (Platform.isIOS) {
   HapticFeedback.lightImpact();
 } else if (Platform.isAndroid) {
