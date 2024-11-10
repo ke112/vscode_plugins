@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "To improve the efficiency of Flutter development, support fast Wrapper code generation, fast Build Runner, fast new Getx page, etc",
-    "version": "0.0.60",
+    "version": "0.0.17",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -53,27 +53,27 @@
         "commands": [
             {
                 "command": "extension.buildRunnerQuick",
-                "title": "F_Build Runner Quick "
+                "title": "★ Build Runner Quick"
             },
             {
                 "command": "extension.buildRunner",
-                "title": "F_Build Runner"
+                "title": "★ Build Runner"
             },
             {
                 "command": "extension.createGetxBindingPage",
-                "title": "F_Create Getx Page (Binding)"
+                "title": "★ Create Getx Page (Binding)"
             },
             {
                 "command": "extension.createGetxBindingCustomPage",
-                "title": "F_Create Getx Page (Binding-Internal)"
+                "title": "★ Create Getx Page (Binding-Internal)"
             },
             {
                 "command": "extension.generateIOSAppIcons",
-                "title": "F_Generate iOS app icons"
+                "title": "★ Generate iOS app icon"
             },
             {
                 "command": "extension.compressToWebP",
-                "title": "F_Compress to webP"
+                "title": "★ Compress to WebP"
             }
         ],
         "menus": {
@@ -99,9 +99,9 @@
                     "group": "navigation"
                 },
                 {
-                    "when": "resourceExtname == '.png'",
+                    "when": "true",
                     "command": "extension.generateIOSAppIcons",
-                    "group": "YourExtensionGroup@5"
+                    "group": "navigation"
                 },
                 {
                     "when": "explorerResourceIsFolder",
