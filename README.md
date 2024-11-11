@@ -1,17 +1,17 @@
 # Flutter Plugins
 
-Flutter Plugins is an extension of VS Code that helps you improve development efficiency.
+Flutter Plugins can help you improve your development efficiency. If you can’t find a perfect plugin for yourself, create your own.
 
-If you want to read the Chinese version of README, [查看中文点击这里](/README_CN.md)
+If you want to read the Chinese version of README, [点击这里查看中文版本](/README_CN.md)
 
-## Widget Extend
+## 1. Widget Extend
 
-- Expand common components that are often used and inconvenient to use in actual development.。
+- Expand the Flutter base library but add components that are often used in actual development but are not convenient to use.
 
-## How to use
+### How to use
 
-1. Select the widget you want to wrap, then press the `Extract List` shortcut key, and select `Extended Widgets` to wrap.
-2. Currently supported widgets: (in ascending order)
+1. Select the components you want to include, then press the `Extract List` shortcut key and select `Expand Components`
+2. Currently supported components are: (in alphabetical order)
     - `AfterLayout`
     - `AnnotatedRegion`
     - `AnimatedBuilder`
@@ -29,27 +29,29 @@ If you want to read the Chinese version of README, [查看中文点击这里](/R
     - `ValueListenableListBuilder`
     - `VisibilityDetector`
 
-## Quick Functions
+## 2. Quick Functions
 
 - Add shortcut commands to the right-click menu of the project.
 
-## How to use
+### How to use
 
 1. Right-click the project, select `Quick Command` to use.
 2. Currently supported commands:
-    - `Build Runner Normal` (Applicable to general generation of Model, repository, and image resources) 
-    - `Build Runner Quick` (Generate Model, repository, and image resources for local files, faster)
-    - `Create Getx Page (Binding)` (Quickly create internal base pages - applicable to directory right-click)
-    - `Create Getx Page (Binding-Internal)` (Quickly create internal base pages - applicable to directory right-click)
+    - `★ Build Runner` is suitable for general generation of Model, repository, and image resources
+    - `★ Build Runner Quick` generates Model, repository, and image resources for local files/directories, which is faster
+    - `★ Create Getx Page (Binding)` is suitable for quick creation of internal base class pages - only right click on the directory
+    - `★ Create Getx Page (Binding-Internal)` is suitable for quick creation of pages - only right click on the directory
+    - `★ Generate iOS app icon` is used to generate icons of various sizes required by iOS - Only 1024*1024.png
+    - `★ Compress to WebP` selects non-webp images in the directory and converts them to webp
 
-## Snippet
+## 3. Snippet
 
 - Very efficient code snippets, can greatly improve your development efficiency.
 
-## How to use
+### How to use
 
-1. Output keywords naturally, such as `sb` for `SizedBox`, `spacer` for `Spacer`, etc.
-2. Currently supported code snippets, the recognition features are all Chinese descriptions, convenient for quick selection, and may be replaced with a unified prefix later.
+1. Natural output keywords, such as `sb` for `SizedBox`, `spacer` for `Spacer`, etc.
+2. Currently, all embedded code snippets have Chinese descriptions
 
 ## Contribution
 
@@ -67,17 +69,18 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 
 ## Update Log
 
-| Date       | Version | Update Content                                                        |
-| ---------- | ------- | --------------------------------------------------------------------- |
-| 2024-10-19 | v0.0.8  | Added n code snippets and Updated 2 widget support and README update. |
-| 2024-10-15 | v0.0.7  | Updated 3 widget support.                                             |
-| 2024-09-13 | v0.0.6  | Removed some pre-set import processing.                               |
-| 2024-09-13 | v0.0.5  | Added const processing when extracting widgets.                       |
-| 2024-09-10 | v0.0.4  | Updated README image display.                                         |
-| 2024-09-10 | v0.0.3  | Updated new interface command support.                                |
-| 2024-09-09 | v0.0.2  | Updated quick generate command support.                               |
-| 2024-09-06 | v0.0.1  | Updated 8 widget support.                                             |
+| Date       | Version | Update Content                                                                    |
+| ---------- | ------- | --------------------------------------------------------------------------------- |
+| 2024-11-11 | v0.0.9  | Add one-click generation of iOS logos of all sizes and image compression to webp. |
+| 2024-10-19 | v0.0.8  | Added n code snippets and Updated 2 widget support and README update.             |
+| 2024-10-15 | v0.0.7  | Updated 3 widget support.                                                         |
+| 2024-09-13 | v0.0.6  | Removed some pre-set import processing.                                           |
+| 2024-09-13 | v0.0.5  | Added const processing when extracting widgets.                                   |
+| 2024-09-10 | v0.0.4  | Updated README image display.                                                     |
+| 2024-09-10 | v0.0.3  | Updated new interface command support.                                            |
+| 2024-09-09 | v0.0.2  | Updated quick generate command support.                                           |
+| 2024-09-06 | v0.0.1  | Updated 8 widget support.                                                         |
 
 
 ## Marketplace
-[Go to VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
+[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)

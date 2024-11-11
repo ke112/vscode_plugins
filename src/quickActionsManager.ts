@@ -1,56 +1,65 @@
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
 export class QuickActionsManager {
-    registerCommands(context: vscode.ExtensionContext) {
-        const quickBuildRunnerDisposable = vscode.commands.registerCommand('extension.quickBuildRunner', (uri: vscode.Uri) => {
-            this.quickBuildRunner(uri);
+    private context: vscode.ExtensionContext;
+
+    constructor(context: vscode.ExtensionContext) {
+        this.context = context;
+    }
+
+    registerCommands() {
+        //快速build runner
+        const buildRunnerQuickDisposable = vscode.commands.registerCommand('extension.buildRunnerQuick', (uri: vscode.Uri) => {
+            this.buildRunnerQuick(uri);
         });
 
+        //全量build runner
         const buildRunnerDisposable = vscode.commands.registerCommand('extension.buildRunner', () => {
             this.buildRunner();
         });
 
+        //创建Getx Binding界面
         const createPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingPage', (uri: vscode.Uri) => {
             this.createPageStructure(uri);
         });
 
+        //创建Getx Binding界面 (内部)
         const createCustomPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingCustomPage', (uri: vscode.Uri) => {
             this.createCustomPageStructure(uri);
         });
 
-        context.subscriptions.push(quickBuildRunnerDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable);
+        //生成iOS所有icon
+        const generateAppIconsDisposable = vscode.commands.registerCommand('extension.generateIOSAppIcons', (uri: vscode.Uri) => {
+            this.generateAppIcons(uri);
+        });
+
+        //将图片转成webp
+        const compressToWebP = vscode.commands.registerCommand('extension.compressToWebP', this.compressToWebP.bind(this));
+        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable, compressToWebP,);
     }
 
-    private async quickBuildRunner(uri: vscode.Uri) {
+    private async buildRunnerQuick(uri: vscode.Uri) {
         const fsPath = uri.fsPath;
         const stats = await vscode.workspace.fs.stat(uri);
         const isDirectory = stats.type === vscode.FileType.Directory;
-
         if (!isDirectory && !fsPath.endsWith('.dart')) {
             vscode.window.showErrorMessage('Quick Build Runner only works with Dart files or directories.');
             return;
         }
-
         try {
             const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
             if (!workspaceFolder) {
                 vscode.window.showErrorMessage('Unable to determine project root directory');
                 return;
             }
-
-            vscode.window.showInformationMessage(`Start Quick Build Runner`);
-
             const projectRoot = workspaceFolder.uri.fsPath;
-
             // 修改 tmpDir 的位置
             const tmpDir = isDirectory ? path.join(fsPath, '.tmp') : path.join(path.dirname(fsPath), '.tmp');
-
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
-
             const originalDir = isDirectory ? fsPath : path.dirname(fsPath);
-
             if (isDirectory) {
                 const files = await vscode.workspace.fs.readDirectory(uri);
                 for (const [file, type] of files) {
@@ -65,9 +74,7 @@ export class QuickActionsManager {
                 const originalFilename = path.basename(fsPath);
                 await vscode.workspace.fs.copy(uri, vscode.Uri.file(path.join(tmpDir, originalFilename)));
             }
-
             await this.runBuildRunner(tmpDir, isDirectory);
-
             const tmpFiles = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
             for (const [file, type] of tmpFiles) {
                 if (type === vscode.FileType.File && file.endsWith('.g.dart')) {
@@ -80,10 +87,8 @@ export class QuickActionsManager {
                     );
                 }
             }
-
             await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
-
-            vscode.window.showInformationMessage('Quick Build Runner completed successfully.');
+            vscode.window.showInformationMessage('Quick Build Runner Completed Successfully');
         } catch (error) {
             vscode.window.showErrorMessage(`Error during Quick Build Runner: ${error}`);
         }
@@ -95,33 +100,45 @@ export class QuickActionsManager {
             vscode.window.showErrorMessage('No workspace folder found');
             return;
         }
-
-        vscode.window.showInformationMessage(`Start Build Runner`);
-
         const projectRoot = workspaceFolder.uri.fsPath;
-
         try {
             await this.runBuildRunnerCommand(projectRoot);
-            vscode.window.showInformationMessage('Build Runner completed successfully.');
+            vscode.window.showInformationMessage('Build Runner Completed Successfully');
         } catch (error) {
             vscode.window.showErrorMessage(`Error during Build Runner: ${error}`);
             console.error(`Error: ${error}`);
         }
     }
 
-    private runBuildRunner(workingDir: string, isDirectory: boolean): Promise<void> {
-        return new Promise((resolve, reject) => {
+    private async checkFvmExists(projectRoot: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            // 检查项目目录下的 .fvmrc 文件是否存在
+            const fvmrcPath = path.join(projectRoot, '.fvmrc');
+            fs.access(fvmrcPath, fs.constants.F_OK, (err) => {
+                resolve(!err); // 如果 .fvmrc 文件存在，则说明项目使用了 FVM
+            });
+        });
+    }
+
+    private async getBuildCommand(projectRoot: string): Promise<string> {
+        const hasFvm = await this.checkFvmExists(projectRoot);
+        console.log(`FVM detected: ${hasFvm}`);
+        // vscode.window.showInformationMessage(`Using ${hasFvm ? 'FVM' : 'regular Dart'} command`);
+        return hasFvm ? 'fvm dart run build_runner build' : 'dart run build_runner build';
+    }
+
+    private async runBuildRunner(workingDir: string, isDirectory: boolean): Promise<void> {
+        return new Promise(async (resolve, reject) => {
             const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(workingDir));
             if (!workspaceFolder) {
                 reject(new Error('Unable to determine project root directory'));
                 return;
             }
-
             const projectRoot = workspaceFolder.uri.fsPath;
             const relativePath = path.relative(projectRoot, workingDir);
             const buildFilter = `${relativePath}/*`;
-
-            const command = `dart run build_runner build --delete-conflicting-outputs --build-filter=${buildFilter}`;
+            const baseCommand = await this.getBuildCommand(projectRoot);
+            const command = `${baseCommand} --delete-conflicting-outputs --build-filter=${buildFilter}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error: ${error}`);
@@ -135,9 +152,10 @@ export class QuickActionsManager {
         });
     }
 
-    private runBuildRunnerCommand(projectRoot: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const command = `dart run build_runner build --delete-conflicting-outputs`;
+    private async runBuildRunnerCommand(projectRoot: string): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            const baseCommand = await this.getBuildCommand(projectRoot);
+            const command = `${baseCommand} --delete-conflicting-outputs`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error: ${error}`);
@@ -156,33 +174,26 @@ export class QuickActionsManager {
             prompt: "Enter the page name",
             placeHolder: "e.g. HomePage or homePage"
         });
-
         if (!pageName) {
             return;
         }
-
         const snakeCaseName = this.toSnakeCase(pageName);
         const pageDir = path.join(uri.fsPath, snakeCaseName);
-
         try {
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(pageDir));
-
             const subDirs = ['bindings', 'views', 'controllers', 'widgets'];
             for (const dir of subDirs) {
                 await vscode.workspace.fs.createDirectory(vscode.Uri.file(path.join(pageDir, dir)));
             }
-
             const files = [
                 { name: `${snakeCaseName}_binding.dart`, dir: 'bindings', content: this.generateBindingContent(snakeCaseName) },
                 { name: `${snakeCaseName}_controller.dart`, dir: 'controllers', content: this.generateControllerContent(snakeCaseName) },
                 { name: `${snakeCaseName}_view.dart`, dir: 'views', content: this.generateViewContent(snakeCaseName) }
             ];
-
             for (const file of files) {
                 const filePath = path.join(pageDir, file.dir, file.name);
                 await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(file.content));
             }
-
             vscode.window.showInformationMessage(`Page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
             vscode.window.showErrorMessage(`Error creating page structure: ${error}`);
@@ -269,7 +280,7 @@ class ${className}View extends GetView<${className}Controller> {
         leading: Builder(builder: (context) {
           return GestureDetector(
             behavior: HitTestBehavior.translucent,
-            onTap: () {
+            onTap: () async {
               Navigator.maybeOf(context)?.pop();
             },
             child: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
@@ -292,33 +303,26 @@ class ${className}View extends GetView<${className}Controller> {
             prompt: "Enter the page name",
             placeHolder: "e.g. HomePage or homePage"
         });
-
         if (!pageName) {
             return;
         }
-
         const snakeCaseName = this.toSnakeCase(pageName);
         const pageDir = path.join(uri.fsPath, snakeCaseName);
-
         try {
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(pageDir));
-
             const subDirs = ['bindings', 'views', 'controllers', 'widgets'];
             for (const dir of subDirs) {
                 await vscode.workspace.fs.createDirectory(vscode.Uri.file(path.join(pageDir, dir)));
             }
-
             const files = [
                 { name: `${snakeCaseName}_binding.dart`, dir: 'bindings', content: this.generateBindingContent(snakeCaseName) },
                 { name: `${snakeCaseName}_controller.dart`, dir: 'controllers', content: this.generateControllerContent(snakeCaseName) },
                 { name: `${snakeCaseName}_view.dart`, dir: 'views', content: this.generateCustomViewContent(snakeCaseName) }
             ];
-
             for (const file of files) {
                 const filePath = path.join(pageDir, file.dir, file.name);
                 await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(file.content));
             }
-
             vscode.window.showInformationMessage(`Custom page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
             vscode.window.showErrorMessage(`Error creating custom page structure: ${error}`);
@@ -346,5 +350,70 @@ class ${className}View extends BasePage<${className}Controller> {
   }
 }
 `;
+    }
+
+    private async generateAppIcons(uri: vscode.Uri) {
+        if (!uri) {
+            vscode.window.showErrorMessage('Please select a PNG file.');
+            return;
+        }
+        const filePath = uri.fsPath;
+        if (!filePath.toLowerCase().endsWith('.png')) {
+            vscode.window.showErrorMessage('The selected file is not a PNG image.');
+            return;
+        }
+        try {
+            const dimensions = await this.getImageDimensions(filePath);
+            if (dimensions.width !== 1024 || dimensions.height !== 1024) {
+                vscode.window.showWarningMessage('The selected image is not 1024x1024.');
+                return;
+            }
+            const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
+            exec(`bash "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
+                if (error) {
+                    vscode.window.showErrorMessage(`Error generating app icons: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    console.error(`stderr: ${stderr}`);
+                }
+                vscode.window.showInformationMessage('Generate successful desktop view');
+            });
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error processing image: ${error}`);
+        }
+    }
+
+    private getImageDimensions(filePath: string): Promise<{ width: number, height: number }> {
+        return new Promise((resolve, reject) => {
+            const sizeOf = require('image-size');
+            sizeOf(filePath, (error: Error, dimensions: { width: number, height: number }) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(dimensions);
+                }
+            });
+        });
+    }
+
+    private compressToWebP(uri: vscode.Uri) {
+        if (uri && uri.fsPath) {
+            const folderPath = uri.fsPath;
+            const scriptPath = path.join(this.context.extensionPath, 'scripts', 'compress_to_webp.sh');
+            if (fs.existsSync(scriptPath)) {
+                try {
+                    execSync(`bash "${scriptPath}" "${folderPath}"`, { stdio: 'inherit' });
+                    vscode.window.showInformationMessage('Compressed to WebP successfully!');
+                } catch (error) {
+                    vscode.window.showErrorMessage('Failed to compress images to webp.');
+                    console.error(error);
+                }
+            } else {
+                vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
+            }
+        } else {
+            vscode.window.showErrorMessage('Please select a folder to compress images.');
+        }
     }
 }

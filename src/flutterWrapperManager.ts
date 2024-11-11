@@ -63,7 +63,12 @@ export class FlutterWrapperManager {
         return match ? match[1] : '';
     }
 
+    // 判断是否为潜在的 Widget 名称
+    // 以下划线开头的名称，检查是否为小驼峰命名
+    // 不以下划线开头的名称，检查是否为大驼峰命名
     private isPotentialWidget(name: string): boolean {
+        // 暂时默认返回 true
+        return true;
         if (name.startsWith('_')) {
             // 对于以下划线开头的名称，检查是否为小驼峰命名
             return /^_[a-z][a-zA-Z0-9]*$/.test(name) && name.length > 2;
@@ -267,7 +272,6 @@ ${indentation})`;
 
     private wrapWithInkWell(widget: string, indentation: string): string {
         return `InkWell(
-${indentation}  behavior: HitTestBehavior.translucent,
 ${indentation}  onTap: () async {
 ${indentation}    //
 ${indentation}  },
@@ -286,7 +290,7 @@ ${indentation})`;
     private wrapWithMeasureSize(widget: string, indentation: string): string {
         return `MeasureSize(
 ${indentation}  onChange: (Size size) {
-${indentation}    // Add your size change logic here
+${indentation}    //
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
@@ -309,7 +313,7 @@ ${indentation}})`;
 
     private wrapWithPreferredSize(widget: string, indentation: string): string {
         return `PreferredSize(
-${indentation}  preferredSize: Size.fromHeight(55),
+${indentation}  preferredSize: Size.fromHeight(55.w),
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
@@ -353,9 +357,9 @@ ${indentation})`;
 
     private wrapWithVisibilityDetector(widget: string, indentation: string): string {
         return `VisibilityDetector(
-${indentation}  key: const Key('unique key'),
+${indentation}  key: Key(),
 ${indentation}  onVisibilityChanged: (VisibilityInfo info) {
-${indentation}    // double value = info.visibleFraction;
+${indentation}    double value = info.visibleFraction;
 ${indentation}  },
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;

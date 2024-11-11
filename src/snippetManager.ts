@@ -7,29 +7,25 @@ interface SnippetInfo {
 
 export class SnippetManager implements vscode.CompletionItemProvider {
   private snippets: { [key: string]: SnippetInfo } = {
-    'sb 固定大小的 SizedBox': {
+    'container 容器': {
+      snippet: `Container($1)`,
+      description: 'Container'
+    },
+    'sb 设置宽高': {
       snippet: `SizedBox(width: 16.w, height: 16.w),`,
       description: '固定大小的 SizedBox'
     },
-    'sbh 固定高度的 SizedBox': {
+    'sbh 设置高度': {
       snippet: `SizedBox(height: 16.w),`,
       description: '固定高度的 SizedBox'
     },
-    'sbw 固定宽度的 SizedBox': {
+    'sbw 设置宽度': {
       snippet: `SizedBox(width: 16.w),`,
       description: '固定宽度的 SizedBox'
     },
     'spacer 弹性空间': {
       snippet: `const Spacer(),`,
       description: '弹性空间'
-    },
-    'width 设置宽度 100': {
-      snippet: `width: 100.w,`,
-      description: '设置宽度 100'
-    },
-    'height 设置高度 100': {
-      snippet: `height: 100.w,`,
-      description: '设置高度 100'
     },
     'physics neverScrollable 禁用滚动物理效果': {
       snippet: `physics: const NeverScrollableScrollPhysics(),`,
@@ -51,9 +47,9 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       snippet: `shrinkWrap: true,`,
       description: '设置启用收缩包裹'
     },
-    'behavior translucent 设置命中测试行为为透明': {
+    'behavior translucent 设置命中测试行为穿透': {
       snippet: `behavior: HitTestBehavior.translucent,`,
-      description: '设置命中测试行为为透明'
+      description: '设置命中测试行为穿透'
     },
     'alignment center 设置居中对齐': {
       snippet: `alignment: Alignment.center,`,
@@ -69,13 +65,13 @@ export class SnippetManager implements vscode.CompletionItemProvider {
     },
     'addPostFrameCallback 获取当前帧结束后回调': {
       snippet: `WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-  '${1}'
+  $0
 });`,
       description: '获取当前帧结束后回调'
     },
     'delayed future延迟执行': {
       snippet: `Future.delayed(const Duration(milliseconds: 1000)).then((value) async {
-  '${1}'
+  $0
 });`,
       description: 'future延迟执行'
     },
@@ -84,27 +80,27 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: 'await 延迟执行'
     },
     'edgeInsets only 生成间距': {
-      snippet: `EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '生成间距'
     },
     'edgeInsets all 生成间距': {
-      snippet: `EdgeInsets.all(16.w),`,
+      snippet: `EdgeInsets.all(16.w)`,
       description: '生成间距'
     },
     'margin all 设置外边距': {
-      snippet: `margin: EdgeInsets.all(16.w),`,
+      snippet: `margin: EdgeInsets.all(16.w)`,
       description: '设置外边距'
     },
     'margin only 设置外边距': {
-      snippet: `margin: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `margin: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置外边距'
     },
     'padding all 设置内边距': {
-      snippet: `padding: EdgeInsets.all(16.w),`,
+      snippet: `padding: EdgeInsets.all(16.w)`,
       description: '设置内边距'
     },
     'padding only 设置内边距': {
-      snippet: `padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置内边距'
     },
     'top 设置顶部': {
@@ -163,7 +159,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
   fontWeight: FontWeight.w500,
   color: const Color(0xFF2A2F3C),
   height: 1.3,
-)`,
+),`,
       description: '设置样式'
     },
     'richText 生成富文本': {
@@ -190,7 +186,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       TextSpan(text: '张图片不符合标准，建议您重新上传'),
     ],
   ),
-)`,
+),`,
       description: '生成富文本'
     },
     'overlay 添加悬浮窗口': {
@@ -211,11 +207,11 @@ overlayState.insert(controller.overlayEntry!);`,
       description: '添加悬浮窗口'
     },
     'push Widget 打开界面': {
-      snippet: `Navigator.of(context).push(MaterialPageRoute(builder: (context) => $1),);`,
+      snippet: `Navigator.of(context).push(MaterialPageRoute(builder: (context) => $0),);`,
       description: '打开界面'
     },
     'push Widget 打开弹起界面': {
-      snippet: `Navigator.of(context).push(MaterialPageRoute(builder: (context) => $1,fullscreenDialog: true,));`,
+      snippet: `Navigator.of(context).push(MaterialPageRoute(builder: (context) => $0,fullscreenDialog: true,));`,
       description: '打开弹起界面'
     },
     'pop 关闭界面': {
@@ -234,9 +230,13 @@ overlayState.insert(controller.overlayEntry!);`,
       snippet: `Get.back(result: data);`,
       description: '关闭界面并传递数据'
     },
+    'getx context ': {
+      snippet: `Get.context!`,
+      description: 'Get context 全局对象'
+    },
     'getx find 获取实例': {
-      snippet: `if (Get.isRegistered<${1}>()) {
-  Get.find<${1}>();
+      snippet: `if (Get.isRegistered<$${0}>()) {
+  Get.find<$${0}>();
 }`,
       description: 'getx find 获取实例'
     },
@@ -251,17 +251,17 @@ debugPrint('沙盒路径: \${directory.path}');`,
 });`,
       description: '定时器'
     },
-    'unfocus 取消焦点': {
+    'unfocus cancel keyboard 取消键盘': {
       snippet: `FocusManager.instance.primaryFocus?.unfocus();`,
       description: '取消焦点'
     },
     'debugPrint 调试打印': {
-      snippet: `debugPrint('${1}');`,
+      snippet: `debugPrint('$${1}');`,
       description: '调试打印'
     },
     'map 映射': {
       snippet: `Map<String, dynamic> params = {
-  '${1}': '${2}',
+  '$${1}': '$${2}',
 };`,
       description: '映射'
     },
@@ -270,19 +270,19 @@ debugPrint('沙盒路径: \${directory.path}');`,
       description: '列表'
     },
     'string s1 字符串': {
-      snippet: `String s1 = '${1}';`,
+      snippet: `String s1 = '';`,
       description: '字符串'
     },
     'int i1 整数': {
-      snippet: `int i1 = ${1};`,
+      snippet: `int i1 = -1;`,
       description: '整数'
     },
     'double d1 浮点数': {
-      snippet: `double d1 = ${1}.0;`,
+      snippet: `double d1 = 0.0;`,
       description: '浮点数'
     },
     'bool b1 布尔值': {
-      snippet: `bool b1 = ${1};`,
+      snippet: `bool b1 = false;`,
       description: '布尔值'
     },
     'static const String globalString = 全局字符串': {
@@ -290,36 +290,28 @@ debugPrint('沙盒路径: \${directory.path}');`,
       description: '全局字符串'
     },
     'duration 设置持续时间': {
-      snippet: `duration: const Duration(milliseconds: '${1}'),`,
+      snippet: `duration: const Duration(milliseconds: \$0),`,
       description: '设置持续时间'
     },
-    'Duration 表示持续时间': {
-      snippet: `Duration(milliseconds: '${1}'),`,
+    'duration 表示持续时间': {
+      snippet: `Duration(milliseconds: \$0),`,
       description: '表示持续时间'
     },
-    'width 设置屏幕宽度': {
-      snippet: `width: MediaQuery.of(context).size.width,`,
+    'width 设置宽度': {
+      snippet: `width: ScreenUtil().screenWidth,`,
       description: '设置屏幕宽度'
     },
-    'height 设置屏幕高度': {
-      snippet: `height: MediaQuery.of(context).size.height,`,
+    'height 设置高度': {
+      snippet: `height: ScreenUtil().screenWidth,`,
       description: '设置屏幕高度'
     },
     'bottomPadding 获取底部安全区域': {
-      snippet: `MediaQuery.of(context).padding.bottom,`,
+      snippet: `ScreenUtil().bottomBarHeight,`,
       description: '获取底部安全区域'
     },
     'topPadding 获取顶部安全区域': {
-      snippet: `MediaQuery.of(context).padding.top,`,
-      description: '获取顶部安全区域'
-    },
-    'statusBarHeight 获取状态栏高度': {
       snippet: `ScreenUtil().statusBarHeight,`,
-      description: '获取状态栏高度'
-    },
-    'bottomBarHeight 获取底部栏高度': {
-      snippet: `ScreenUtil().bottomBarHeight,`,
-      description: '获取底部栏高度'
+      description: '获取顶部安全区域'
     },
     'screenWidth 获取屏幕宽度': {
       snippet: `ScreenUtil().screenWidth,`,
@@ -329,12 +321,8 @@ debugPrint('沙盒路径: \${directory.path}');`,
       snippet: `ScreenUtil().screenHeight,`,
       description: '获取屏幕高度'
     },
-    'sliver adapter class 适配器': {
-      snippet: `SliverAdapter`,
-      description: 'sliver adapter 适配器'
-    },
     'sliver adapter with child 适配器': {
-      snippet: `SliverAdapter(child: '${1}'),`,
+      snippet: `SliverAdapter(child: $${1}),`,
       description: 'sliver adapter with child 适配器'
     },
     'typedef callback 定义回调': {
@@ -351,7 +339,7 @@ debugPrint('沙盒路径: \${directory.path}');`,
     },
     'wantKeepAlive 保持状态': {
       snippet: `@override
-  bool get wantKeepAlive => true;`,
+bool get wantKeepAlive => true;`,
       description: '保持状态'
     },
     'key 修饰Class': {
@@ -365,7 +353,7 @@ debugPrint('沙盒路径: \${directory.path}');`,
     'switch 开关': {
       snippet: `switch ($1) {
   case 0:
-    {};
+    {}
     break;
   default:
     break;
@@ -388,10 +376,10 @@ debugPrint('沙盒路径: \${directory.path}');`,
 },`,
       description: 'onNotification 滚动通知'
     },
-    'Image.file 图片': {
+    'image.file 图片': {
       snippet: `Image.file(
+  File('assets/images/flutter_logo.png'),
   fit: BoxFit.contain,
-  File('${1}'),
   width: 100.w,
   height: 100.w,
 )`,
@@ -410,7 +398,7 @@ debugPrint('沙盒路径: \${directory.path}');`,
       description: 'icon 系统图标'
     },
     'icon 自定义图标事件': {
-      snippet: `const IconButton(
+      snippet: `IconButton(
   icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
   onPressed: () => Navigator.of(context).pop(),
 )`,
@@ -442,7 +430,7 @@ debugPrint('沙盒路径: \${directory.path}');`,
   shrinkWrap: true,
   // physics: const NeverScrollableScrollPhysics(),
   itemCount: 3,
-  itemExtent: 60,
+  itemExtent: 60.w,
   itemBuilder: (BuildContext context, int index) {
     return Container(
       child: Text('$index'),
@@ -554,7 +542,7 @@ debugPrint('沙盒路径: \${directory.path}');`,
   },
 )`, description: 'list generate 循环生成Widget数组'
     },
-    'decoration 设置修饰边框': {
+    'decoration 设置修饰': {
       snippet: `decoration: BoxDecoration(
   color: Colors.white,
   border: Border.all(width: 0.5.w, color: const Color(0xFF999999)),
@@ -596,11 +584,10 @@ debugPrint('沙盒路径: \${directory.path}');`,
     },
     'box gradient 设置线性渐变': {
       snippet: `gradient: LinearGradient(
-  begin: Alignment(0.91, -0.40),
-  end: Alignment(-0.91, 0.4),
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
   colors: [
     Color(0xFF5E4FF5),
-    Color(0xFF5272F4),
     Color(0xFF58A9F7),
   ],
 ),`,
@@ -619,14 +606,14 @@ debugPrint('沙盒路径: \${directory.path}');`,
     },
     'box image 设置本地图片': {
       snippet: `image: DecorationImage(
-  image: AssetImage('${1}'),
+  image: AssetImage('assets/images/flutter_logo.png'),
   fit: BoxFit.cover,
 ),`,
       description: 'box image 设置本地图片'
     },
     'box url 设置网络图片': {
       snippet: `image: DecorationImage(
-  image: NetworkImage('${1}'),
+  image: NetworkImage('https:images/flutter_logo.png'),
   fit: BoxFit.cover,
 ),`,
       description: 'box url 设置网络图片'
@@ -635,7 +622,7 @@ debugPrint('沙盒路径: \${directory.path}');`,
       snippet: `shape: BoxShape.circle,`,
       description: 'box shape 设置形状'
     },
-    'showModalBottomSheet 展示底部弹窗': {
+    'show bottom sheet 展示底部弹窗': {
       snippet: `showModalBottomSheet(
   context: context,
   isDismissible: true,
@@ -643,12 +630,12 @@ debugPrint('沙盒路径: \${directory.path}');`,
   isScrollControlled: true,
   backgroundColor: Colors.transparent,
   builder: (context) {
-    return Container();
+    return Container(height: 200.w,);
   },
 );`,
       description: 'showModalBottomSheet 展示底部弹窗'
     },
-    'showDialog 展示中心弹窗': {
+    'show dialog 展示中心弹窗': {
       snippet: `showDialog(
   context: context,
   builder: (context) {
@@ -694,16 +681,15 @@ animation = Tween(begin: 0.0, end: 1.0)
       description: '动画'
     },
     'random 随机数': {
-      snippet: `Random random = Random();
-int randomNumber = random.nextInt(100);`,
+      snippet: `Random().nextInt(100);`,
       description: '随机数'
     },
     'random 随机颜色': {
-      snippet: `Color randomColor = Color.fromARGB(
+      snippet: `Color.fromARGB(
   255,
-  random.nextInt(256),
-  random.nextInt(256),
-  random.nextInt(256),
+  Random().nextInt(256),
+  Random().nextInt(256),
+  Random().nextInt(256),
 );`,
       description: '随机颜色'
     },
@@ -867,6 +853,10 @@ int randomNumber = random.nextInt(100);`,
       snippet: `import 'dart:ui' as ui;`,
       description: 'dart:ui 界面'
     },
+    'getx 引入': {
+      snippet: `import 'package:get/get.dart';`,
+      description: 'getx 引入'
+    },
     'singleton 单例': {
       snippet: `class Singleton {
   // 私有的命名构造函数
@@ -875,28 +865,28 @@ int randomNumber = random.nextInt(100);`,
   static final Singleton _instance = Singleton._internal();
   factory Singleton() => _instance;
   static Singleton get instance => _instance;
-},`,
+}`,
       description: 'singleton 单例'
     },
-    'globalKey 全局key': {
+    'globalkey 初始化': {
       snippet: `final GlobalKey globalKey = GlobalKey();`,
       description: 'globalKey 全局key'
     },
-    'globalKey 获取widget': {
+    'globalkey 获取widget': {
       snippet: `globalKey.currentWidget`,
       description: 'globalKey 获取widget'
     },
     'globalkey 获取state': {
-      snippet: `${1}State globalState = _globalKey.currentState as ${1}State;`,
+      snippet: `State globalState = _globalKey.currentState as State;`,
       description: 'globalkey 获取state'
     },
-    'globalKey 获取height': {
+    'globalkey 获取height': {
       snippet: `var renderBox = globalKey.currentContext?.findRenderObject() as RenderBox;
 double dy = renderBox.localToGlobal(Offset.zero).dy;
 double height = renderBox.size.height;`,
       description: 'globalKey 获取height'
     },
-    'globalKey 获取width': {
+    'globalkey 获取width': {
       snippet: `var renderBox = globalKey.currentContext?.findRenderObject() as RenderBox;
 double dx = renderBox.localToGlobal(Offset.zero).dx;
 double width = renderBox.size.width;`,
@@ -916,11 +906,15 @@ while (i < 10) {
 }`,
       description: 'for 循环'
     },
-    'channel 通道': {
-      snippet: `static const MethodChannel _channel = MethodChannel('work_channel');`,
-      description: 'channel 通道'
+    'void 方法': {
+      snippet: `void function() {$0}`,
+      description: 'void 方法'
     },
-    'channel 退出app安卓': {
+    'channel method 通道': {
+      snippet: `static const MethodChannel _channel = MethodChannel('work_channel');`,
+      description: 'channel method通道'
+    },
+    'channel pop 退出app安卓': {
       snippet: `SystemNavigator.pop();`,
       description: 'channel 退出app安卓'
     },
@@ -932,56 +926,56 @@ while (i < 10) {
       snippet: `ValueNotifier<int?> lister = ValueNotifier<int?>(null);`,
       description: 'value notifier 为空'
     },
-    'jsonKey 不包含': {
+    'jsonkey 不包含': {
       snippet: `@JsonKey(includeFromJson: false, includeToJson: false)`,
       description: 'jsonKey 不包含'
     },
-    "jsonKey string 重命名": {
-      snippet: `@JsonKey(name: 'content')
-String content = '';`,
+    "jsonkey string 重命名": {
+      snippet: `@JsonKey(name: 'content', defaultValue: '')
+String content;`,
       description: 'jsonKey string 重命名'
     },
-    "jsonKey int 重命名": {
-      snippet: `@JsonKey(name: 'count')
-int count = 0;`,
+    "jsonkey int 重命名": {
+      snippet: `@JsonKey(name: 'count', defaultValue: 0)
+int count;`,
       description: 'jsonKey int 重命名'
     },
-    "jsonKey double 重命名": {
-      snippet: `@JsonKey(name: 'size')
-double size = 0;`,
+    "jsonkey double 重命名": {
+      snippet: `@JsonKey(name: 'size', defaultValue: 0.0)
+double size;`,
       description: 'jsonKey double 重命名'
     },
-    "jsonKey bool 重命名": {
-      snippet: `@JsonKey(name: 'isShow')
-bool isShow = false;`,
+    "jsonkey bool 重命名": {
+      snippet: `@JsonKey(name: 'isShow', defaultValue: false)
+bool isShow;`,
       description: 'jsonKey bool 重命名'
     },
-    "jsonKey list 重命名": {
-      snippet: `@JsonKey(name: 'list')
-List<String> list = [];`,
+    "jsonkey list 重命名": {
+      snippet: `@JsonKey(name: 'list', defaultValue: [])
+List<String> list;`,
       description: 'jsonKey list 重命名'
     },
-    "jsonKey map 重命名": {
-      snippet: `@JsonKey(name: 'map')
-Map<String, dynamic> map = {};`,
+    "jsonkey map 重命名": {
+      snippet: `@JsonKey(name: 'map', defaultValue: {})
+Map<String, dynamic>? map;`,
       description: 'jsonKey map 重命名'
     },
-    'jsonSerializable with class 生成': {
+    'json with class 生成': {
       snippet: `import 'package:json_annotation/json_annotation.dart';
 
-part '${1}.g.dart';
+part '$${1}.g.dart';
 
 @JsonSerializable()
-class ${1} {
-  @JsonKey(name: 'content')
-  String content = '';
+class $${1} {
+  @JsonKey(name: 'content', defaultValue: '')
+  String? content;
 
-  ${1}();
+  $${1}(this.content);
 
-  factory ${1}.fromJson(Map<String, dynamic> json) => _$${1}FromJson(json);
-  Map<String, dynamic> toJson() => _$${1}ToJson(this);
+  factory $${1}.fromJson(Map<String, dynamic> json) => _$$${1}FromJson(json);
+  Map<String, dynamic> toJson() => _$$${1}ToJson(this);
 }`,
-      description: 'jsonSerializable with class 生成'
+      description: 'json with class 生成'
     },
     'debounce 防抖': {
       snippet: `EasyThrottle.throttle(hashCode.toString(), const Duration(milliseconds: 500), () async {
@@ -994,11 +988,11 @@ class ${1} {
       description: 'image assets package 图片'
     },
     'copy 复制': {
-      snippet: `Clipboard.setData(ClipboardData(text: '复制内容'));`,
+      snippet: `Clipboard.setData(ClipboardData(text: '我是复制内容'));`,
       description: 'copy 复制'
     },
     'toast 吐司': {
-      snippet: `ToastUtil.showTip('复制成功');`,
+      snippet: `ToastUtil.showTip('我是吐司');`,
       description: 'toast 吐司'
     },
     'feed back 反馈': {
