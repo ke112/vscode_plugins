@@ -38,7 +38,13 @@ export class QuickActionsManager {
 
         //将图片转成webp
         const compressToWebP = vscode.commands.registerCommand('extension.compressToWebP', this.compressToWebP.bind(this));
-        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable, compressToWebP,);
+
+        // 生成 Assets
+        const generateAssetsDisposable = vscode.commands.registerCommand('extension.generateAssets', () => {
+            this.generateAssets();
+        });
+
+        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable, compressToWebP, generateAssetsDisposable);
     }
 
     private async buildRunnerQuick(uri: vscode.Uri) {
@@ -88,6 +94,24 @@ export class QuickActionsManager {
                 }
             }
             await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
+
+            // 为偶尔误删除的 .g.dart 文件添加 git 恢复操作
+            await new Promise((resolve, reject) => {
+                const command = `git status --porcelain | grep '^ D .*\\.g\\.dart$' | while read -r line; do
+                    file_path=$(echo "$line" | awk '{print $2}')
+                    git restore "$file_path"
+                done`;
+
+                exec(command, { cwd: workspaceFolder?.uri.fsPath }, (error, stdout, stderr) => {
+                    if (error && error.code !== 1) { //当未找到匹配项时，grep 将返回 1，这对我们来说不是错误
+                        console.error(`Error during git restore: ${error}`);
+                        reject(error);
+                        return;
+                    }
+                    resolve(void 0);
+                });
+            });
+
             vscode.window.showInformationMessage('Quick Build Runner Completed Successfully');
         } catch (error) {
             vscode.window.showErrorMessage(`Error during Quick Build Runner: ${error}`);
@@ -414,6 +438,46 @@ class ${className}View extends BasePage<${className}Controller> {
             }
         } else {
             vscode.window.showErrorMessage('Please select a folder to compress images.');
+        }
+    }
+
+    private async generateAssets() {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            vscode.window.showErrorMessage('No workspace folder found');
+            return;
+        }
+
+        try {
+            const projectRoot = workspaceFolder.uri.fsPath;
+            const genDir = path.join(projectRoot, 'lib', 'gen');
+
+            // 检查 gen 目录是否存在
+            try {
+                await vscode.workspace.fs.stat(vscode.Uri.file(genDir));
+            } catch {
+                vscode.window.showErrorMessage('gen directory does not exist');
+                return;
+            }
+
+            // 删除所有 .gen.dart 文件
+            const deleteCommand = `find "${genDir}" -type f -name "*.gen.dart" -delete`;
+            execSync(deleteCommand, { cwd: projectRoot });
+
+            // 运行 build_runner
+            const hasFvm = await this.checkFvmExists(projectRoot);
+            const baseCommand = await this.getBuildCommand(projectRoot);
+            const command = `${baseCommand} --delete-conflicting-outputs --build-filter=lib/gen/*`;
+
+            exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
+                if (error) {
+                    vscode.window.showErrorMessage(`Error generating assets: ${error.message}`);
+                    return;
+                }
+                vscode.window.showInformationMessage('Assets generated successfully');
+            });
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error during assets generation: ${error}`);
         }
     }
 }
