@@ -466,8 +466,8 @@ class ${className}View extends BasePage<${className}Controller> {
 
             // 运行 build_runner
             const hasFvm = await this.checkFvmExists(projectRoot);
-            const buildCommand = hasFvm ? 'fvm dart' : 'dart';
-            const command = `${buildCommand} run build_runner build --delete-conflicting-outputs --build-filter=lib/gen/*`;
+            const baseCommand = await this.getBuildCommand(projectRoot);
+            const command = `${baseCommand} --delete-conflicting-outputs --build-filter=lib/gen/*`;
 
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {

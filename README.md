@@ -37,12 +37,13 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
 
 1. Right-click the project, select `Quick Command` to use.
 2. Currently supported commands:
-    - `★ Build Runner` is suitable for general generation of Model, repository, and image resources
-    - `★ Build Runner Quick` generates Model, repository, and image resources for local files/directories, which is faster
-    - `★ Create Getx Page (Binding)` is suitable for quick creation of internal base class pages - only right click on the directory
-    - `★ Create Getx Page (Binding-Internal)` is suitable for quick creation of pages - only right click on the directory
-    - `★ Generate iOS app icon` is used to generate icons of various sizes required by iOS - Only 1024*1024.png
-    - `★ Compress to WebP` selects non-webp images in the directory and converts them to webp
+   - `★ Compress To WebP (Automatically replace the original image)` Select the non-WebP image in the directory to convert to WebP - Right-click the directory only
+   - `★ Create Getx Page (Internal use)` Applicable to quickly create a page - Right-click the directory only
+   - `★ Create Getx Page (Binding method)` Applicable to quickly create an internal basic class page - Right-click the directory only
+   - `★ Generate Assets (Quick update lib/gen)` Applicable to generating local resources under lib/gen, faster
+   - `★ Generate iOS App Icon (png images of various sizes)` Applicable to generating icons of various sizes required by iOS - Only 1024*1024.png - Right-click the directory|file
+   - `★ Generate Part (Local fast json/retrofit)` Generate model, repository for local files/directories, faster
+   - `★ Generate Project (Full project build)` Applicable to general generation of model, repository, and image resources
 
 ## 3. Snippet
 
@@ -69,17 +70,18 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 
 ## Update Log
 
-| Date       | Version | Update Content                                                                    |
-| ---------- | ------- | --------------------------------------------------------------------------------- |
-| 2024-11-11 | v0.0.9  | Add one-click generation of iOS logos of all sizes and image compression to webp. |
-| 2024-10-19 | v0.0.8  | Added n code snippets and Updated 2 widget support and README update.             |
-| 2024-10-15 | v0.0.7  | Updated 3 widget support.                                                         |
-| 2024-09-13 | v0.0.6  | Removed some pre-set import processing.                                           |
-| 2024-09-13 | v0.0.5  | Added const processing when extracting widgets.                                   |
-| 2024-09-10 | v0.0.4  | Updated README image display.                                                     |
-| 2024-09-10 | v0.0.3  | Updated new interface command support.                                            |
-| 2024-09-09 | v0.0.2  | Updated quick generate command support.                                           |
-| 2024-09-06 | v0.0.1  | Updated 8 widget support.                                                         |
+| Date       | Version | Update Content                                                             |
+| ---------- | ------- | -------------------------------------------------------------------------- |
+| 2024-11-13 | v0.0.10 | Update the shortcut function for generating lib/gen resources.             |
+| 2024-11-11 | v0.0.9  | Update one-click generation of all iOS logo sizes, image compression webp. |
+| 2024-10-19 | v0.0.8  | Update n code snippets, update 2 component support, README update.         |
+| 2024-10-15 | v0.0.7  | Update 3 component support.                                                |
+| 2024-09-13 | v0.0.6  | Remove some preset import processing.                                      |
+| 2024-09-13 | v0.0.5  | Update const processing.                                                   |
+| 2024-09-10 | v0.0.4  | Update README text and graphics.                                           |
+| 2024-09-10 | v0.0.3  | Update new interface command support.                                      |
+| 2024-09-09 | v0.0.2  | Update fast generation command support.                                    |
+| 2024-09-06 | v0.0.1  | Update 8 component support.                                                |  |
 
 
 ## Marketplace
