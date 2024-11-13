@@ -38,7 +38,13 @@ export class QuickActionsManager {
 
         //将图片转成webp
         const compressToWebP = vscode.commands.registerCommand('extension.compressToWebP', this.compressToWebP.bind(this));
-        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable, compressToWebP,);
+
+        // 生成 Assets
+        const generateAssetsDisposable = vscode.commands.registerCommand('extension.generateAssets', () => {
+            this.generateAssets();
+        });
+
+        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable, compressToWebP, generateAssetsDisposable);
     }
 
     private async buildRunnerQuick(uri: vscode.Uri) {
@@ -432,6 +438,46 @@ class ${className}View extends BasePage<${className}Controller> {
             }
         } else {
             vscode.window.showErrorMessage('Please select a folder to compress images.');
+        }
+    }
+
+    private async generateAssets() {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            vscode.window.showErrorMessage('No workspace folder found');
+            return;
+        }
+
+        try {
+            const projectRoot = workspaceFolder.uri.fsPath;
+            const genDir = path.join(projectRoot, 'lib', 'gen');
+
+            // 检查 gen 目录是否存在
+            try {
+                await vscode.workspace.fs.stat(vscode.Uri.file(genDir));
+            } catch {
+                vscode.window.showErrorMessage('gen directory does not exist');
+                return;
+            }
+
+            // 删除所有 .gen.dart 文件
+            const deleteCommand = `find "${genDir}" -type f -name "*.gen.dart" -delete`;
+            execSync(deleteCommand, { cwd: projectRoot });
+
+            // 运行 build_runner
+            const hasFvm = await this.checkFvmExists(projectRoot);
+            const buildCommand = hasFvm ? 'fvm dart' : 'dart';
+            const command = `${buildCommand} run build_runner build --delete-conflicting-outputs --build-filter=lib/gen/*`;
+
+            exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
+                if (error) {
+                    vscode.window.showErrorMessage(`Error generating assets: ${error.message}`);
+                    return;
+                }
+                vscode.window.showInformationMessage('Assets generated successfully');
+            });
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error during assets generation: ${error}`);
         }
     }
 }

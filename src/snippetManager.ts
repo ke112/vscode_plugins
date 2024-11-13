@@ -681,7 +681,7 @@ animation = Tween(begin: 0.0, end: 1.0)
       description: '动画'
     },
     'random 随机数': {
-      snippet: `Random().nextInt(100);`,
+      snippet: `Random().nextInt(100)`,
       description: '随机数'
     },
     'random 随机颜色': {
@@ -690,7 +690,7 @@ animation = Tween(begin: 0.0, end: 1.0)
   Random().nextInt(256),
   Random().nextInt(256),
   Random().nextInt(256),
-);`,
+)`,
       description: '随机颜色'
     },
     'nested 嵌套': {

@@ -74,6 +74,10 @@
             {
                 "command": "extension.compressToWebP",
                 "title": "★ Compress to WebP"
+            },
+            {
+                "command": "extension.generateAssets",
+                "title": "★ Generate Assets"
             }
         ],
         "menus": {
@@ -106,6 +110,11 @@
                 {
                     "when": "explorerResourceIsFolder",
                     "command": "extension.compressToWebP",
+                    "group": "navigation"
+                },
+                {
+                    "when": "true",
+                    "command": "extension.generateAssets",
                     "group": "navigation"
                 }
             ]
