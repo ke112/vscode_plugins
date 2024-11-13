@@ -71,7 +71,6 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 ## Update Log
 
 | Date       | Version | Update Content                                                             |
-| ---------- | ------- | -------------------------------------------------------------------------- |
 | 2024-11-13 | v0.0.10 | Update the shortcut function for generating lib/gen resources.             |
 | 2024-11-11 | v0.0.9  | Update one-click generation of all iOS logo sizes, image compression webp. |
 | 2024-10-19 | v0.0.8  | Update n code snippets, update 2 component support, README update.         |
