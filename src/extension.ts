@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
     // 注册快速操作命令
     quickActionsManager.registerCommands();
 
-    // 注册代码片段命令和自动完成
+    // 注册代码片段命令
     snippetManager.registerCommands(context);
 
     // 注册代码操作提供者
@@ -24,11 +24,16 @@ export function activate(context: vscode.ExtensionContext) {
     );
     // 注册代码操作提供者
     context.subscriptions.push(codeActionProvider);
+
+    // 注册清理
+    context.subscriptions.push({
+        dispose: () => snippetManager.dispose()
+    });
 }
 
 class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
     constructor(private flutterWrapperManager: FlutterWrapperManager) { }
-    // 提供代码操作
+
     provideCodeActions(document: vscode.TextDocument, range: vscode.Range): vscode.CodeAction[] {
         return this.flutterWrapperManager.provideCodeActions(document, range);
     }

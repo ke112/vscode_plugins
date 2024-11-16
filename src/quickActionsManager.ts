@@ -2,6 +2,7 @@ import { exec, execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { log } from './logger';
 
 export class QuickActionsManager {
     private context: vscode.ExtensionContext;
@@ -130,7 +131,7 @@ export class QuickActionsManager {
             vscode.window.showInformationMessage('Build Runner Completed Successfully');
         } catch (error) {
             vscode.window.showErrorMessage(`Error during Build Runner: ${error}`);
-            console.error(`Error: ${error}`);
+            log(`buildRunner Error: ${error}`);
         }
     }
 
@@ -146,7 +147,7 @@ export class QuickActionsManager {
 
     private async getBuildCommand(projectRoot: string): Promise<string> {
         const hasFvm = await this.checkFvmExists(projectRoot);
-        console.log(`FVM detected: ${hasFvm}`);
+        log(`getBuildCommand 是否有FVM: ${hasFvm}`);
         // vscode.window.showInformationMessage(`Using ${hasFvm ? 'FVM' : 'regular Dart'} command`);
         return hasFvm ? 'fvm dart run build_runner build' : 'dart run build_runner build';
     }
@@ -165,12 +166,12 @@ export class QuickActionsManager {
             const command = `${baseCommand} --delete-conflicting-outputs --build-filter=${buildFilter}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    console.error(`Error: ${error}`);
+                    log(`runBuildRunner Error: ${error}`);
                     reject(error);
                     return;
                 }
-                console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
+                log(`runBuildRunner stdout: ${stdout}`);
+                log(`runBuildRunner stderr: ${stderr}`);
                 resolve();
             });
         });
@@ -182,12 +183,12 @@ export class QuickActionsManager {
             const command = `${baseCommand} --delete-conflicting-outputs`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    console.error(`Error: ${error}`);
+                    log(`runBuildRunnerCommand Error: ${error}`);
                     reject(error);
                     return;
                 }
-                console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
+                log(`runBuildRunnerCommand stdout: ${stdout}`);
+                log(`runBuildRunnerCommand stderr: ${stderr}`);
                 resolve();
             });
         });
@@ -399,7 +400,7 @@ class ${className}View extends BasePage<${className}Controller> {
                     return;
                 }
                 if (stderr) {
-                    console.error(`stderr: ${stderr}`);
+                    log(`generateAppIcons stderr: ${stderr}`);
                 }
                 vscode.window.showInformationMessage('Generate successful desktop view');
             });
@@ -431,7 +432,7 @@ class ${className}View extends BasePage<${className}Controller> {
                     vscode.window.showInformationMessage('Compressed to WebP successfully!');
                 } catch (error) {
                     vscode.window.showErrorMessage('Failed to compress images to webp.');
-                    console.error(error);
+                    log(`compressToWebP Error: ${error}`);
                 }
             } else {
                 vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
