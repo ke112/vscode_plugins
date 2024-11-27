@@ -103,15 +103,16 @@ echo "Contents.json 文件已生成！"
 IOS_FOLDER="" #ios项目根目录
 ICON_PARENT_DIR=$(dirname "$SOURCE_ICON")
 cd "$ICON_PARENT_DIR"
-echo "当前目录: $ICON_PARENT_DIR"
+echo "当前icon所在目录: $ICON_PARENT_DIR"
 if [[ $ICON_PARENT_DIR == */ios/Runner/* ]]; then
     # 使用sed截取到/ios的路径
     IOS_FOLDER=$(echo "$ICON_PARENT_DIR" | sed 's/\(.*\/ios\).*/\1/')
+    # 拼接到Runner目录
     IOS_FOLDER="$IOS_FOLDER/Runner"
     echo "纯flutter项目 : $IOS_FOLDER"
-elif [[ $ICON_PARENT_DIR == */ios/* ]]; then
-    # 使用sed截取到/ios的路径
-    IOS_FOLDER=$(echo "$ICON_PARENT_DIR" | sed 's/\(.*\/ios\).*/\1/')
+elif [[ $ICON_PARENT_DIR == */Assets.xcassets/* ]]; then
+    # 使用更简单的方式拿到ios项目根目录
+    IOS_FOLDER=${ICON_PARENT_DIR%/Assets.xcassets/*}
     echo "ios原生项目 : $IOS_FOLDER"
 else
     echo "未知项目类型"
