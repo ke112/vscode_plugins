@@ -240,6 +240,27 @@ overlayState.insert(controller.overlayEntry!);`,
 }`,
       description: 'getx find 获取实例'
     },
+    'fgetx init 初始化': {
+      snippet: `@override
+void onInit() {
+  super.onInit();
+}`,
+      description: 'get 初始化'
+    },
+    'fgetx ready 初始化后一帧': {
+      snippet: `@override
+void onReady() {
+  super.onReady();
+}`,
+      description: 'get 初始化后一帧'
+    },
+    'fgetx close 关闭销毁': {
+      snippet: `@override
+void onClose() {
+  super.onClose();
+}`,
+      description: 'get 关闭销毁'
+    },
     'fget Application Cache Directory 沙盒路径': {
       snippet: `final directory = await getApplicationCacheDirectory();
 debugPrint('沙盒路径: \${directory.path}');`,
@@ -349,27 +370,6 @@ bool get wantKeepAlive => true;`,
     'fsuper 调用父类': {
       snippet: `super(key: key);`,
       description: '调用父类'
-    },
-    'fgetx init 初始化': {
-      snippet: `@override
-void onInit() {
-  super.onInit();
-}`,
-      description: 'get 初始化'
-    },
-    'fgetx ready 初始化后一帧': {
-      snippet: `@override
-void onReady() {
-  super.onReady();
-}`,
-      description: 'get 初始化后一帧'
-    },
-    'fgetx close 关闭销毁': {
-      snippet: `@override
-void onClose() {
-  super.onClose();
-}`,
-      description: 'get 关闭销毁'
     },
     'fswitch 开关': {
       snippet: `switch ($1) {
@@ -969,34 +969,34 @@ while (i < 10) {
       snippet: `@JsonKey(includeFromJson: false, includeToJson: false)`,
       description: 'jsonKey 不包含'
     },
-    "jsonkey string 重命名": {
+    "fjsonkey string 重命名": {
       snippet: `@JsonKey(name: 'content', defaultValue: '')
-String content;`,
+final String content;`,
       description: 'jsonKey string 重命名'
     },
-    "jsonkey int 重命名": {
+    "fjsonkey int 重命名": {
       snippet: `@JsonKey(name: 'count', defaultValue: 0)
-int count;`,
+final int count;`,
       description: 'jsonKey int 重命名'
     },
-    "jsonkey double 重命名": {
+    "fjsonkey double 重命名": {
       snippet: `@JsonKey(name: 'size', defaultValue: 0.0)
-double size;`,
+final double size;`,
       description: 'jsonKey double 重命名'
     },
-    "jsonkey bool 重命名": {
+    "fjsonkey bool 重命名": {
       snippet: `@JsonKey(name: 'isShow', defaultValue: false)
-bool isShow;`,
+final bool isShow;`,
       description: 'jsonKey bool 重命名'
     },
-    "jsonkey list 重命名": {
+    "fjsonkey list 重命名": {
       snippet: `@JsonKey(name: 'list', defaultValue: [])
-List<String> list;`,
+final List<String> list;`,
       description: 'jsonKey list 重命名'
     },
-    "jsonkey map 重命名": {
+    "fjsonkey map 重命名": {
       snippet: `@JsonKey(name: 'map', defaultValue: {})
-Map<String, dynamic> map;`,
+final Map<String, dynamic> map;`,
       description: 'jsonKey map 重命名'
     },
     'fjson with class 生成': {
@@ -1007,7 +1007,7 @@ part '$${1}.g.dart';
 @JsonSerializable()
 class $${1} {
   @JsonKey(name: 'content', defaultValue: '')
-  String? content;
+  final String content;
 
   $${1}(this.content);
 
