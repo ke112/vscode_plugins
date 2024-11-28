@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "To improve the efficiency of Flutter development, support fast Wrapper code generation, fast Build Runner, fast new Getx page, etc",
-    "version": "0.0.53",
+    "version": "0.0.54",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",

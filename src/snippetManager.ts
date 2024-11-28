@@ -139,16 +139,40 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       snippet: `child: Text('Hello World'),`,
       description: '设置子组件 文本'
     },
-    'ftext 生成文本组件': {
+    'ftext 默认多行': {
       snippet: `Text(
-  'Hello World',
+  '多行文本',
   style: TextStyle(
     fontSize: 15.sp,
     fontFamily: 'PingFang SC',
     fontWeight: FontWeight.w500,
     color: const Color(0xFF2A2F3C),
-    height: 1.3,
+    height: 1.2,
   ),
+),`,
+      description: '生成文本组件'
+    },
+    'ftext 单行居中': {
+      snippet: `Text(
+  '单行文本垂直居中',
+  style: TextStyle(
+    fontFamily: 'PingFang SC',
+    fontWeight: FontWeight.w500,
+    color: const Color(0xFF2A2F3C),
+  ),
+  strutStyle: StrutStyle(
+    fontSize: 14.sp,
+    height: 1.2,
+    forceStrutHeight: true,
+  ),
+),`,
+      description: '生成文本组件'
+    },
+    'fstrut style 单行居中': {
+      snippet: `strutStyle: StrutStyle(
+  fontSize: 14.sp,
+  height: 1.2,
+  forceStrutHeight: true,
 ),`,
       description: '生成文本组件'
     },
@@ -158,7 +182,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
   fontFamily: 'PingFang SC',
   fontWeight: FontWeight.w500,
   color: const Color(0xFF2A2F3C),
-  height: 1.3,
+  height: 1.2,
 ),`,
       description: '设置样式'
     },
@@ -170,7 +194,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       color: const Color(0xFF202020),
       fontSize: 13.sp,
       fontWeight: FontWeight.normal,
-      height: 1.3,
+      height: 1.2,
     ),
     children: [
       const TextSpan(text: '当前系统检测到'),
