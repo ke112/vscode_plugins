@@ -156,13 +156,13 @@ export class FlutterWrapperManager {
             log('名称包含非小部件前缀:', name);
             return false;
         }
-    
+
         // 排除非大写开头的名称
         if (!/^[A-Z][a-zA-Z0-9]*$/.test(name)) {
             log('名称不符合 Widget 命名规范:', name);
             return false;
         }
-    
+
         // 通过所有检查，认为是潜在的 Widget
         return true;
     }

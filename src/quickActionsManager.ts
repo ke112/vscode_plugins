@@ -81,7 +81,7 @@ export class QuickActionsManager {
                 const originalFilename = path.basename(fsPath);
                 await vscode.workspace.fs.copy(uri, vscode.Uri.file(path.join(tmpDir, originalFilename)));
             }
-            await this.runBuildRunner(tmpDir, isDirectory);
+            await this.runBuildRunnerQuick(tmpDir, isDirectory);
             const tmpFiles = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
             for (const [file, type] of tmpFiles) {
                 if (type === vscode.FileType.File && file.endsWith('.g.dart')) {
@@ -115,6 +115,7 @@ export class QuickActionsManager {
 
             vscode.window.showInformationMessage('Quick Build Runner Completed Successfully');
         } catch (error) {
+            log(`quickBuildRunner错误: ${error}`);
             vscode.window.showErrorMessage(`Error during Quick Build Runner: ${error}`);
         }
     }
@@ -131,7 +132,7 @@ export class QuickActionsManager {
             vscode.window.showInformationMessage('Build Runner Completed Successfully');
         } catch (error) {
             vscode.window.showErrorMessage(`Error during Build Runner: ${error}`);
-            log(`buildRunner Error: ${error}`);
+            log(`buildRunner错误: ${error}`);
         }
     }
 
@@ -148,11 +149,10 @@ export class QuickActionsManager {
     private async getBuildCommand(projectRoot: string): Promise<string> {
         const hasFvm = await this.checkFvmExists(projectRoot);
         log(`getBuildCommand 是否有FVM: ${hasFvm}`);
-        // vscode.window.showInformationMessage(`Using ${hasFvm ? 'FVM' : 'regular Dart'} command`);
         return hasFvm ? 'fvm dart run build_runner build' : 'dart run build_runner build';
     }
 
-    private async runBuildRunner(workingDir: string, isDirectory: boolean): Promise<void> {
+    private async runBuildRunnerQuick(workingDir: string, isDirectory: boolean): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(workingDir));
             if (!workspaceFolder) {
@@ -166,12 +166,11 @@ export class QuickActionsManager {
             const command = `${baseCommand} --delete-conflicting-outputs --build-filter=${buildFilter}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    log(`runBuildRunner Error: ${error}`);
+                    log(`runBuildRunnerQuick错误: ${error}`);
                     reject(error);
                     return;
                 }
-                log(`runBuildRunner stdout: ${stdout}`);
-                log(`runBuildRunner stderr: ${stderr}`);
+                log(`runBuildRunnerQuick标准输出: ${stdout}`);
                 resolve();
             });
         });
@@ -183,12 +182,11 @@ export class QuickActionsManager {
             const command = `${baseCommand} --delete-conflicting-outputs`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    log(`runBuildRunnerCommand Error: ${error}`);
+                    log(`runBuildRunnerCommand错误: ${error}`);
                     reject(error);
                     return;
                 }
-                log(`runBuildRunnerCommand stdout: ${stdout}`);
-                log(`runBuildRunnerCommand stderr: ${stderr}`);
+                log(`runBuildRunnerQuick标准输出: ${stdout}`);
                 resolve();
             });
         });
@@ -221,6 +219,7 @@ export class QuickActionsManager {
             }
             vscode.window.showInformationMessage(`Page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
+            log(`createPageStructure错误: ${error}`);
             vscode.window.showErrorMessage(`Error creating page structure: ${error}`);
         }
     }
@@ -350,6 +349,7 @@ class ${className}View extends GetView<${className}Controller> {
             }
             vscode.window.showInformationMessage(`Custom page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
+            log(`createCustomPageStructure错误: ${error}`);
             vscode.window.showErrorMessage(`Error creating custom page structure: ${error}`);
         }
     }
@@ -399,12 +399,11 @@ class ${className}View extends BasePage<${className}Controller> {
                     vscode.window.showErrorMessage(`Error generating app icons: ${error.message}`);
                     return;
                 }
-                if (stderr) {
-                    log(`generateAppIcons stderr: ${stderr}`);
-                }
+                log(`generateAppIcons标准输出: ${stdout}`);
                 vscode.window.showInformationMessage('Generate successful desktop view');
             });
         } catch (error) {
+            log(`generateAppIcons错误: ${error}`);
             vscode.window.showErrorMessage(`Error processing image: ${error}`);
         }
     }
@@ -432,7 +431,7 @@ class ${className}View extends BasePage<${className}Controller> {
                     vscode.window.showInformationMessage('Compressed to WebP successfully!');
                 } catch (error) {
                     vscode.window.showErrorMessage('Failed to compress images to webp.');
-                    log(`compressToWebP Error: ${error}`);
+                    log(`compressToWebP错误: ${error}`);
                 }
             } else {
                 vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
@@ -466,9 +465,9 @@ class ${className}View extends BasePage<${className}Controller> {
             execSync(deleteCommand, { cwd: projectRoot });
 
             // 运行 build_runner
-            const hasFvm = await this.checkFvmExists(projectRoot);
             const baseCommand = await this.getBuildCommand(projectRoot);
             const command = `${baseCommand} --delete-conflicting-outputs --build-filter=lib/gen/*`;
+            log(`${command}`);
 
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {

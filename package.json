@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "To improve the efficiency of Flutter development, support fast Wrapper code generation, fast Build Runner, fast new Getx page, etc",
-    "version": "0.0.54",
+    "version": "0.0.58",
     "publisher": "zhangzhihua",
     "author": {
         "name": "zhangzhihua",
@@ -53,19 +53,19 @@
         "commands": [
             {
                 "command": "extension.buildRunnerQuick",
-                "title": "★ Generate Part (局部快速json/retrofit)"
+                "title": "★ Generate Part  (局部快速json/retrofit)"
             },
             {
                 "command": "extension.buildRunner",
-                "title": "★ Generate Project (全量项目构建)"
+                "title": "★ Generate Project  (全量项目构建)"
             },
             {
                 "command": "extension.createGetxBindingPage",
-                "title": "★ Create Getx Page (Binding方式)"
+                "title": "★ Create Getx Page  (Binding方式)"
             },
             {
                 "command": "extension.createGetxBindingCustomPage",
-                "title": "★ Create Getx Page (内部使用)"
+                "title": "★ Create Getx Page  (内部使用)"
             },
             {
                 "command": "extension.generateIOSAppIcons",
@@ -73,11 +73,11 @@
             },
             {
                 "command": "extension.compressToWebP",
-                "title": "★ Compress To WebP (自动替换原图)"
+                "title": "★ Compress To WebP  (自动替换)"
             },
             {
                 "command": "extension.generateAssets",
-                "title": "★ Generate Assets (快速更新lib/gen)"
+                "title": "★ Generate Assets  (快速更新lib/gen)"
             }
         ],
         "menus": {
