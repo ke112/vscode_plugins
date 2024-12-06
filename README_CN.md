@@ -49,7 +49,7 @@ Flutter Plugins 能帮助你提高开发效率，找不到一个完美的插件�
 
 ### 使用方法
 
-1. 自然的输出关键词，比如 `sb` 代表 `SizedBox`， `spacer` 代表 `Spacer` 等。
+1. 自然的输出关键词，比如 `fsb` 代表 `SizedBox`， `fspacer` 代表 `Spacer` 等。
 2. 目前的内嵌代码片段，都会有中文的描述
 
 ## 贡献

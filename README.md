@@ -51,7 +51,7 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
 
 ### How to use
 
-1. Natural output keywords, such as `sb` for `SizedBox`, `spacer` for `Spacer`, etc.
+1. Natural output keywords, such as `fsb` for `SizedBox`, `fspacer` for `Spacer`, etc.
 2. Currently, all embedded code snippets have Chinese descriptions
 
 ## Contribution
