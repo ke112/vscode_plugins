@@ -150,6 +150,7 @@ export class FlutterWrapperManager {
     }
 
     private isPotentialWidget(name: string): boolean {
+        return true;
         // 快速检查常见的非 widget 情况
         const nonWidgetPrefixes = ['on', 'get', 'set', 'is', 'has'];
         if (nonWidgetPrefixes.some(prefix => name.toLowerCase().startsWith(prefix))) {
