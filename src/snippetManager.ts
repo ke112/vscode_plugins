@@ -64,7 +64,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: '设置交叉轴方式'
     },
     'faddPostFrameCallback 获取当前帧结束后回调': {
-      snippet: `WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      snippet: `WidgetsBinding.instance.addPostFrameCallback((_) {
   $0
 });`,
       description: '获取当前帧结束后回调'

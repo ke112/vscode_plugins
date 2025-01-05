@@ -460,9 +460,13 @@ class ${className}View extends BasePage<${className}Controller> {
                 return;
             }
 
-            // 删除所有 .gen.dart 文件
-            const deleteCommand = `find "${genDir}" -type f -name "*.gen.dart" -delete`;
-            execSync(deleteCommand, { cwd: projectRoot });
+            // 删除 lib/gen 目录下的所有 .gen.dart 文件
+            const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(genDir));
+            for (const [file, type] of files) {
+                if (type === vscode.FileType.File && file.endsWith('.gen.dart')) {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(path.join(genDir, file)));
+                }
+            }
 
             // 运行 build_runner
             const baseCommand = await this.getBuildCommand(projectRoot);
