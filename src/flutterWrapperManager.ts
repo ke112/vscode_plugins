@@ -14,6 +14,9 @@ export class FlutterWrapperManager {
         'NeverScrollableScrollPhysics',
         'EdgeInsets',
         'Axis',
+        'Size',
+        'Colors',
+        'Get',
         // 可以添加其他需要排除的基础 Widget 类型
     ]);
 
@@ -57,6 +60,22 @@ export class FlutterWrapperManager {
         // 确保 widgetName 不为空, 
         // >50 为过滤选择全部文件时的响应, 正常2~50足够
         if (!widgetName || widgetName.length < 2 || widgetName.length > 50) {
+            return [];
+        }
+
+        // 检查 widgetName 前面的字符是否为点号(. <)
+        const widgetIndex = lineText.indexOf(widgetName);
+        if (widgetIndex > 0 && lineText[widgetIndex - 1] === '.' ||
+            widgetIndex > 0 && lineText[widgetIndex - 1] === '<'
+        ) {
+            log(`已排除前边是.的情况`);
+            return [];
+        }
+
+        // 检查是否为方法声明
+        const trimmedLeft = lineText.substring(0, range.start.character).trimLeft();
+        if (trimmedLeft.startsWith('void ') || trimmedLeft.startsWith('async ')) {
+            log(`已排除前边是void 的情况`);
             return [];
         }
 
