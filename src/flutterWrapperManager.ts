@@ -55,8 +55,8 @@ export class FlutterWrapperManager {
         const widgetName = this.extractWidgetName(lineText, range.start.character);
 
         // 确保 widgetName 不为空, 
-        // >20 为过滤选择全部文件时的响应, 正常2~20足够
-        if (!widgetName || widgetName.length < 2 || widgetName.length > 20) {
+        // >50 为过滤选择全部文件时的响应, 正常2~50足够
+        if (!widgetName || widgetName.length < 2 || widgetName.length > 50) {
             return [];
         }
 
