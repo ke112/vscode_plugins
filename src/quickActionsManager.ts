@@ -407,19 +407,22 @@ class ${className}View extends BasePage<${className}Controller> {
             return;
         }
         try {
+            log(`generateAppIcons: filePath = ${filePath}`);
             const dimensions = await this.getImageDimensions(filePath);
             if (dimensions.width !== 1024 || dimensions.height !== 1024) {
                 vscode.window.showWarningMessage('The selected image is not 1024x1024.');
                 return;
             }
             const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
-            exec(`bash "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
+            log(`generateAppIcons: scriptPath = ${scriptPath}`);
+            exec(`sh "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
                 if (error) {
                     vscode.window.showErrorMessage(`Error generating app icons: ${error.message}`);
+                    log(`generateAppIcons: error = ${error.message}`);
                     return;
                 }
                 log(`generateAppIcons标准输出: ${stdout}`);
-                vscode.window.showInformationMessage('Generate successful desktop view');
+                vscode.window.showInformationMessage('iOS logo generated successfully');
             });
         } catch (error) {
             log(`generateAppIcons错误: ${error}`);
