@@ -7,6 +7,11 @@ export NODE_PATH=$(npm root -g):$NODE_PATH
 
 SOURCE_ICON=$1
 DEST_FOLDER="$HOME/Desktop/AppIcon.appiconset"
+REMOVE_TEMP_FOLDER=true
+GENERATE_1X=false
+# 输出1x 2x 3x图标的尺寸列表（包含浮点数）
+sizes=(20 29 38 40 60 64 68 76 83.5)
+# sizes=(16 32 64 128 256 512)
 
 # 检测回到flutter主目录
 function checkFlutter() {
@@ -29,9 +34,6 @@ function checkFlutter() {
     fi
   done
 }
-
-# 输出2x和3x图标的尺寸列表（包含浮点数）
-sizes=(20 29 38 40 60 64 68 76 83.5)
 
 if [ ! -f "$SOURCE_ICON" ]; then
   echo "源图标文件不存在！"
@@ -66,6 +68,21 @@ json_content='{
 
 # 遍历尺寸并生成2x和3x的图标
 for size in "${sizes[@]}"; do
+  # 生成1x图标
+  if [ $GENERATE_1X=true ]; then
+    size1x=$(echo "$size * 1" | bc)
+    convert "$SOURCE_ICON" -resize "${size1x}x${size1x}" "$DEST_FOLDER/icon-${size}.png"
+    echo "生成 $DEST_FOLDER/icon-${size}.png 尺寸: ${size1x}x${size1x}"
+    json_content+='    {
+        "filename" : "icon-'${size}'.png",
+        "idiom" : "universal",
+        "platform" : "ios",
+        "scale" : "1x",
+        "size" : "'${size}'x'${size}'"
+      },
+'
+  fi
+
   # 生成2x图标
   size2x=$(echo "$size * 2" | bc)
   convert "$SOURCE_ICON" -resize "${size2x}x${size2x}" "$DEST_FOLDER/icon-${size}@2x.png"
@@ -159,5 +176,8 @@ else
   echo "错误: 目标文件夹不存在: $IOS_FOLDER/Assets.xcassets/AppIcon.appiconset"
   exit 1
 fi
+
 # 删除临时文件夹
-rm -rf "$DEST_FOLDER"
+if [ $REMOVE_TEMP_FOLDER=true ]; then
+  rm -rf "$DEST_FOLDER"
+fi
