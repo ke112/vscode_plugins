@@ -81,5 +81,5 @@ Flutter Plugins 能帮助你提高开发效率，找不到一个完美的插件�
 | 2024-09-09 | v0.0.2  | 更新快速生成命令支持。                         |
 | 2024-09-06 | v0.0.1  | 更新8个组件支持。                              |
 
-## 插件市场
-[VSCode插件市场](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
+## 插件
+[VSCode插件](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
