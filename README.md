@@ -1,17 +1,17 @@
 # Flutter Plugins
 
-Flutter Plugins can help you improve your development efficiency. If you can’t find a perfect plugin for yourself, create your own.
+Flutter Plugins 能帮助你提高开发效率，找不到一个完美的插件适合自己，那就自己创造。
 
-If you want to read the Chinese version of README, [点击这里查看中文版本](/README_CN.md)
+If you want to read the English version of README, [click here to view the English version](/README_EN.md)
 
-## 1. Widget Extend
+## Part 1 : 组件扩展
 
-- Expand the Flutter base library but add components that are often used in actual development but are not convenient to use.
+- 扩展Flutter基础库中没有，但实际开发中经常使用而又不方便使用的组件。
 
-### How to use
+### 使用方法
 
-1. Select the components you want to include, then press the `Extract List` shortcut key and select `Expand Components`
-2. Currently supported components are: (in alphabetical order)
+1. 选择你要包括的组件，然后按 `提取列表` 快捷键，选择 `拓展组件` 即可。
+2. 目前支持的组件有：(按字母排序)
     - `AfterLayout`
     - `AnnotatedRegion`
     - `AnimatedBuilder`
@@ -29,60 +29,60 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
     - `ValueListenableListBuilder`
     - `VisibilityDetector`
 
-## 2. Quick Functions
+## Part 2 : 快捷命令
 
-- Add shortcut commands to the right-click menu of the project.
+- 右键项目，选择 `快速命令` 即可。
 
-### How to use
+### 使用方法
 
-1. Right-click the project, select `Quick Command` to use.
-2. Currently supported commands:
-   - `★ Compress To WebP (Automatically replace the original image)` Select the non-WebP image in the directory to convert to WebP - Right-click the directory only
-   - `★ Create Getx Page (Internal use)` Applicable to quickly create a page - Right-click the directory only
-   - `★ Create Getx Page (Binding method)` Applicable to quickly create an internal basic class page - Right-click the directory only
-   - `★ Generate Assets (Quick update lib/gen)` Applicable to generating local resources under lib/gen, faster
-   - `★ Generate iOS App Icon (png images of various sizes)` Applicable to generating icons of various sizes required by iOS - Only 1024*1024.png - Right-click the directory|file
-   - `★ Generate Part (Local fast json/retrofit)` Generate model, repository for local files/directories, faster
-   - `★ Generate Project (Full project build)` Applicable to general generation of model, repository, and image resources
+1. 右键项目，选择 `快速命令` 即可。
+2. 目前支持的命令有：
+   - `★ Compress To WebP  (自动替换)` 选择目录下非 WebP 图片转换为 WebP - 仅限目录右键
+   - `★ Create Getx Page  (内部使用)` 适用于快速创建页面 - 仅限目录右键
+   - `★ Create Getx Page  (Binding方式)` 适用于快速创建内部基础类页面 - 仅限目录右键
+   - `★ Generate Assets  (快速更新lib/gen)` 适用于生成 lib/gen 下的本地资源，速度更快
+   - `★ Generate iOS App Icon (各尺寸png图)` 适用于生成iOS需要各尺寸icon - 仅限1024*1024.png - 目录|文件右键
+   - `★ Generate Part  (局部快速json/retrofit)` 针对局部文件/目录生成 model， repository，速度更快
+   - `★ Generate Project  (全量项目构建)` 适用于常规生成 model， repository， 和 image资源
+  
+## Part 3 :代码片段
 
-## 3. Snippet
+- 非常高效的代码片段，可以大大提高你的开发效率。
 
-- Very efficient code snippets, can greatly improve your development efficiency.
+### 使用方法
 
-### How to use
+1. 自然的输出关键词，比如 `fsb` 代表 `SizedBox`， `fspacer` 代表 `Spacer` 等。
+2. 目前的内嵌代码片段，都会有中文的描述
 
-1. Natural output keywords, such as `fsb` for `SizedBox`, `fspacer` for `Spacer`, etc.
-2. Currently, all embedded code snippets have Chinese descriptions
+## 贡献
 
-## Contribution
+如果觉得对你有帮助，欢迎 star。
 
-If you find it helpful, please star it.
-
-This project will be continuously updated. If you have new ideas, welcome to submit issues or pull requests to [GitHub Repository](https://github.com/ke112/vscode_plugins). I will add new features when I am free.
-
-
-## Contact
-Flower Name : 徐凤年
-
-Weixin ID : zhang1102d
-
-Facebook : https://www.facebook.com/zhihua.zhang.3958
-
-## Update Log
-
-| Date       | Version | Update Content                                                             |
-| ---------- | ------- | -------------------------------------------------------------------------- |
-| 2024-11-13 | v0.0.10 | Update the shortcut function for generating lib/gen resources.             |
-| 2024-11-11 | v0.0.9  | Update one-click generation of all iOS logo sizes, image compression webp. |
-| 2024-10-19 | v0.0.8  | Update n code snippets, update 2 component support, README update.         |
-| 2024-10-15 | v0.0.7  | Update 3 component support.                                                |
-| 2024-09-13 | v0.0.6  | Remove some preset import processing.                                      |
-| 2024-09-13 | v0.0.5  | Update const processing.                                                   |
-| 2024-09-10 | v0.0.4  | Update README text and graphics.                                           |
-| 2024-09-10 | v0.0.3  | Update new interface command support.                                      |
-| 2024-09-09 | v0.0.2  | Update fast generation command support.                                    |
-| 2024-09-06 | v0.0.1  | Update 8 component support.                                                |
+这个项目会持续更新。如果你有新的想法，欢迎提交 issues 或 pull requests 到 [GitHub Repository](https://github.com/ke112/vscode_plugins)，空闲时我会添加新功能。
 
 
-## Marketplace
-[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
+## 联系
+花名 : 徐凤年
+
+微信 : zhang1102d
+
+脸书 : https://www.facebook.com/zhihua.zhang.3958
+
+## 更新日志
+
+| 日期       | 版本    | 更新内容                                       |
+| ---------- | ------- | ---------------------------------------------- |
+| 2025-01-11 | v0.0.11 | 更新代码健壮性和效率。                         |
+| 2024-11-13 | v0.0.10 | 更新生成lib/gen资源的快捷功能。                |
+| 2024-11-11 | v0.0.9  | 更新一键生成iOS所有尺寸logo，图片压缩webp。    |
+| 2024-10-19 | v0.0.8  | 更新n个代码片段，更新2个组件支持，README更新。 |
+| 2024-10-15 | v0.0.7  | 更新3个组件支持。                              |
+| 2024-09-13 | v0.0.6  | 移除一些预设的import处理。                     |
+| 2024-09-13 | v0.0.5  | 更新const处理。                                |
+| 2024-09-10 | v0.0.4  | 更新README文本和图形。                         |
+| 2024-09-10 | v0.0.3  | 更新新接口命令支持。                           |
+| 2024-09-09 | v0.0.2  | 更新快速生成命令支持。                         |
+| 2024-09-06 | v0.0.1  | 更新8个组件支持。                              |
+
+## 插件市场
+[VSCode插件市场](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)
