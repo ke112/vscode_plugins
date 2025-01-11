@@ -1,7 +1,24 @@
 import * as vscode from 'vscode';
+import { log } from './logger';
 
 export class FlutterWrapperManager {
     private wrappers: Map<string, (widget: string, indentation: string) => string> = new Map();
+    private cachedCodeActions: Map<string, vscode.CodeAction[]> = new Map();
+    private lastCacheCleanTime: number = Date.now();
+    private readonly CACHE_CLEANUP_INTERVAL = 1000 * 60 * 5; // 5分钟清理一次缓存
+    private readonly EXCLUDED_WIDGETS = new Set([
+        'StatelessWidget',
+        'StatefulWidget',
+        'Widget',
+        'BuildContext',
+        'NeverScrollableScrollPhysics',
+        'EdgeInsets',
+        'Axis',
+        'Size',
+        'Colors',
+        'Get',
+        // 可以添加其他需要排除的基础 Widget 类型
+    ]);
 
     constructor() {
         this.initializeWrappers();
@@ -37,45 +54,138 @@ export class FlutterWrapperManager {
     }
 
     provideCodeActions(document: vscode.TextDocument, range: vscode.Range): vscode.CodeAction[] {
-        const actions: vscode.CodeAction[] = [];
         const lineText = document.lineAt(range.start.line).text;
         const widgetName = this.extractWidgetName(lineText, range.start.character);
 
-        if (this.isPotentialWidget(widgetName)) {
-            this.wrappers.forEach((_, name) => {
-                const action = new vscode.CodeAction(`Wrap with ${name}`, vscode.CodeActionKind.RefactorRewrite);
-                action.command = {
-                    command: `extension.wrapWith${name}`,
-                    title: `Wrap with ${name}`,
-                    arguments: [document, range]
-                };
-                actions.push(action);
-            });
+        // 确保 widgetName 不为空, 
+        // >50 为过滤选择全部文件时的响应, 正常2~50足够
+        if (!widgetName || widgetName.length < 2 || widgetName.length > 50) {
+            return [];
         }
+
+        // 检查 widgetName 前面的字符是否为点号(. <)
+        const widgetIndex = lineText.indexOf(widgetName);
+        if (widgetIndex > 0 && lineText[widgetIndex - 1] === '.' ||
+            widgetIndex > 0 && lineText[widgetIndex - 1] === '<'
+        ) {
+            log(`已排除前边是.的情况`);
+            return [];
+        }
+
+        // 检查是否为方法声明
+        const trimmedLeft = lineText.substring(0, range.start.character).trimLeft();
+        if (trimmedLeft.startsWith('void ') || trimmedLeft.startsWith('async ')) {
+            log(`已排除前边是void 的情况`);
+            return [];
+        }
+
+        // 确保 widgetName 是完整的字符串匹配
+        if (this.EXCLUDED_WIDGETS.has(widgetName)) {
+            log('已排除预先排除组件:', widgetName);
+            return [];
+        } else {
+            log('不是预先排除的组件:', widgetName);
+        }
+
+        // 检查缓存
+        const cacheKey = `${widgetName}`;
+        const cachedActions = this.cachedCodeActions.get(cacheKey);
+        if (cachedActions) {
+            return this.updateCachedActionArguments(cachedActions, document, range);
+        }
+
+        // 清理过期缓存
+        this.cleanupCacheIfNeeded();
+
+        // 如果不是潜在的 Widget，直接返回空数组
+        if (!this.isPotentialWidget(widgetName)) {
+            return [];
+        }
+
+        const actions: vscode.CodeAction[] = [];
+        this.wrappers.forEach((_, name) => {
+            const action = new vscode.CodeAction(`Wrap with ${name}`, vscode.CodeActionKind.RefactorRewrite);
+            action.command = {
+                command: `extension.wrapWith${name}`,
+                title: `Wrap with ${name}`,
+                arguments: [document, range]
+            };
+            actions.push(action);
+        });
+
+        // 缓存结果
+        this.cachedCodeActions.set(cacheKey, actions);
 
         return actions;
     }
 
-    private extractWidgetName(lineText: string, cursorPosition: number): string {
-        // 从光标位置向前搜索可能的 Widget 名称或方法名
-        const beforeCursor = lineText.slice(0, cursorPosition);
-        const match = beforeCursor.match(/\b(_?[a-zA-Z][a-zA-Z0-9_]*)\s*$/);
-        return match ? match[1] : '';
+    private updateCachedActionArguments(
+        cachedActions: vscode.CodeAction[],
+        document: vscode.TextDocument,
+        range: vscode.Range
+    ): vscode.CodeAction[] {
+        return cachedActions.map(action => {
+            const newAction = new vscode.CodeAction(
+                action.title!,
+                action.kind
+            );
+            newAction.command = {
+                ...action.command!,
+                arguments: [document, range]
+            };
+            return newAction;
+        });
     }
 
-    // 判断是否为潜在的 Widget 名称
-    // 以下划线开头的名称，检查是否为小驼峰命名
-    // 不以下划线开头的名称，检查是否为大驼峰命名
-    private isPotentialWidget(name: string): boolean {
-        // 暂时默认返回 true
-        return true;
-        if (name.startsWith('_')) {
-            // 对于以下划线开头的名称，检查是否为小驼峰命名
-            return /^_[a-z][a-zA-Z0-9]*$/.test(name) && name.length > 2;
-        } else {
-            // 对于不以下划线开头的名称，检查是否为大驼峰命名
-            return /^[A-Z][a-zA-Z0-9]*$/.test(name) && name.length > 1;
+    private cleanupCacheIfNeeded() {
+        const now = Date.now();
+        if (now - this.lastCacheCleanTime > this.CACHE_CLEANUP_INTERVAL) {
+            this.cachedCodeActions.clear();
+            this.lastCacheCleanTime = now;
         }
+    }
+
+    private extractWidgetName(lineText: string, cursorPosition: number): string {
+        // 获取选中的文本范围
+        const editor = vscode.window.activeTextEditor;
+        if (editor && !editor.selection.isEmpty) {
+            const selectedText = editor.document.getText(editor.selection).trim();
+            return selectedText;
+        }
+
+        // 如果没有选中文本，则从光标位置前后提取
+        const beforeCursor = lineText.slice(0, cursorPosition);
+        const afterCursor = lineText.slice(cursorPosition);
+
+        // 向前匹配到单词开始
+        const beforeMatch = beforeCursor.match(/\b(_?[a-zA-Z][a-zA-Z0-9_]*)$/);
+        const beforePart = beforeMatch ? beforeMatch[1] : '';
+
+        // 向后匹配到空格、左括号或小数点
+        const afterMatch = afterCursor.match(/^([a-zA-Z0-9_]*?)(?=[\s(.]|$)/);
+        const afterPart = afterMatch ? afterMatch[1] : '';
+
+        const extractedName = beforePart + afterPart;
+        return extractedName;
+    }
+
+    private isPotentialWidget(name: string): boolean {
+        return true;
+        // 快速检查常见的非 widget 情况
+        const nonWidgetPrefixes = ['on', 'get', 'set', 'is', 'has'];
+        if (nonWidgetPrefixes.some(prefix => name.toLowerCase().startsWith(prefix))) {
+            log('名称包含非小部件前缀:', name);
+            return false;
+        }
+
+        // 排除非大写开头的名称
+        if (!/^[A-Z][a-zA-Z0-9]*$/.test(name)) {
+            log('名称不符合 Widget 命名规范:', name);
+            return false;
+        }
+
+        // 通过所有检查，认为是潜在的 Widget
+        return true;
     }
 
     private wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunction: (widget: string, indentation: string) => string) {

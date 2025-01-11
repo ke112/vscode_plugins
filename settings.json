@@ -1,0 +1,31 @@
+{
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.organizeImports": true
+    },
+    "editor.codeActionsOnSaveTimeout": 750,
+    "dart.completionCacheSize": 512,
+    "dart.analysisExcludedFolders": [
+        "build",
+        ".dart_tool",
+        ".pub-cache",
+        "generated",
+        "*.g.dart"
+    ],
+    "dart.enableCompletionCaching": true,
+    "dart.enableSdkFormatter": false,
+    "dart.lineLength": 120,
+    "dart.showTodos": false,
+    "dart.previewLsp": true,
+    "editor.quickSuggestions": {
+        "other": "on",
+        "comments": "off",
+        "strings": "off"
+    },
+    "editor.suggestOnTriggerCharacters": true,
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.snippetSuggestions": "top",
+    "editor.suggest.localityBonus": true,
+    "editor.suggest.shareSuggestSelections": true,
+    "editor.suggestSelection": "recentlyUsed"
+}

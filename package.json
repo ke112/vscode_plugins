@@ -1,11 +1,11 @@
 {
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
-    "description": "To improve the efficiency of Flutter development, support fast Wrapper code generation, fast Build Runner, fast new Getx page, etc",
-    "version": "0.0.10",
-    "publisher": "zhangzhihua",
+    "description": "提高Flutter开发效率，快速Wrapper代码生成、快速Build Runner、快速新建Getx页面等",
+    "version": "0.0.11",
+    "publisher": "徐凤年",
     "author": {
-        "name": "zhangzhihua",
+        "name": "徐凤年",
         "email": "zhangzhihua.email@gmail.com"
     },
     "icon": "images/logo.png",
@@ -52,32 +52,32 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.buildRunnerQuick",
-                "title": "★ Generate Part (局部快速json/retrofit)"
-            },
-            {
-                "command": "extension.buildRunner",
-                "title": "★ Generate Project (全量项目构建)"
+                "command": "extension.compressToWebP",
+                "title": "★ Convert to webp images"
             },
             {
                 "command": "extension.createGetxBindingPage",
-                "title": "★ Create Getx Page (Binding方式)"
+                "title": "★ Create getx binding page"
             },
             {
                 "command": "extension.createGetxBindingCustomPage",
-                "title": "★ Create Getx Page (内部使用)"
+                "title": "★ Create getx binding page by custom"
+            },
+            {
+                "command": "extension.buildRunner",
+                "title": "★ Generate all codes"
             },
             {
                 "command": "extension.generateIOSAppIcons",
-                "title": "★ Generate iOS App Icon (各尺寸png图)"
+                "title": "★ Generate all iOS logos"
             },
             {
-                "command": "extension.compressToWebP",
-                "title": "★ Compress To WebP (自动替换原图)"
+                "command": "extension.buildRunnerQuick",
+                "title": "★ Quickly generate .g.dart"
             },
             {
                 "command": "extension.generateAssets",
-                "title": "★ Generate Assets (快速更新lib/gen)"
+                "title": "★ Quickly generate lib/gen (image/font)"
             }
         ],
         "menus": {

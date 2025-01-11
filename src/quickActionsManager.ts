@@ -2,6 +2,7 @@ import { exec, execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { log } from './logger';
 
 export class QuickActionsManager {
     private context: vscode.ExtensionContext;
@@ -80,7 +81,7 @@ export class QuickActionsManager {
                 const originalFilename = path.basename(fsPath);
                 await vscode.workspace.fs.copy(uri, vscode.Uri.file(path.join(tmpDir, originalFilename)));
             }
-            await this.runBuildRunner(tmpDir, isDirectory);
+            await this.runBuildRunnerQuick(tmpDir, isDirectory);
             const tmpFiles = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
             for (const [file, type] of tmpFiles) {
                 if (type === vscode.FileType.File && file.endsWith('.g.dart')) {
@@ -97,9 +98,12 @@ export class QuickActionsManager {
 
             // 为偶尔误删除的 .g.dart 文件添加 git 恢复操作
             await new Promise((resolve, reject) => {
+                const relativeTmpDir = path.relative(projectRoot, tmpDir);
                 const command = `git status --porcelain | grep '^ D .*\\.g\\.dart$' | while read -r line; do
                     file_path=$(echo "$line" | awk '{print $2}')
-                    git restore "$file_path"
+                    if [[ "$file_path" == *"${relativeTmpDir}"* ]]; then
+                        git restore "$file_path"
+                    fi
                 done`;
 
                 exec(command, { cwd: workspaceFolder?.uri.fsPath }, (error, stdout, stderr) => {
@@ -114,6 +118,7 @@ export class QuickActionsManager {
 
             vscode.window.showInformationMessage('Quick Build Runner Completed Successfully');
         } catch (error) {
+            log(`quickBuildRunner错误: ${error}`);
             vscode.window.showErrorMessage(`Error during Quick Build Runner: ${error}`);
         }
     }
@@ -127,10 +132,26 @@ export class QuickActionsManager {
         const projectRoot = workspaceFolder.uri.fsPath;
         try {
             await this.runBuildRunnerCommand(projectRoot);
+            // 为偶尔误删除的 .g.dart 文件添加 git 恢复操作
+            await new Promise((resolve, reject) => {
+                const command = `git status --porcelain | grep '^ D .*\\.g\\.dart$' | while read -r line; do
+                    file_path=$(echo "$line" | awk '{print $2}')
+                    git restore "$file_path"
+                done`;
+
+                exec(command, { cwd: workspaceFolder?.uri.fsPath }, (error, stdout, stderr) => {
+                    if (error && error.code !== 1) { //当未找到匹配项时，grep 将返回 1，这对我们来说不是错误
+                        console.error(`Error during git restore: ${error}`);
+                        reject(error);
+                        return;
+                    }
+                    resolve(void 0);
+                });
+            });
             vscode.window.showInformationMessage('Build Runner Completed Successfully');
         } catch (error) {
             vscode.window.showErrorMessage(`Error during Build Runner: ${error}`);
-            console.error(`Error: ${error}`);
+            log(`buildRunner错误: ${error}`);
         }
     }
 
@@ -146,12 +167,11 @@ export class QuickActionsManager {
 
     private async getBuildCommand(projectRoot: string): Promise<string> {
         const hasFvm = await this.checkFvmExists(projectRoot);
-        console.log(`FVM detected: ${hasFvm}`);
-        // vscode.window.showInformationMessage(`Using ${hasFvm ? 'FVM' : 'regular Dart'} command`);
+        log(`getBuildCommand 是否有FVM: ${hasFvm}`);
         return hasFvm ? 'fvm dart run build_runner build' : 'dart run build_runner build';
     }
 
-    private async runBuildRunner(workingDir: string, isDirectory: boolean): Promise<void> {
+    private async runBuildRunnerQuick(workingDir: string, isDirectory: boolean): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(workingDir));
             if (!workspaceFolder) {
@@ -165,12 +185,11 @@ export class QuickActionsManager {
             const command = `${baseCommand} --delete-conflicting-outputs --build-filter=${buildFilter}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    console.error(`Error: ${error}`);
+                    log(`runBuildRunnerQuick错误: ${error}`);
                     reject(error);
                     return;
                 }
-                console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
+                log(`runBuildRunnerQuick标准输出: ${stdout}`);
                 resolve();
             });
         });
@@ -182,12 +201,11 @@ export class QuickActionsManager {
             const command = `${baseCommand} --delete-conflicting-outputs`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    console.error(`Error: ${error}`);
+                    log(`runBuildRunnerCommand错误: ${error}`);
                     reject(error);
                     return;
                 }
-                console.log(`stdout: ${stdout}`);
-                console.error(`stderr: ${stderr}`);
+                log(`runBuildRunnerQuick标准输出: ${stdout}`);
                 resolve();
             });
         });
@@ -220,6 +238,7 @@ export class QuickActionsManager {
             }
             vscode.window.showInformationMessage(`Page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
+            log(`createPageStructure错误: ${error}`);
             vscode.window.showErrorMessage(`Error creating page structure: ${error}`);
         }
     }
@@ -349,6 +368,7 @@ class ${className}View extends GetView<${className}Controller> {
             }
             vscode.window.showInformationMessage(`Custom page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
+            log(`createCustomPageStructure错误: ${error}`);
             vscode.window.showErrorMessage(`Error creating custom page structure: ${error}`);
         }
     }
@@ -387,23 +407,25 @@ class ${className}View extends BasePage<${className}Controller> {
             return;
         }
         try {
+            log(`generateAppIcons: filePath = ${filePath}`);
             const dimensions = await this.getImageDimensions(filePath);
             if (dimensions.width !== 1024 || dimensions.height !== 1024) {
                 vscode.window.showWarningMessage('The selected image is not 1024x1024.');
                 return;
             }
             const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
-            exec(`bash "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
+            log(`generateAppIcons: scriptPath = ${scriptPath}`);
+            exec(`sh "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
                 if (error) {
                     vscode.window.showErrorMessage(`Error generating app icons: ${error.message}`);
+                    log(`generateAppIcons: error = ${error.message}`);
                     return;
                 }
-                if (stderr) {
-                    console.error(`stderr: ${stderr}`);
-                }
-                vscode.window.showInformationMessage('Generate successful desktop view');
+                log(`generateAppIcons标准输出: ${stdout}`);
+                vscode.window.showInformationMessage('iOS logo generated successfully');
             });
         } catch (error) {
+            log(`generateAppIcons错误: ${error}`);
             vscode.window.showErrorMessage(`Error processing image: ${error}`);
         }
     }
@@ -431,7 +453,7 @@ class ${className}View extends BasePage<${className}Controller> {
                     vscode.window.showInformationMessage('Compressed to WebP successfully!');
                 } catch (error) {
                     vscode.window.showErrorMessage('Failed to compress images to webp.');
-                    console.error(error);
+                    log(`compressToWebP错误: ${error}`);
                 }
             } else {
                 vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
@@ -460,14 +482,18 @@ class ${className}View extends BasePage<${className}Controller> {
                 return;
             }
 
-            // 删除所有 .gen.dart 文件
-            const deleteCommand = `find "${genDir}" -type f -name "*.gen.dart" -delete`;
-            execSync(deleteCommand, { cwd: projectRoot });
+            // 删除 lib/gen 目录下的所有 .gen.dart 文件
+            const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(genDir));
+            for (const [file, type] of files) {
+                if (type === vscode.FileType.File && file.endsWith('.gen.dart')) {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(path.join(genDir, file)));
+                }
+            }
 
             // 运行 build_runner
-            const hasFvm = await this.checkFvmExists(projectRoot);
             const baseCommand = await this.getBuildCommand(projectRoot);
             const command = `${baseCommand} --delete-conflicting-outputs --build-filter=lib/gen/*`;
+            log(`${command}`);
 
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
