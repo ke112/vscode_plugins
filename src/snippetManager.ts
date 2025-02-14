@@ -382,6 +382,22 @@ debugPrint('沙盒路径: \${directory.path}');`,
       snippet: `if (mounted) setState(() {});`,
       description: '判断是否挂载，并设置状态'
     },
+    'frx int': {
+      snippet: `final RxInt count = 0.obs;`,
+      description: 'getx Rx int类型的状态'
+    },
+    'frx string': {
+      snippet: `final RxString name = ''.obs;`,
+      description: 'getx Rx string类型的状态'
+    },
+    'frx double': {
+      snippet: `final RxDouble value = 0.0.obs;`,
+      description: 'getx Rx double类型的状态'
+    },
+    'frx bool': {
+      snippet: `final RxBool status = false.obs;`,
+      description: 'getx Rx bool类型的状态'
+    },
     'fwantKeepAlive 保持状态': {
       snippet: `@override
 bool get wantKeepAlive => true;`,
