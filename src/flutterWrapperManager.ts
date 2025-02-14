@@ -217,7 +217,7 @@ export class FlutterWrapperManager {
         const endIndex = document.offsetAt(range.end);
 
         let widgetStart = startIndex;
-        while (widgetStart > 0 && /[a-zA-Z]/.test(text[widgetStart - 1])) {
+        while (widgetStart > 0 && /[a-zA-Z_]/.test(text[widgetStart - 1])) {
             widgetStart--;
         }
 
