@@ -56,6 +56,7 @@ export class QuickActionsManager {
             vscode.window.showErrorMessage('Quick Build Runner only works with Dart files or directories.');
             return;
         }
+        let tmpDir: string | undefined;
         try {
             const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
             if (!workspaceFolder) {
@@ -63,8 +64,12 @@ export class QuickActionsManager {
                 return;
             }
             const projectRoot = workspaceFolder.uri.fsPath;
-            // 修改 tmpDir 的位置
-            const tmpDir = isDirectory ? path.join(fsPath, '.tmp') : path.join(path.dirname(fsPath), '.tmp');
+            tmpDir = isDirectory ? path.join(fsPath, '.tmp') : path.join(path.dirname(fsPath), '.tmp');
+            try {
+                await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true, useTrash: false });
+            } catch (error) {
+                // 如果目录不存在，忽略错误
+            }
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
             const originalDir = isDirectory ? fsPath : path.dirname(fsPath);
             if (isDirectory) {
@@ -94,11 +99,9 @@ export class QuickActionsManager {
                     );
                 }
             }
-            await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
-
             // 为偶尔误删除的 .g.dart 文件添加 git 恢复操作
             await new Promise((resolve, reject) => {
-                const relativeTmpDir = path.relative(projectRoot, tmpDir);
+                const relativeTmpDir = path.relative(projectRoot, tmpDir!);
                 const command = `git status --porcelain | grep '^ D .*\\.g\\.dart$' | while read -r line; do
                     file_path=$(echo "$line" | awk '{print $2}')
                     if [[ "$file_path" == *"${relativeTmpDir}"* ]]; then
@@ -107,7 +110,7 @@ export class QuickActionsManager {
                 done`;
 
                 exec(command, { cwd: workspaceFolder?.uri.fsPath }, (error, stdout, stderr) => {
-                    if (error && error.code !== 1) { //当未找到匹配项时，grep 将返回 1，这对我们来说不是错误
+                    if (error && error.code !== 1) {
                         console.error(`Error during git restore: ${error}`);
                         reject(error);
                         return;
@@ -120,6 +123,14 @@ export class QuickActionsManager {
         } catch (error) {
             log(`quickBuildRunner错误: ${error}`);
             vscode.window.showErrorMessage(`Error during Quick Build Runner: ${error}`);
+        } finally {
+            if (tmpDir) {
+                try {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
+                } catch (finallyError) {
+                    log(`删除临时目录 ${tmpDir} 失败: ${finallyError}`);
+                }
+            }
         }
     }
 
@@ -474,7 +485,6 @@ class ${className}View extends BasePage<${className}Controller> {
             const projectRoot = workspaceFolder.uri.fsPath;
             const genDir = path.join(projectRoot, 'lib', 'gen');
 
-            // 检查 gen 目录是否存在
             try {
                 await vscode.workspace.fs.stat(vscode.Uri.file(genDir));
             } catch {
@@ -482,7 +492,6 @@ class ${className}View extends BasePage<${className}Controller> {
                 return;
             }
 
-            // 删除 lib/gen 目录下的所有 .gen.dart 文件
             const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(genDir));
             for (const [file, type] of files) {
                 if (type === vscode.FileType.File && file.endsWith('.gen.dart')) {
@@ -490,7 +499,6 @@ class ${className}View extends BasePage<${className}Controller> {
                 }
             }
 
-            // 运行 build_runner
             const baseCommand = await this.getBuildCommand(projectRoot);
             const command = `${baseCommand} --delete-conflicting-outputs --build-filter=lib/gen/*`;
             log(`${command}`);

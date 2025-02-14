@@ -467,7 +467,7 @@ ${indentation})`;
 
     private wrapWithVisibilityDetector(widget: string, indentation: string): string {
         return `VisibilityDetector(
-${indentation}  key: Key(),
+${indentation}  key: ValueKey(''),
 ${indentation}  onVisibilityChanged: (VisibilityInfo info) {
 ${indentation}    double value = info.visibleFraction;
 ${indentation}  },
