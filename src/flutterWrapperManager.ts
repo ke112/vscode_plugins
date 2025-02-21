@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { EXCLUDED_WIDGETS } from './config';
 import { log } from './logger';
 
 export class FlutterWrapperManager {
@@ -6,19 +7,6 @@ export class FlutterWrapperManager {
     private cachedCodeActions: Map<string, vscode.CodeAction[]> = new Map();
     private lastCacheCleanTime: number = Date.now();
     private readonly CACHE_CLEANUP_INTERVAL = 1000 * 60 * 5; // 5分钟清理一次缓存
-    private readonly EXCLUDED_WIDGETS = new Set([
-        'StatelessWidget',
-        'StatefulWidget',
-        'Widget',
-        'BuildContext',
-        'NeverScrollableScrollPhysics',
-        'EdgeInsets',
-        'Axis',
-        'Size',
-        'Colors',
-        'Get',
-        // 可以添加其他需要排除的基础 Widget 类型
-    ]);
 
     constructor() {
         this.initializeWrappers();
@@ -80,7 +68,7 @@ export class FlutterWrapperManager {
         }
 
         // 确保 widgetName 是完整的字符串匹配
-        if (this.EXCLUDED_WIDGETS.has(widgetName)) {
+        if (EXCLUDED_WIDGETS.has(widgetName)) {
             log('已排除预先排除组件:', widgetName);
             return [];
         } else {
@@ -97,10 +85,6 @@ export class FlutterWrapperManager {
         // 清理过期缓存
         this.cleanupCacheIfNeeded();
 
-        // 如果不是潜在的 Widget，直接返回空数组
-        if (!this.isPotentialWidget(widgetName)) {
-            return [];
-        }
 
         const actions: vscode.CodeAction[] = [];
         this.wrappers.forEach((_, name) => {
@@ -167,25 +151,6 @@ export class FlutterWrapperManager {
 
         const extractedName = beforePart + afterPart;
         return extractedName;
-    }
-
-    private isPotentialWidget(name: string): boolean {
-        return true;
-        // 快速检查常见的非 widget 情况
-        const nonWidgetPrefixes = ['on', 'get', 'set', 'is', 'has'];
-        if (nonWidgetPrefixes.some(prefix => name.toLowerCase().startsWith(prefix))) {
-            log('名称包含非小部件前缀:', name);
-            return false;
-        }
-
-        // 排除非大写开头的名称
-        if (!/^[A-Z][a-zA-Z0-9]*$/.test(name)) {
-            log('名称不符合 Widget 命名规范:', name);
-            return false;
-        }
-
-        // 通过所有检查，认为是潜在的 Widget
-        return true;
     }
 
     private wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunction: (widget: string, indentation: string) => string) {
