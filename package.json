@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "提高Flutter开发效率，快速Wrapper代码生成、快速Build Runner、快速新建Getx页面等",
-    "version": "0.0.16",
+    "version": "0.0.21",
     "publisher": "zhangzhihua",
     "author": {
         "name": "徐凤年",
@@ -61,8 +61,8 @@
                 "title": "★ Create getx binding page"
             },
             {
-                "command": "extension.createGetxBindingCustomPage",
-                "title": "★ Create getx binding page by custom"
+                "command": "extension.createGetxBasePage",
+                "title": "★ Create getx base page"
             },
             {
                 "command": "extension.buildRunner",
@@ -100,7 +100,7 @@
                 },
                 {
                     "when": "explorerResourceIsFolder",
-                    "command": "extension.createGetxBindingCustomPage",
+                    "command": "extension.createGetxBasePage",
                     "group": "navigation"
                 },
                 {

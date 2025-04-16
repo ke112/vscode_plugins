@@ -28,8 +28,8 @@ export class QuickActionsManager {
         });
 
         //创建Getx Binding界面 (内部)
-        const createCustomPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingCustomPage', (uri: vscode.Uri) => {
-            this.createCustomPageStructure(uri);
+        const createGetBasePageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBasePage', (uri: vscode.Uri) => {
+            this.createGetBasePageStructure(uri);
         });
 
         //生成iOS所有icon
@@ -45,7 +45,7 @@ export class QuickActionsManager {
             this.generateAssets();
         });
 
-        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable, compressToWebP, generateAssetsDisposable);
+        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createGetBasePageStructureDisposable, generateAppIconsDisposable, compressToWebP, generateAssetsDisposable);
     }
 
     private async buildRunnerQuick(uri: vscode.Uri) {
@@ -277,6 +277,8 @@ class ${className}Binding extends Bindings {
 `;
     }
 
+
+
     private generateControllerContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
         return `import 'package:get/get.dart';
@@ -298,6 +300,77 @@ class ${className}Controller extends GetxController {
   void onClose() {
     super.onClose();
     //
+  }
+}
+`;
+    }
+
+    private generateLogicContent(pageName: string, stateFilePath: string): string {
+        const className = this.toPascalCase(pageName);
+        return `import '${stateFilePath}';
+
+class ${className}Controller extends BaseController {
+  final Map? _extra;
+  ${className}Controller(this._extra);
+
+  final stateExt = ${className}State();
+
+  @override
+  void onInit() {
+    super.onInit();
+    print('路由参数 : $_extra');
+  }
+
+  @override
+  void onClose() {
+    // Dispose of any resources here
+    super.onClose();
+  }
+}
+`;
+    }
+
+    private generateStateContent(pageName: string): string {
+        const className = this.toPascalCase(pageName);
+        return `
+class ${className}State {
+  ${className}State() {
+    ///Initialize variables
+  }
+}
+`;
+    }
+
+
+    private generateGetViewContent(pageName: string, controllerFilePath: string): string {
+        const className = this.toPascalCase(pageName);
+        return `import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '${controllerFilePath}';
+
+class ${className}View extends GetView<${className}Controller> {
+  static const String _tag = '';
+
+  @override
+  String get tag => _tag;
+
+  ${className}View(Map? extra, {super.key}) {
+    Get.put(${className}Controller(extra), tag: tag.isEmpty ? null : tag);
+  }
+
+  static List<Recycler> get recyclers => [Recycler(run: () => Get.delete<${className}Controller>(tag: _tag))];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('${className}'),
+      ),
+      body: Center(
+        child: Text('${className} View $tag'),
+      ),
+    );
   }
 }
 `;
@@ -352,10 +425,10 @@ class ${className}View extends GetView<${className}Controller> {
         return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
     }
 
-    private async createCustomPageStructure(uri: vscode.Uri) {
+    private async createGetBasePageStructure(uri: vscode.Uri) {
         const pageName = await vscode.window.showInputBox({
-            prompt: "Enter the page name",
-            placeHolder: "e.g. HomePage or homePage"
+            prompt: "",
+            placeHolder: "输入类名  eg: HomePage or homePage"
         });
         if (!pageName) {
             return;
@@ -364,25 +437,31 @@ class ${className}View extends GetView<${className}Controller> {
         const pageDir = path.join(uri.fsPath, snakeCaseName);
         try {
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(pageDir));
-            const subDirs = ['bindings', 'views', 'controllers', 'widgets'];
+            const subDirs = ['controller', 'state', 'view'];
             for (const dir of subDirs) {
                 await vscode.workspace.fs.createDirectory(vscode.Uri.file(path.join(pageDir, dir)));
             }
+
+            // const stateFilePath = `${vscode.Uri.file(pageDir)}/${snakeCaseName}/state/${snakeCaseName}_state.dart`;
+            const stateFilePath = `../state/${snakeCaseName}_state.dart`;
+            const controllerFilePath = `../controller/${snakeCaseName}_controller.dart`;
+
             const files = [
-                { name: `${snakeCaseName}_binding.dart`, dir: 'bindings', content: this.generateBindingContent(snakeCaseName) },
-                { name: `${snakeCaseName}_controller.dart`, dir: 'controllers', content: this.generateControllerContent(snakeCaseName) },
-                { name: `${snakeCaseName}_view.dart`, dir: 'views', content: this.generateCustomViewContent(snakeCaseName) }
+                { name: `${snakeCaseName}_controller.dart`, dir: 'controller', content: this.generateLogicContent(snakeCaseName, stateFilePath) },
+                { name: `${snakeCaseName}_state.dart`, dir: 'state', content: this.generateStateContent(snakeCaseName) },
+                { name: `${snakeCaseName}_view.dart`, dir: 'view', content: this.generateGetViewContent(snakeCaseName, controllerFilePath) }
             ];
             for (const file of files) {
                 const filePath = path.join(pageDir, file.dir, file.name);
                 await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(file.content));
             }
-            vscode.window.showInformationMessage(`Custom page structure for ${snakeCaseName} created successfully.`);
+            vscode.window.showInformationMessage(`Get界面 for ${snakeCaseName} 创建完成.`);
         } catch (error) {
-            log(`createCustomPageStructure错误: ${error}`);
+            log(`createGetBasePageStructure错误: ${error}`);
             vscode.window.showErrorMessage(`Error creating custom page structure: ${error}`);
         }
     }
+
 
     private generateCustomViewContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
