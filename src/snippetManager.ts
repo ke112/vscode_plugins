@@ -239,11 +239,11 @@ overlayState.insert(controller.overlayEntry!);`,
       description: '打开弹起界面'
     },
     'fpop 关闭界面': {
-      snippet: `Navigator.maybeOf(context)?.pop();`,
+      snippet: `if (context.mounted) Navigator.maybeOf(context)?.pop();`,
       description: '关闭界面'
     },
     'fpop 关闭界面并传递数据': {
-      snippet: `Navigator.maybeOf(context)?.pop(data);`,
+      snippet: `if (context.mounted) Navigator.maybeOf(context)?.pop(data);`,
       description: '关闭界面并传递数据'
     },
     'fgetx pop 关闭界面': {
