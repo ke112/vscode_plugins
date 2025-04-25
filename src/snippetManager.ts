@@ -11,15 +11,15 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       snippet: `Container($1)`,
       description: 'Container'
     },
-    'fsb 设置宽高': {
+    'sb 设置宽高': {
       snippet: `SizedBox(width: 16.w, height: 16.w),`,
       description: '固定大小的 SizedBox'
     },
-    'fsbh 设置高度': {
+    'sbh 设置高度': {
       snippet: `SizedBox(height: 16.w),`,
       description: '固定高度的 SizedBox'
     },
-    'fsbw 设置宽度': {
+    'sbw 设置宽度': {
       snippet: `SizedBox(width: 16.w),`,
       description: '固定宽度的 SizedBox'
     },
@@ -239,30 +239,12 @@ overlayState.insert(controller.overlayEntry!);`,
       description: '打开弹起界面'
     },
     'fpop 关闭界面': {
-      snippet: `if (context.mounted) Navigator.maybeOf(context)?.pop();`,
+      snippet: `if (mounted) Navigator.maybeOf(context)?.pop();`,
       description: '关闭界面'
     },
     'fpop 关闭界面并传递数据': {
-      snippet: `if (context.mounted) Navigator.maybeOf(context)?.pop(data);`,
+      snippet: `if (mounted) Navigator.maybeOf(context)?.pop(data);`,
       description: '关闭界面并传递数据'
-    },
-    'fgetx pop 关闭界面': {
-      snippet: `Get.back();`,
-      description: '关闭界面'
-    },
-    'fgetx pop 关闭界面并传递数据': {
-      snippet: `Get.back(result: data);`,
-      description: '关闭界面并传递数据'
-    },
-    'fgetx context ': {
-      snippet: `Get.context!`,
-      description: 'Get context 全局对象'
-    },
-    'fgetx find 获取实例': {
-      snippet: `if (Get.isRegistered<$${0}>()) {
-  Get.find<$${0}>();
-}`,
-      description: 'getx find 获取实例'
     },
     'fgetx init 初始化': {
       snippet: `@override
@@ -371,7 +353,7 @@ debugPrint('沙盒路径: \${directory.path}');`,
       description: 'sliver adapter with child 适配器'
     },
     'ftypedef callback 定义回调': {
-      snippet: `typedef Callback = void Function(String res);`,
+      snippet: `typedef Callback = void Function(String msg);`,
       description: '定义回调'
     },
     'ftypedef enum 定义枚举': {
@@ -625,7 +607,7 @@ return false;
     'fdecoration 设置修饰': {
       snippet: `decoration: BoxDecoration(
   color: Colors.white,
-  border: Border.all(width: 0.5.w, color: const Color(0xFF999999)),
+  border: Border.all(width: 1.w, color: const Color(0xFF999999)),
   borderRadius: BorderRadius.all(Radius.circular(8.w)),
 ),`, description: 'decoration 设置修饰边框'
     },
@@ -636,15 +618,15 @@ return false;
       description: 'constraints 设置约束'
     },
     'fborder 设置全部边框': {
-      snippet: `border: Border.all(width: 0.5.w, color: Color(0xFF333333)),`,
+      snippet: `border: Border.all(width: 1.w, color: Color(0xFF333333)),`,
       description: 'border 设置全部边框'
     },
     'fborder 设置各个边框': {
       snippet: `border: Border(
-  top: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
-  bottom: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
-  left: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
-  right: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
+  top: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
+  bottom: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
+  left: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
+  right: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
 ),`,
       description: 'border 设置各个边框'
     },
@@ -1067,11 +1049,11 @@ class $${1} {
       description: 'image assets package 图片'
     },
     'fcopy 复制': {
-      snippet: `Clipboard.setData(ClipboardData(text: '我是复制内容'));`,
+      snippet: `Clipboard.setData(ClipboardData(text: '测试复制'));`,
       description: 'copy 复制'
     },
     'ftoast 吐司': {
-      snippet: `ToastUtil.showTip('我是吐司');`,
+      snippet: `ToastUtil.showTip('测试提示');`,
       description: 'toast 吐司'
     },
     'ffeed back 反馈': {

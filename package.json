@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "提高Flutter开发效率，快速Wrapper代码生成、快速Build Runner、快速新建Getx页面等",
-    "version": "0.0.21",
+    "version": "0.0.31",
     "publisher": "zhangzhihua",
     "author": {
         "name": "徐凤年",
@@ -62,7 +62,7 @@
             },
             {
                 "command": "extension.createGetxBasePage",
-                "title": "★ Create getx base page"
+                "title": "★ Create getx and goRouter page"
             },
             {
                 "command": "extension.buildRunner",

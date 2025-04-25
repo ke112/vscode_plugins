@@ -27,7 +27,7 @@ export class QuickActionsManager {
             this.createPageStructure(uri);
         });
 
-        //创建Getx Binding界面 (内部)
+        //创建Getx 继承基类封装
         const createGetBasePageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBasePage', (uri: vscode.Uri) => {
             this.createGetBasePageStructure(uri);
         });
@@ -308,22 +308,28 @@ class ${className}Controller extends GetxController {
     private generateLogicContent(pageName: string, stateFilePath: string): string {
         const className = this.toPascalCase(pageName);
         return `import '${stateFilePath}';
+import 'package:go_router/go_router.dart';
 
 class ${className}Controller extends BaseController {
-  final Map? _extra;
-  ${className}Controller(this._extra);
+  final GoRouterState? _routeState;
+  ${className}Controller(this._routeState);
+  static const String _logTag = '${className}Controller';  
 
-  final stateExt = ${className}State();
+  final states = ${className}State();
 
   @override
   void onInit() {
     super.onInit();
-    print('路由参数 : $_extra');
+    _routeState?.extra; //路由参数
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
   }
 
   @override
   void onClose() {
-    // Dispose of any resources here
     super.onClose();
   }
 }
@@ -342,36 +348,62 @@ class ${className}State {
     }
 
 
-    private generateGetViewContent(pageName: string, controllerFilePath: string): string {
+    private generateGetViewContent(pageName: string, controllerFilePath: string, stateFilePath: string): string {
         const className = this.toPascalCase(pageName);
         return `import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 import '${controllerFilePath}';
+import '${stateFilePath}';
 
-class ${className}View extends GetView<${className}Controller> {
-  static const String _tag = '';
+class ${className}View extends BasePage<${className}Controller> implements CommonHandler{
+  final String _tag;
 
   @override
   String get tag => _tag;
 
-  ${className}View(Map? extra, {super.key}) {
-    Get.put(${className}Controller(extra), tag: tag.isEmpty ? null : tag);
+  /// 获取用于GetX的tag，如果tag为空字符串则返回null
+  String? get _getXTag => tag.isEmpty ? null : tag;
+
+  /// 从路由参数中获取tag值，如果没有则返回空字符串
+  static String _getTagFromRoute(GoRouterState? routeState) {
+    // 从extra中获取tag，如果没有则返回空字符串
+    if (routeState?.extra is Map) {
+      final extra = routeState!.extra as Map;
+      return extra['tag']?.toString() ?? '';
+    }
+    return '';
   }
 
-  static List<Recycler> get recyclers => [Recycler(run: () => Get.delete<${className}Controller>(tag: _tag))];
+  ${className}View(GoRouterState? routeState, {super.key}) : _tag = _getTagFromRoute(routeState) {
+    Get.put(${className}Controller(routeState), tag: _getXTag);
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('${className}'),
-      ),
-      body: Center(
-        child: Text('${className} View $tag'),
-      ),
-    );
+  List<GetControllerRecycler> provideRecyclers() {
+    return [GetControllerRecycler(run: () => Get.delete<${className}Controller>(tag: tag))];
   }
+
+  ${className}Controller get logic => Get.find<${className}Controller>(tag: _getXTag);
+  ${className}State get state => logic.states;
+
+  @override
+  PreferredSizeWidget createAppBar() {
+    return createCommonAppBar(title: '消息');
+  }
+  
+  @override
+  List<Widget> createBody() {
+    return [
+      const Center(
+        child: Text(
+          '内容区域',
+        ),
+      ),
+    ];
+  }
+
 }
 `;
     }
@@ -437,7 +469,7 @@ class ${className}View extends GetView<${className}Controller> {
         const pageDir = path.join(uri.fsPath, snakeCaseName);
         try {
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(pageDir));
-            const subDirs = ['controller', 'state', 'view'];
+            const subDirs = ['controller', 'state', 'view', 'widget'];
             for (const dir of subDirs) {
                 await vscode.workspace.fs.createDirectory(vscode.Uri.file(path.join(pageDir, dir)));
             }
@@ -449,7 +481,7 @@ class ${className}View extends GetView<${className}Controller> {
             const files = [
                 { name: `${snakeCaseName}_controller.dart`, dir: 'controller', content: this.generateLogicContent(snakeCaseName, stateFilePath) },
                 { name: `${snakeCaseName}_state.dart`, dir: 'state', content: this.generateStateContent(snakeCaseName) },
-                { name: `${snakeCaseName}_view.dart`, dir: 'view', content: this.generateGetViewContent(snakeCaseName, controllerFilePath) }
+                { name: `${snakeCaseName}_view.dart`, dir: 'view', content: this.generateGetViewContent(snakeCaseName, controllerFilePath, stateFilePath) }
             ];
             for (const file of files) {
                 const filePath = path.join(pageDir, file.dir, file.name);
