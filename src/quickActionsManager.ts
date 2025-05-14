@@ -310,15 +310,9 @@ class ${className}Controller extends GetxController {
         return `import '${stateFilePath}';
 import 'package:go_router/go_router.dart';
 
-/// 页面控制器，负责业务逻辑处理
 class ${className}Controller extends BaseController {
-  /// 路由状态，包含路由参数
   final GoRouterState? _routeState;
-
-  /// 页面状态管理对象
   ${className}Controller(this._routeState);
-
-  /// 当前controller的log
   static const String _logTag = '${className}Controller';  
 
   final states = ${className}State();
@@ -329,20 +323,14 @@ class ${className}Controller extends BaseController {
     _initRouteParams();
   }
   
-  /// 初始化路由参数
   void _initRouteParams() {
     if (_routeState?.extra != null) {
       ALog.debug(_logTag, _routeState?.extra);
-      // 解析路由参数
       final params = _routeState!.extra as Map?;
-      // TODO: 处理路由参数
+      if (params != null) {
+        // TODO: 处理路由参数
+      }
     }
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-    // TODO: 页面准备完成后的初始化逻辑
   }
 
   @override
@@ -356,9 +344,7 @@ class ${className}Controller extends BaseController {
 
     private generateStateContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
-        return `
-/// 页面状态管理对象
-class ${className}State {
+        return `class ${className}State {
   ${className}State() {
     ///Initialize variables
   }
@@ -372,19 +358,15 @@ class ${className}State {
         return `import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-
 import '${controllerFilePath}';
 import '${stateFilePath}';
 
-/// 页面视图，负责UI展示和用户交互
 class ${className}View extends BasePage<${className}Controller> implements CommonHandler {
-  /// 控制器标识符，用于GetX多实例控制器管理
   final String _tag;
 
   @override
   String get tag => _tag;
 
-  /// 获取用于GetX的tag，如果tag为空字符串则返回null
   String? get _getXTag => tag.isEmpty ? null : tag;
 
   /// 从路由参数中获取tag值，如果没有则返回空字符串
@@ -396,22 +378,18 @@ class ${className}View extends BasePage<${className}Controller> implements Commo
     return '';
   }
   
-  /// 构造函数，自动处理控制器的初始化和注入
   ${className}View(GoRouterState? routeState, {super.key}) : _tag = _getTagFromRoute(routeState) {
-    Get.put(${className}Controller(routeState), tag: _getXTag);
+    if (!Get.isRegistered<${className}Controller>(tag: _getXTag)) {
+      Get.put(${className}Controller(routeState), tag: _getXTag);
+    }
   }
   
-  /// 自动处理控制器的销毁
   @override
   List<GetControllerRecycler> provideRecyclers() {
     return [GetControllerRecycler(run: () => Get.delete<${className}Controller>(tag: _getXTag))];
   }
   
-  /// 获取控制器实例
-  ${className}Controller get logic => Get.find<${className}Controller>(tag: _getXTag);
-
-  /// 获取状态管理实例
-  ${className}State get state => logic.states;
+  ${className}State get state => controller.states;
 
   @override
   PreferredSizeWidget createAppBar() {
