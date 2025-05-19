@@ -59,11 +59,7 @@ function throttle<T extends (...args: any[]) => any>(func: T, wait: number): T {
 }
 
 class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
-    private throttledProvideCodeActions: Function;
-
-    constructor(private flutterWrapperManager: FlutterWrapperManager) {
-        this.throttledProvideCodeActions = throttle(this._provideCodeActions.bind(this), 500);
-    }
+    constructor(private flutterWrapperManager: FlutterWrapperManager) { }
 
     public provideCodeActions(
         document: vscode.TextDocument,
@@ -71,27 +67,18 @@ class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
         context: vscode.CodeActionContext,
         token: vscode.CancellationToken
     ): vscode.ProviderResult<(vscode.Command | vscode.CodeAction)[]> {
-        // 更严格的判断：
-        // 1. 必须是通过重构菜单触发
-        // 2. 检查触发源是否为重构操作
-        if (!context.triggerKind || context.triggerKind !== vscode.CodeActionTriggerKind.Invoke) {
+        // 放宽条件，允许在更多情况下触发包裹组件功能
+        // 不再严格要求必须通过重构菜单触发
+        // 仅检查document是否是dart文件
+        if (document.languageId !== 'dart') {
             return [];
         }
 
-        // 如果有 context.only，还需要确保它包含重构类型
+        // 检查是否有context.only，如果有，确保它包含重构类型
         if (context.only && !context.only.contains(vscode.CodeActionKind.Refactor)) {
             return [];
         }
 
-        return this.throttledProvideCodeActions(document, range, context, token);
-    }
-
-    private _provideCodeActions(
-        document: vscode.TextDocument,
-        range: vscode.Range | vscode.Selection,
-        context: vscode.CodeActionContext,
-        token: vscode.CancellationToken
-    ): vscode.ProviderResult<(vscode.Command | vscode.CodeAction)[]> {
         return this.flutterWrapperManager.provideCodeActions(document, range);
     }
 }

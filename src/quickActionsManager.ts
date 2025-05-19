@@ -325,7 +325,6 @@ class ${className}Controller extends BaseController {
   
   void _initRouteParams() {
     if (_routeState?.extra != null) {
-      ALog.debug(_logTag, _routeState?.extra);
       final params = _routeState!.extra as Map?;
       if (params != null) {
         // TODO: 处理路由参数

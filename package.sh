@@ -58,6 +58,7 @@ install_extension() {
 
     if [[ $? -eq 0 ]]; then
         echo "$editor 插件安装成功！请完全退出 $editor 并重新启动以使更改生效。"
+        echo ""
         return 0
     else
         echo "$editor 插件安装失败，请检查错误信息。"

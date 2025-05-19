@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "提高Flutter开发效率，快速Wrapper代码生成、快速Build Runner、快速新建Getx页面等",
-    "version": "0.0.39",
+    "version": "0.0.46",
     "publisher": "zhangzhihua",
     "author": {
         "name": "徐凤年",
@@ -79,6 +79,70 @@
             {
                 "command": "extension.generateAssets",
                 "title": "★ Quickly generate lib/gen (image/font)"
+            },
+            {
+                "command": "extension.wrapWithAfterLayout",
+                "title": "Wrap with AfterLayout"
+            },
+            {
+                "command": "extension.wrapWithAnnotatedRegion",
+                "title": "Wrap with AnnotatedRegion"
+            },
+            {
+                "command": "extension.wrapWithAnimatedBuilder",
+                "title": "Wrap with AnimatedBuilder"
+            },
+            {
+                "command": "extension.wrapWithClipRRect",
+                "title": "Wrap with ClipRRect"
+            },
+            {
+                "command": "extension.wrapWithGestureDetector",
+                "title": "Wrap with GestureDetector"
+            },
+            {
+                "command": "extension.wrapWithInkWell",
+                "title": "Wrap with InkWell"
+            },
+            {
+                "command": "extension.wrapWithLayoutBuilder",
+                "title": "Wrap with LayoutBuilder"
+            },
+            {
+                "command": "extension.wrapWithMeasureSize",
+                "title": "Wrap with MeasureSize"
+            },
+            {
+                "command": "extension.wrapWithMediaQuery",
+                "title": "Wrap with MediaQuery"
+            },
+            {
+                "command": "extension.wrapWithObx",
+                "title": "Wrap with Obx"
+            },
+            {
+                "command": "extension.wrapWithPreferredSize",
+                "title": "Wrap with PreferredSize"
+            },
+            {
+                "command": "extension.wrapWithStack",
+                "title": "Wrap with Stack"
+            },
+            {
+                "command": "extension.wrapWithTheme",
+                "title": "Wrap with Theme"
+            },
+            {
+                "command": "extension.wrapWithValueListenableBuilder",
+                "title": "Wrap with ValueListenableBuilder"
+            },
+            {
+                "command": "extension.wrapWithValueListenableListBuilder",
+                "title": "Wrap with ValueListenableListBuilder"
+            },
+            {
+                "command": "extension.wrapWithVisibilityDetector",
+                "title": "Wrap with VisibilityDetector"
             }
         ],
         "menus": {
@@ -117,6 +181,13 @@
                     "when": "true",
                     "command": "extension.generateAssets",
                     "group": "navigation"
+                }
+            ],
+            "editor/context": [
+                {
+                    "when": "resourceLangId == dart",
+                    "command": "editor.action.refactor",
+                    "group": "1_modification"
                 }
             ]
         }

@@ -4,9 +4,6 @@ import { log } from './logger';
 
 export class FlutterWrapperManager {
     private wrappers: Map<string, (widget: string, indentation: string) => string> = new Map();
-    private cachedCodeActions: Map<string, vscode.CodeAction[]> = new Map();
-    private lastCacheCleanTime: number = Date.now();
-    private readonly CACHE_CLEANUP_INTERVAL = 1000 * 60 * 5; // 5分钟清理一次缓存
 
     constructor() {
         this.initializeWrappers();
@@ -75,17 +72,7 @@ export class FlutterWrapperManager {
             log('不是预先排除的组件:', widgetName);
         }
 
-        // 检查缓存
-        const cacheKey = `${widgetName}`;
-        const cachedActions = this.cachedCodeActions.get(cacheKey);
-        if (cachedActions) {
-            return this.updateCachedActionArguments(cachedActions, document, range);
-        }
-
-        // 清理过期缓存
-        this.cleanupCacheIfNeeded();
-
-
+        // 直接创建和返回代码操作，不使用缓存
         const actions: vscode.CodeAction[] = [];
         this.wrappers.forEach((_, name) => {
             const action = new vscode.CodeAction(`Wrap with ${name}`, vscode.CodeActionKind.RefactorRewrite);
@@ -97,36 +84,7 @@ export class FlutterWrapperManager {
             actions.push(action);
         });
 
-        // 缓存结果
-        this.cachedCodeActions.set(cacheKey, actions);
-
         return actions;
-    }
-
-    private updateCachedActionArguments(
-        cachedActions: vscode.CodeAction[],
-        document: vscode.TextDocument,
-        range: vscode.Range
-    ): vscode.CodeAction[] {
-        return cachedActions.map(action => {
-            const newAction = new vscode.CodeAction(
-                action.title!,
-                action.kind
-            );
-            newAction.command = {
-                ...action.command!,
-                arguments: [document, range]
-            };
-            return newAction;
-        });
-    }
-
-    private cleanupCacheIfNeeded() {
-        const now = Date.now();
-        if (now - this.lastCacheCleanTime > this.CACHE_CLEANUP_INTERVAL) {
-            this.cachedCodeActions.clear();
-            this.lastCacheCleanTime = now;
-        }
     }
 
     private extractWidgetName(lineText: string, cursorPosition: number): string {
@@ -134,6 +92,7 @@ export class FlutterWrapperManager {
         const editor = vscode.window.activeTextEditor;
         if (editor && !editor.selection.isEmpty) {
             const selectedText = editor.document.getText(editor.selection).trim();
+            log(`选中的文本: ${selectedText}`);
             return selectedText;
         }
 
@@ -142,7 +101,8 @@ export class FlutterWrapperManager {
         const afterCursor = lineText.slice(cursorPosition);
 
         // 向前匹配到单词开始
-        const beforeMatch = beforeCursor.match(/\b(_?[a-zA-Z][a-zA-Z0-9_]*)$/);
+        // 放宽正则表达式以适应更多的组件名称模式
+        const beforeMatch = beforeCursor.match(/\b([a-zA-Z][a-zA-Z0-9_]*)$/);
         const beforePart = beforeMatch ? beforeMatch[1] : '';
 
         // 向后匹配到空格、左括号或小数点
@@ -150,6 +110,7 @@ export class FlutterWrapperManager {
         const afterPart = afterMatch ? afterMatch[1] : '';
 
         const extractedName = beforePart + afterPart;
+        log(`提取的组件名: ${extractedName}`);
         return extractedName;
     }
 
@@ -432,7 +393,7 @@ ${indentation})`;
 
     private wrapWithVisibilityDetector(widget: string, indentation: string): string {
         return `VisibilityDetector(
-${indentation}  key: ValueKey(''),
+${indentation}  key: Key(''),
 ${indentation}  onVisibilityChanged: (VisibilityInfo info) {
 ${indentation}    double value = info.visibleFraction;
 ${indentation}  },
