@@ -23,6 +23,7 @@ export class FlutterWrapperManager {
         this.wrappers.set('Obx', this.wrapWithObx);
         this.wrappers.set('PreferredSize', this.wrapWithPreferredSize);
         this.wrappers.set('Stack', this.wrapWithStack);
+        this.wrappers.set('SizedBox.square', this.wrapWithSizedBoxSquare);
         this.wrappers.set('Theme', this.wrapWithTheme);
         this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
         this.wrappers.set('ValueListenableListBuilder', this.wrapWithValueListenableListBuilder);
@@ -359,6 +360,13 @@ ${indentation})`;
 ${indentation}  children: [
 ${indentation}    ${widget.trim()},
 ${indentation}  ],
+${indentation})`;
+    }
+
+    private wrapWithSizedBoxSquare(widget: string, indentation: string): string {
+        return `SizedBox.square(
+${indentation}  dimension: 100.w,
+${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }
 
