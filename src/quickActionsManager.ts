@@ -315,7 +315,7 @@ class ${className}Controller extends BaseController {
   ${className}Controller(this._routeState);
   static const String _logTag = '${className}Controller';  
 
-  final states = ${className}State();
+  final pageState = ${className}State();
 
   @override
   void onInit() {
@@ -388,7 +388,7 @@ class ${className}View extends BasePage<${className}Controller> implements Commo
     return [GetControllerRecycler(run: () => Get.delete<${className}Controller>(tag: _getXTag))];
   }
   
-  ${className}State get state => controller.states;
+  ${className}State get state => controller.pageState;
 
   @override
   PreferredSizeWidget createAppBar() {
