@@ -63,7 +63,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       snippet: `crossAxisAlignment: CrossAxisAlignment.start,`,
       description: '设置交叉轴方式'
     },
-    'faddPostFrameCallback 获取当前帧结束后回调': {
+    'fpostFrameCallback 获取当前帧结束后回调': {
       snippet: `WidgetsBinding.instance.addPostFrameCallback((_) {
   $0
 });`,
@@ -278,9 +278,13 @@ debugPrint('沙盒路径: \${directory.path}');`,
 });`,
       description: '定时器'
     },
-    'funfocus cancel keyboard 取消键盘': {
-      snippet: `FocusManager.instance.primaryFocus?.unfocus();`,
-      description: '取消焦点'
+    'fisIOS 判断是否为iOS': {
+      snippet: `Platform.isIOS`,
+      description: '判断是否为iOS'
+    },
+    'fisAndroid 判断是否为Android': {
+      snippet: `Platform.isAndroid`,
+      description: '判断是否为Android'
     },
     'fdebugPrint 调试打印': {
       snippet: `debugPrint('$${1}');`,
@@ -978,6 +982,10 @@ while (i < 10) {
     'fchannel pop 退出app安卓': {
       snippet: `SystemNavigator.pop();`,
       description: 'channel 退出app安卓'
+    },
+    'fchannel cancel keyboard 取消键盘': {
+      snippet: `SystemChannels.textInput.invokeMethod('TextInput.hide');`,
+      description: '取消键盘'
     },
     'fvalue notifier 不为空': {
       snippet: `ValueNotifier<int> lister = ValueNotifier<int>(0);`,
