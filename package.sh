@@ -39,6 +39,7 @@ install_extension() {
     local vsix_file=$3
     local extension_id=$4
 
+    echo ""
     echo "正在检查 $editor 中的插件安装状态..."
 
     # 检查插件是否已安装
@@ -58,12 +59,12 @@ install_extension() {
 
     if [[ $? -eq 0 ]]; then
         echo "$editor 插件安装成功！请完全退出 $editor 并重新启动以使更改生效。"
-        echo ""
         return 0
     else
         echo "$editor 插件安装失败，请检查错误信息。"
         return 1
     fi
+    echo ""
 }
 
 # 主程序
@@ -87,6 +88,9 @@ main() {
         # Cursor路径
         cursor_path="/Applications/Cursor.app/Contents/Resources/app/bin/code"
 
+        # Trae路径
+        trae_path="/Applications/Trae.app/Contents/Resources/app/bin/marscode"
+
         # 安装到VSCode
         if [ -f "$vscode_path" ]; then
             install_extension "VSCode" "$vscode_path" "$vsix_file" "$extension_id"
@@ -99,6 +103,13 @@ main() {
             install_extension "Cursor" "$cursor_path" "$vsix_file" "$extension_id"
         else
             echo "未找到Cursor安装路径，跳过Cursor安装"
+        fi
+
+        # 安装到Trae
+        if [ -f "$trae_path" ]; then
+            install_extension "Trae" "$trae_path" "$vsix_file" "$extension_id"
+        else
+            echo "未找到Trae安装路径，跳过Trae安装"
         fi
 
         echo "安装过程完成！"

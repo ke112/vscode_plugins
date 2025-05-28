@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "提高Flutter开发效率，快速Wrapper代码生成、快速Build Runner、快速新建Getx页面等",
-    "version": "0.0.48",
+    "version": "0.0.57",
     "publisher": "zhangzhihua",
     "author": {
         "name": "徐凤年",
@@ -10,7 +10,7 @@
     },
     "icon": "images/logo.png",
     "engines": {
-        "vscode": "^1.60.0"
+        "vscode": "^1.74.0"
     },
     "categories": [
         "Snippets",
@@ -32,7 +32,7 @@
     },
     "devDependencies": {
         "@types/node": "^14.x",
-        "@types/vscode": "^1.60.0",
+        "@types/vscode": "^1.74.0",
         "@typescript-eslint/eslint-plugin": "^4.x",
         "@typescript-eslint/parser": "^4.x",
         "eslint": "^7.x",
