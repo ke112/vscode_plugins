@@ -28,6 +28,8 @@ export class FlutterWrapperManager {
         this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
         this.wrappers.set('ValueListenableListBuilder', this.wrapWithValueListenableListBuilder);
         this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
+        this.wrappers.set('Directionality', this.wrapWithDirectionality);
+        this.wrappers.set('PositionedDirectional', this.wrapWithPositionedDirectional);
     }
 
     registerCommands(context: vscode.ExtensionContext) {
@@ -289,9 +291,9 @@ ${indentation})`;
     private wrapWithClipRRect(widget: string, indentation: string): string {
         return `ClipRRect(
 ${indentation}  // borderRadius: BorderRadius.circular(16.w),
-${indentation}  borderRadius: BorderRadius.only(
-${indentation}    topLeft: Radius.circular(16.w),
-${indentation}    topRight: Radius.circular(16.w),
+${indentation}  borderRadius: BorderRadiusDirectional.only(
+${indentation}    topStart: Radius.circular(16.w),
+${indentation}    topEnd: Radius.circular(16.w),
 ${indentation}  ),
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
@@ -405,6 +407,21 @@ ${indentation}  key: Key(''),
 ${indentation}  onVisibilityChanged: (VisibilityInfo info) {
 ${indentation}    double value = info.visibleFraction;
 ${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithDirectionality(widget: string, indentation: string): string {
+        return `Directionality(
+${indentation}  textDirection: TextDirection.ltr, // Change to rtl for Arabic
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithPositionedDirectional(widget: string, indentation: string): string {
+        return `PositionedDirectional(
+${indentation}  top: 0,
+${indentation}  start: 0, // Use start instead of left for RTL support
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }

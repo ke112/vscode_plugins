@@ -38,5 +38,16 @@ export const EXCLUDED_WIDGETS = new Set([
     'center',
     'start',
     'end',
+    'topLeft',
+    'topRight',
+    'bottomLeft',
+    'bottomRight',
+    'topStart',
+    'topEnd',
+    'bottomStart',
+    'bottomEnd',
+    'ltr',
+    'rtl',
+    'textDirection',
     // 可以添加其他需要排除的基础 Widget 类型
 ]); 

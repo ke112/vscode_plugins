@@ -80,44 +80,44 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: 'await 延迟执行'
     },
     'fedgeInsets only 生成间距': {
-      snippet: `EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
+      snippet: `EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '生成间距'
     },
     'fedgeInsets all 生成间距': {
-      snippet: `EdgeInsets.all(16.w)`,
+      snippet: `EdgeInsetsDirectional.all(16.w)`,
       description: '生成间距'
     },
     'fmargin all 设置外边距': {
-      snippet: `margin: EdgeInsets.all(16.w)`,
+      snippet: `margin: EdgeInsetsDirectional.all(16.w)`,
       description: '设置外边距'
     },
     'fmargin only 设置外边距': {
-      snippet: `margin: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
+      snippet: `margin: EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置外边距'
     },
     'fpadding all 设置内边距': {
-      snippet: `padding: EdgeInsets.all(16.w)`,
+      snippet: `padding: EdgeInsetsDirectional.all(16.w)`,
       description: '设置内边距'
     },
     'fpadding only 设置内边距': {
-      snippet: `padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
+      snippet: `padding: EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置内边距'
     },
     'ftop 设置顶部': {
       snippet: `top: 16.w,`,
       description: '设置顶部'
     },
-    'fleft 设置左边': {
-      snippet: `left: 16.w,`,
-      description: '设置左边'
+    'fstart 设置开始边': {
+      snippet: `start: 16.w,`,
+      description: '设置开始边'
     },
     'fbottom 设置底部': {
       snippet: `bottom: 16.w,`,
       description: '设置底部'
     },
-    'fright 设置右边': {
-      snippet: `right: 16.w,`,
-      description: '设置右边'
+    'fend 设置结束边': {
+      snippet: `end: 16.w,`,
+      description: '设置结束边'
     },
     'fcolor 设置红色': {
       snippet: `color: Colors.red,`,
@@ -214,13 +214,12 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: '生成富文本'
     },
     'foverlay 添加悬浮窗口': {
-      snippet: `if (controller.overlayEntry != null) return; // 防止重复插入
-OverlayState? overlayState = Overlay.of(context);
+      snippet: `OverlayState? overlayState = Overlay.of(context);
 controller.overlayEntry = OverlayEntry(
   builder: (context) {
-    return Positioned(
+    return PositionedDirectional(
       top: 200.w,
-      left: 200.w,
+      start: 200.w,
       width: 100.w,
       height: 100.w,
       child: const Text('悬浮窗口'),
@@ -493,7 +492,7 @@ return false;
     },
     'flistview builder 列表': {
       snippet: `ListView.builder(
-  padding: EdgeInsets.zero,
+  padding: EdgeInsetsDirectional.zero,
   scrollDirection: Axis.vertical,
   shrinkWrap: true,
   // physics: const NeverScrollableScrollPhysics(),
@@ -508,7 +507,7 @@ return false;
     },
     'flistview separated 列表': {
       snippet: `ListView.separated(
-  padding: EdgeInsets.zero,
+  padding: EdgeInsetsDirectional.zero,
   scrollDirection: Axis.vertical,
   shrinkWrap: true,
   // physics: const NeverScrollableScrollPhysics(),
@@ -626,11 +625,11 @@ return false;
       description: 'border 设置全部边框'
     },
     'fborder 设置各个边框': {
-      snippet: `border: Border(
+      snippet: `border: BorderDirectional(
   top: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
   bottom: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
-  left: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
-  right: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
+  start: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
+  end: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
 ),`,
       description: 'border 设置各个边框'
     },
@@ -639,11 +638,11 @@ return false;
       description: 'borderRadius 设置全部圆角'
     },
     'fborderRadius 设置单个圆角': {
-      snippet: `borderRadius: BorderRadius.only(
-  topLeft: Radius.circular(4.w),
-  topRight: Radius.circular(4.w),
-  bottomLeft: Radius.circular(4.w),
-  bottomRight: Radius.circular(4.w),
+      snippet: `borderRadius: BorderRadiusDirectional.only(
+  topStart: Radius.circular(4.w),
+  topEnd: Radius.circular(4.w),
+  bottomStart: Radius.circular(4.w),
+  bottomEnd: Radius.circular(4.w),
 ),`,
       description: 'borderRadius 设置单个圆角'
     },
@@ -778,7 +777,7 @@ animation = Tween(begin: 0.0, end: 1.0)
     ];
   },
   body: ListView.builder(
-    padding: EdgeInsets.zero,
+    padding: EdgeInsetsDirectional.zero,
     scrollDirection: Axis.vertical,
     itemCount: 30,
     itemExtent: 100,
@@ -833,7 +832,7 @@ animation = Tween(begin: 0.0, end: 1.0)
         flexibleSpace: FlexibleSpaceBar(
           collapseMode: CollapseMode.pin,
           background: Container(
-            padding: EdgeInsets.only(bottom: middleWeightH),
+            padding: EdgeInsetsDirectional.only(bottom: middleWeightH),
             color: Colors.green,
             alignment: Alignment.center,
             child: const Text('第一排文案'),
@@ -852,7 +851,7 @@ animation = Tween(begin: 0.0, end: 1.0)
     ];
   },
   body: ListView.builder(
-    padding: EdgeInsets.zero,
+    padding: EdgeInsetsDirectional.zero,
     scrollDirection: Axis.vertical,
     addAutomaticKeepAlives: false,
     addRepaintBoundaries: false,
@@ -1071,6 +1070,36 @@ class $${1} {
   HapticFeedback.vibrate(duration: 30, amplitude: 128);
 }`,
       description: 'feed back 反馈'
+    },
+    'frtl directionality RTL布局': {
+      snippet: `Directionality(
+  textDirection: TextDirection.rtl,
+  child: $0,
+)`,
+      description: 'RTL directionality RTL布局'
+    },
+    'fltr directionality LTR布局': {
+      snippet: `Directionality(
+  textDirection: TextDirection.ltr,
+  child: $0,
+)`,
+      description: 'LTR directionality LTR布局'
+    },
+    'flocale 阿拉伯语区域设置': {
+      snippet: `Locale('ar', 'SA')`,
+      description: 'Arabic locale 阿拉伯语区域设置'
+    },
+    'flocale 英语区域设置': {
+      snippet: `Locale('en', 'US')`,
+      description: 'English locale 英语区域设置'
+    },
+    'fintl bidi 双向文本': {
+      snippet: `import 'package:intl/intl.dart' as intl;
+
+String getBidiText(String text) {
+  return intl.Bidi.stripHtmlIfNeeded(text);
+}`,
+      description: 'intl bidi 双向文本处理'
     },
   };
 

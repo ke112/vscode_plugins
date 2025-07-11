@@ -7,6 +7,7 @@ If you want to read the English version of README, [click here to view the Engli
 ## Part 1 : 组件扩展
 
 - 扩展Flutter基础库中没有，但实际开发中经常使用而又不方便使用的组件。
+- ✨ **全面支持RTL布局** - 所有生成的代码都使用RTL友好的组件和属性
 
 ### 使用方法
 
@@ -16,12 +17,14 @@ If you want to read the English version of README, [click here to view the Engli
     - `AnnotatedRegion`
     - `AnimatedBuilder`
     - `ClipRRect`
+    - `Directionality` ✨ RTL支持
     - `GestureDetector`
     - `InkWell`
     - `LayoutBuilder`
     - `MeasureSize`
     - `MediaQuery`
     - `Obx`
+    - `PositionedDirectional` ✨ RTL支持
     - `PreferredSize`
     - `Stack`
     - `Theme`
@@ -48,6 +51,15 @@ If you want to read the English version of README, [click here to view the Engli
 ## Part 3 :代码片段
 
 - 非常高效的代码片段，可以大大提高你的开发效率。
+- ✨ **全面支持RTL布局** - 使用 `EdgeInsetsDirectional`、`BorderRadiusDirectional`、`PositionedDirectional` 等RTL友好组件
+- 🌍 **多语言支持** - 包含阿拉伯语、英语等区域设置的代码片段
+
+### RTL 支持特性
+
+- 使用 `start/end` 替代 `left/right` 属性
+- 支持 `EdgeInsetsDirectional` 和 `BorderRadiusDirectional`
+- 包含 `Directionality` 组件用于控制文本方向
+- 提供双向文本处理的代码片段
 
 ### 使用方法
 

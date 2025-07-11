@@ -403,9 +403,15 @@ class ${className}View extends BasePage<${className}Controller> implements Commo
   }
 
   Widget _buildContent() {
-    return const Center(
-      child: Text(
-        '内容区域',
+    return Directionality(
+      textDirection: TextDirection.ltr, // Change to rtl for Arabic support
+      child: Container(
+        padding: EdgeInsetsDirectional.all(16.w),
+        child: const Center(
+          child: Text(
+            '内容区域',
+          ),
+        ),
       ),
     );
   }
@@ -427,31 +433,37 @@ class ${className}View extends GetView<${className}Controller> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '${className}Title',
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontFamily: 'PingFang SC',
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF000818),
-            height: 1.3,
+    return Directionality(
+      textDirection: TextDirection.ltr, // Change to rtl for Arabic support
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            '${className}Title',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF000818),
+              height: 1.3,
+            ),
           ),
+          centerTitle: true,
+          elevation: 0,
+          leading: Builder(builder: (context) {
+            return GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () async {
+                Navigator.maybeOf(context)?.pop();
+              },
+              child: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+            );
+          }),
         ),
-        centerTitle: true,
-        elevation: 0,
-        leading: Builder(builder: (context) {
-          return GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () async {
-              Navigator.maybeOf(context)?.pop();
-            },
-            child: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          );
-        }),
+        body: Container(
+          padding: EdgeInsetsDirectional.all(16.w),
+          child: const Text('Content goes here'),
+        ),
       ),
-      body: Container(),
     );
   }
 }
