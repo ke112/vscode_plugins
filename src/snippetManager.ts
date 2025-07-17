@@ -468,7 +468,7 @@ return false;
     },
     'ficon 自定义图标事件': {
       snippet: `IconButton(
-  icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+  icon: const Icon(Icons.arrow_back, color: Colors.white),
   onPressed: () => Navigator.of(context).pop(),
 )`,
       description: 'icon 自定义图标事件'
@@ -479,7 +479,7 @@ return false;
   appBar: AppBar(
     title: const Text('标题', style: TextStyle(color: Colors.white)),
     leading: IconButton(
-      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+      icon: const Icon(Icons.arrow_back, color: Colors.white),
       onPressed: () => Navigator.of(context).pop(),
     ),
     elevation: 0,
@@ -585,6 +585,7 @@ return false;
     'fwrap 自动换行': {
       snippet: `Wrap(
   direction: Axis.horizontal,
+  textDirection: TextDirection.ltr,
   runSpacing: 20.w,
   spacing: 20.w,
   alignment: WrapAlignment.start,
@@ -621,15 +622,15 @@ return false;
       description: 'constraints 设置约束'
     },
     'fborder 设置全部边框': {
-      snippet: `border: Border.all(width: 1.w, color: Color(0xFF333333)),`,
+      snippet: `border: Border.all(width: 1.w, color: const Color(0xFF333333)),`,
       description: 'border 设置全部边框'
     },
     'fborder 设置各个边框': {
       snippet: `border: BorderDirectional(
-  top: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
-  bottom: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
-  start: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
-  end: BorderSide(width: 1.w, color: Color(0xFFE5E4E3)),
+  top: BorderSide(width: 1.w, color: const Color(0xFFE5E4E3)),
+  bottom: BorderSide(width: 1.w, color: const Color(0xFFE5E4E3)),
+  start: BorderSide(width: 1.w, color: const Color(0xFFE5E4E3)),
+  end: BorderSide(width: 1.w, color: const Color(0xFFE5E4E3)),
 ),`,
       description: 'border 设置各个边框'
     },

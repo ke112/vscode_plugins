@@ -86,6 +86,15 @@ export class QuickActionsManager {
                 const originalFilename = path.basename(fsPath);
                 await vscode.workspace.fs.copy(uri, vscode.Uri.file(path.join(tmpDir, originalFilename)));
             }
+
+            // 在运行 build_runner 之前，删除临时目录中可能存在的旧 .g.dart 文件
+            const tmpFilesInDir = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
+            for (const [file, type] of tmpFilesInDir) {
+                if (type === vscode.FileType.File && file.endsWith('.g.dart')) {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(path.join(tmpDir, file)));
+                }
+            }
+
             await this.runBuildRunnerQuick(tmpDir, isDirectory);
             const tmpFiles = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
             for (const [file, type] of tmpFiles) {
@@ -99,25 +108,6 @@ export class QuickActionsManager {
                     );
                 }
             }
-            // 为偶尔误删除的 .g.dart 文件添加 git 恢复操作
-            await new Promise((resolve, reject) => {
-                const relativeTmpDir = path.relative(projectRoot, tmpDir!);
-                const command = `git status --porcelain | grep '^ D .*\\.g\\.dart$' | while read -r line; do
-                    file_path=$(echo "$line" | awk '{print $2}')
-                    if [[ "$file_path" == *"${relativeTmpDir}"* ]]; then
-                        git restore "$file_path"
-                    fi
-                done`;
-
-                exec(command, { cwd: workspaceFolder?.uri.fsPath }, (error, stdout, stderr) => {
-                    if (error && error.code !== 1) {
-                        console.error(`Error during git restore: ${error}`);
-                        reject(error);
-                        return;
-                    }
-                    resolve(void 0);
-                });
-            });
 
             vscode.window.showInformationMessage('Quick Build Runner Completed Successfully');
         } catch (error) {
@@ -143,22 +133,6 @@ export class QuickActionsManager {
         const projectRoot = workspaceFolder.uri.fsPath;
         try {
             await this.runBuildRunnerCommand(projectRoot);
-            // 为偶尔误删除的 .g.dart 文件添加 git 恢复操作
-            await new Promise((resolve, reject) => {
-                const command = `git status --porcelain | grep '^ D .*\\.g\\.dart$' | while read -r line; do
-                    file_path=$(echo "$line" | awk '{print $2}')
-                    git restore "$file_path"
-                done`;
-
-                exec(command, { cwd: workspaceFolder?.uri.fsPath }, (error, stdout, stderr) => {
-                    if (error && error.code !== 1) { //当未找到匹配项时，grep 将返回 1，这对我们来说不是错误
-                        console.error(`Error during git restore: ${error}`);
-                        reject(error);
-                        return;
-                    }
-                    resolve(void 0);
-                });
-            });
             vscode.window.showInformationMessage('Build Runner Completed Successfully');
         } catch (error) {
             vscode.window.showErrorMessage(`Error during Build Runner: ${error}`);
@@ -193,7 +167,8 @@ export class QuickActionsManager {
             const relativePath = path.relative(projectRoot, workingDir);
             const buildFilter = `${relativePath}/*`;
             const baseCommand = await this.getBuildCommand(projectRoot);
-            const command = `${baseCommand} --delete-conflicting-outputs --build-filter=${buildFilter}`;
+            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
+            const command = `${baseCommand} --build-filter=${buildFilter}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
                     log(`runBuildRunnerQuick错误: ${error}`);
@@ -209,7 +184,8 @@ export class QuickActionsManager {
     private async runBuildRunnerCommand(projectRoot: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const baseCommand = await this.getBuildCommand(projectRoot);
-            const command = `${baseCommand} --delete-conflicting-outputs`;
+            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
+            const command = `${baseCommand}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
                     log(`runBuildRunnerCommand错误: ${error}`);
@@ -404,7 +380,7 @@ class ${className}View extends BasePage<${className}Controller> implements Commo
 
   Widget _buildContent() {
     return Directionality(
-      textDirection: TextDirection.ltr, // Change to rtl for Arabic support
+      textDirection: Directionality.of(context),
       child: Container(
         padding: EdgeInsetsDirectional.all(16.w),
         child: const Center(
@@ -434,7 +410,7 @@ class ${className}View extends GetView<${className}Controller> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.ltr, // Change to rtl for Arabic support
+      textDirection: Directionality.of(context),
       child: Scaffold(
         appBar: AppBar(
           title: Text(
@@ -455,7 +431,7 @@ class ${className}View extends GetView<${className}Controller> {
               onTap: () async {
                 Navigator.maybeOf(context)?.pop();
               },
-              child: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+              child: const Icon(Icons.arrow_back, color: Colors.black),
             );
           }),
         ),
@@ -571,14 +547,19 @@ class ${className}View extends BasePage<${className}Controller> {
 
     private getImageDimensions(filePath: string): Promise<{ width: number, height: number }> {
         return new Promise((resolve, reject) => {
-            const sizeOf = require('image-size');
-            sizeOf(filePath, (error: Error, dimensions: { width: number, height: number }) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(dimensions);
-                }
-            });
+            try {
+                const sizeOf = require('image-size');
+                sizeOf(filePath, (error: Error, dimensions: { width: number, height: number }) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(dimensions);
+                    }
+                });
+            } catch (e) {
+                vscode.window.showErrorMessage('The "image-size" package is not installed. Please run "npm install image-size" in the extension directory.');
+                reject(new Error('"image-size" package not found'));
+            }
         });
     }
 
@@ -588,11 +569,12 @@ class ${className}View extends BasePage<${className}Controller> {
             const scriptPath = path.join(this.context.extensionPath, 'scripts', 'compress_to_webp.sh');
             if (fs.existsSync(scriptPath)) {
                 try {
-                    execSync(`bash "${scriptPath}" "${folderPath}"`, { stdio: 'inherit' });
+                    execSync(`sh "${scriptPath}" "${folderPath}"`, { stdio: 'inherit' });
                     vscode.window.showInformationMessage('Compressed to WebP successfully!');
                 } catch (error) {
-                    vscode.window.showErrorMessage('Failed to compress images to webp.');
-                    log(`compressToWebP错误: ${error}`);
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    vscode.window.showErrorMessage(`Failed to compress images to webp. Error: ${errorMessage}`);
+                    log(`compressToWebP错误: ${errorMessage}`);
                 }
             } else {
                 vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
@@ -628,7 +610,8 @@ class ${className}View extends BasePage<${className}Controller> {
             }
 
             const baseCommand = await this.getBuildCommand(projectRoot);
-            const command = `${baseCommand} --delete-conflicting-outputs --build-filter=lib/gen/*`;
+            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
+            const command = `${baseCommand} --build-filter=lib/gen/*`;
             log(`${command}`);
 
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
