@@ -12,15 +12,15 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: 'Container'
     },
     'sb 设置宽高': {
-      snippet: `SizedBox(width: 16.w, height: 16.w),`,
+      snippet: `SizedBox(width: 16.w, height: 16.w)`,
       description: '固定大小的 SizedBox'
     },
     'sbh 设置高度': {
-      snippet: `SizedBox(height: 16.w),`,
+      snippet: `SizedBox(height: 16.w)`,
       description: '固定高度的 SizedBox'
     },
     'sbw 设置宽度': {
-      snippet: `SizedBox(width: 16.w),`,
+      snippet: `SizedBox(width: 16.w)`,
       description: '固定宽度的 SizedBox'
     },
     'fspacer 弹性空间': {
@@ -80,27 +80,27 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: 'await 延迟执行'
     },
     'fedgeInsets only 生成间距': {
-      snippet: `EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '生成间距'
     },
     'fedgeInsets all 生成间距': {
-      snippet: `EdgeInsetsDirectional.all(16.w),`,
+      snippet: `EdgeInsetsDirectional.all(16.w)`,
       description: '生成间距'
     },
     'fmargin all 设置外边距': {
-      snippet: `margin: EdgeInsetsDirectional.all(16.w),`,
+      snippet: `margin: EdgeInsetsDirectional.all(16.w)`,
       description: '设置外边距'
     },
     'fmargin only 设置外边距': {
-      snippet: `margin: EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `margin: EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置外边距'
     },
     'fpadding all 设置内边距': {
-      snippet: `padding: EdgeInsetsDirectional.all(16.w),`,
+      snippet: `padding: EdgeInsetsDirectional.all(16.w)`,
       description: '设置内边距'
     },
     'fpadding only 设置内边距': {
-      snippet: `padding: EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w),`,
+      snippet: `padding: EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置内边距'
     },
     'ftop 设置顶部': {
