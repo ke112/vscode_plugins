@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { EXCLUDED_WIDGETS } from './config';
-import { log } from './logger';
+import { configManager } from './config';
+import { logger } from './logger';
 
 export class FlutterWrapperManager {
     private wrappers: Map<string, (widget: string, indentation: string) => string> = new Map();
@@ -56,23 +56,23 @@ export class FlutterWrapperManager {
         if (widgetIndex > 0 && lineText[widgetIndex - 1] === '.' ||
             widgetIndex > 0 && lineText[widgetIndex - 1] === '<'
         ) {
-            log(`已排除前边是.的情况`);
+            logger.log(`已排除前边是.的情况`);
             return [];
         }
 
         // 检查是否为方法声明
         const trimmedLeft = lineText.substring(0, range.start.character).trimLeft();
         if (trimmedLeft.startsWith('void ') || trimmedLeft.startsWith('async ')) {
-            log(`已排除前边是void 的情况`);
+            logger.log(`已排除前边是void 的情况`);
             return [];
         }
 
         // 确保 widgetName 是完整的字符串匹配
-        if (EXCLUDED_WIDGETS.has(widgetName)) {
-            log('已排除预先排除组件:', widgetName);
+        if (configManager.excludedWidgets.has(widgetName)) {
+            logger.log('已排除预先排除组件:', widgetName);
             return [];
         } else {
-            log('不是预先排除的组件:', widgetName);
+            logger.log('不是预先排除的组件:', widgetName);
         }
 
         // 直接创建和返回代码操作，不使用缓存
@@ -95,7 +95,7 @@ export class FlutterWrapperManager {
         const editor = vscode.window.activeTextEditor;
         if (editor && !editor.selection.isEmpty) {
             const selectedText = editor.document.getText(editor.selection).trim();
-            log(`选中的文本: ${selectedText}`);
+            logger.log(`选中的文本: ${selectedText}`);
             return selectedText;
         }
 
@@ -113,7 +113,7 @@ export class FlutterWrapperManager {
         const afterPart = afterMatch ? afterMatch[1] : '';
 
         const extractedName = beforePart + afterPart;
-        log(`提取的组件名: ${extractedName}`);
+        logger.log(`提取的组件名: ${extractedName}`);
         return extractedName;
     }
 

@@ -2,7 +2,7 @@ import { exec, execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { log } from './logger';
+import { logger } from './logger';
 
 export class QuickActionsManager {
     private context: vscode.ExtensionContext;
@@ -111,14 +111,16 @@ export class QuickActionsManager {
 
             vscode.window.showInformationMessage('Quick Build Runner Completed Successfully');
         } catch (error) {
-            log(`quickBuildRunner错误: ${error}`);
-            vscode.window.showErrorMessage(`Error during Quick Build Runner: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`quickBuildRunner错误: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error during Quick Build Runner: ${errorMessage}`);
         } finally {
             if (tmpDir) {
                 try {
                     await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
                 } catch (finallyError) {
-                    log(`删除临时目录 ${tmpDir} 失败: ${finallyError}`);
+                    const errorMessage = finallyError instanceof Error ? finallyError.message : String(finallyError);
+                    logger.log(`删除临时目录 ${tmpDir} 失败: ${errorMessage}`);
                 }
             }
         }
@@ -135,8 +137,9 @@ export class QuickActionsManager {
             await this.runBuildRunnerCommand(projectRoot);
             vscode.window.showInformationMessage('Build Runner Completed Successfully');
         } catch (error) {
-            vscode.window.showErrorMessage(`Error during Build Runner: ${error}`);
-            log(`buildRunner错误: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Error during Build Runner: ${errorMessage}`);
+            logger.log(`buildRunner错误: ${errorMessage}`);
         }
     }
 
@@ -152,7 +155,7 @@ export class QuickActionsManager {
 
     private async getBuildCommand(projectRoot: string): Promise<string> {
         const hasFvm = await this.checkFvmExists(projectRoot);
-        log(`getBuildCommand 是否有FVM: ${hasFvm}`);
+        logger.log(`getBuildCommand 是否有FVM: ${hasFvm}`);
         return hasFvm ? 'fvm dart run build_runner build' : 'dart run build_runner build';
     }
 
@@ -171,11 +174,11 @@ export class QuickActionsManager {
             const command = `${baseCommand} --build-filter=${buildFilter}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    log(`runBuildRunnerQuick错误: ${error}`);
+                    logger.log(`runBuildRunnerQuick错误: ${error}`);
                     reject(error);
                     return;
                 }
-                log(`runBuildRunnerQuick标准输出: ${stdout}`);
+                logger.log(`runBuildRunnerQuick标准输出: ${stdout}`);
                 resolve();
             });
         });
@@ -188,11 +191,11 @@ export class QuickActionsManager {
             const command = `${baseCommand}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    log(`runBuildRunnerCommand错误: ${error}`);
+                    logger.log(`runBuildRunnerCommand错误: ${error}`);
                     reject(error);
                     return;
                 }
-                log(`runBuildRunnerQuick标准输出: ${stdout}`);
+                logger.log(`runBuildRunnerQuick标准输出: ${stdout}`);
                 resolve();
             });
         });
@@ -225,8 +228,9 @@ export class QuickActionsManager {
             }
             vscode.window.showInformationMessage(`Page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
-            log(`createPageStructure错误: ${error}`);
-            vscode.window.showErrorMessage(`Error creating page structure: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`createPageStructure错误: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error creating page structure: ${errorMessage}`);
         }
     }
 
@@ -482,8 +486,9 @@ class ${className}View extends GetView<${className}Controller> {
             }
             vscode.window.showInformationMessage(`Get界面 for ${snakeCaseName} 创建完成.`);
         } catch (error) {
-            log(`createGetBasePageStructure错误: ${error}`);
-            vscode.window.showErrorMessage(`Error creating custom page structure: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`createGetBasePageStructure错误: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error creating custom page structure: ${errorMessage}`);
         }
     }
 
@@ -522,26 +527,27 @@ class ${className}View extends BasePage<${className}Controller> {
             return;
         }
         try {
-            log(`generateAppIcons: filePath = ${filePath}`);
+            logger.log(`generateAppIcons: filePath = ${filePath}`);
             const dimensions = await this.getImageDimensions(filePath);
             if (dimensions.width !== 1024 || dimensions.height !== 1024) {
                 vscode.window.showWarningMessage('The selected image is not 1024x1024.');
                 return;
             }
             const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
-            log(`generateAppIcons: scriptPath = ${scriptPath}`);
+            logger.log(`generateAppIcons: scriptPath = ${scriptPath}`);
             exec(`sh "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
                 if (error) {
                     vscode.window.showErrorMessage(`Error generating app icons: ${error.message}`);
-                    log(`generateAppIcons: error = ${error.message}`);
+                    logger.log(`generateAppIcons: error = ${error.message}`);
                     return;
                 }
-                log(`generateAppIcons标准输出: ${stdout}`);
+                logger.log(`generateAppIcons标准输出: ${stdout}`);
                 vscode.window.showInformationMessage('iOS logo generated successfully');
             });
         } catch (error) {
-            log(`generateAppIcons错误: ${error}`);
-            vscode.window.showErrorMessage(`Error processing image: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`generateAppIcons错误: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error processing image: ${errorMessage}`);
         }
     }
 
@@ -574,7 +580,7 @@ class ${className}View extends BasePage<${className}Controller> {
                 } catch (error) {
                     const errorMessage = error instanceof Error ? error.message : String(error);
                     vscode.window.showErrorMessage(`Failed to compress images to webp. Error: ${errorMessage}`);
-                    log(`compressToWebP错误: ${errorMessage}`);
+                    logger.log(`compressToWebP错误: ${errorMessage}`);
                 }
             } else {
                 vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
@@ -612,7 +618,7 @@ class ${className}View extends BasePage<${className}Controller> {
             const baseCommand = await this.getBuildCommand(projectRoot);
             // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
             const command = `${baseCommand} --build-filter=lib/gen/*`;
-            log(`${command}`);
+            logger.log(`${command}`);
 
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
@@ -622,7 +628,8 @@ class ${className}View extends BasePage<${className}Controller> {
                 vscode.window.showInformationMessage('Assets generated successfully');
             });
         } catch (error) {
-            vscode.window.showErrorMessage(`Error during assets generation: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Error during assets generation: ${errorMessage}`);
         }
     }
 }

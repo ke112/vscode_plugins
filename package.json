@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "提高Flutter开发效率，快速Wrapper代码生成、快速Build Runner、快速新建Getx页面等",
-    "version": "0.0.61",
+    "version": "0.0.70",
     "publisher": "zhangzhihua",
     "author": {
         "name": "徐凤年",
@@ -48,9 +48,31 @@
     },
     "files": [
         "images",
-        "out"
+        "out",
+        "scripts"
     ],
     "contributes": {
+        "configuration": {
+            "title": "FNPlugin",
+            "properties": {
+                "fnplugin.logging.enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable or disable logging for the FNPlugin extension."
+                },
+                "fnplugin.flutter.excludedWidgets": {
+                    "type": "array",
+                    "default": [
+                        "Container",
+                        "SizedBox",
+                        "Padding",
+                        "Row",
+                        "Column"
+                    ],
+                    "description": "List of widget names to be excluded from the 'Wrap with...' commands."
+                }
+            }
+        },
         "commands": [
             {
                 "command": "extension.compressToWebP",

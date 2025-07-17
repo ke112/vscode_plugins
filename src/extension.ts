@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import { FlutterWrapperManager } from './flutterWrapperManager';
+import { logger } from './logger';
 import { QuickActionsManager } from './quickActionsManager';
 import { SnippetManager } from './snippetManager';
 
 export function activate(context: vscode.ExtensionContext) {
+    logger.log('FNPlugin activated');
     const flutterWrapperManager = new FlutterWrapperManager();
     const quickActionsManager = new QuickActionsManager(context);
     const snippetManager = new SnippetManager();
@@ -83,4 +85,6 @@ class FlutterWrapperActionProvider implements vscode.CodeActionProvider {
     }
 }
 
-export function deactivate() { }
+export function deactivate() {
+    logger.log('FNPlugin deactivated');
+}

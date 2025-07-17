@@ -12,15 +12,15 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: 'Container'
     },
     'sb 设置宽高': {
-      snippet: `SizedBox(width: 16.w, height: 16.w)`,
+      snippet: `SizedBox(width: 16.w, height: 16.w),`,
       description: '固定大小的 SizedBox'
     },
     'sbh 设置高度': {
-      snippet: `SizedBox(height: 16.w)`,
+      snippet: `SizedBox(height: 16.w),`,
       description: '固定高度的 SizedBox'
     },
     'sbw 设置宽度': {
-      snippet: `SizedBox(width: 16.w)`,
+      snippet: `SizedBox(width: 16.w),`,
       description: '固定宽度的 SizedBox'
     },
     'fspacer 弹性空间': {

@@ -1,4 +1,10 @@
 #!/bin/bash
+set -e
+
+# 函数: 检查命令是否存在
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
 
 # 函数: 更新版本号
 update_version() {
@@ -43,79 +49,76 @@ install_extension() {
     echo "正在检查 $editor 中的插件安装状态..."
 
     # 检查插件是否已安装
-    "$code_path" --list-extensions | grep -i "$extension_id" >/dev/null
-
-    if [[ $? -eq 0 ]]; then
+    if "$code_path" --list-extensions | grep -qi "$extension_id"; then
         echo "检测到 $editor 中已安装旧版本，正在卸载..."
-        # 卸载旧版本
-        "$code_path" --uninstall-extension "$extension_id"
+        # 卸载旧版本，并将成功输出重定向，只在出错时显示错误
+        if ! "$code_path" --uninstall-extension "$extension_id" >/dev/null; then
+            echo "卸载 $editor 旧版本失败。"
+            return 1
+        fi
         # 等待卸载完成
         sleep 1
     fi
 
     # 安装新版本
     echo "正在安装新版本到 $editor..."
-    "$code_path" --install-extension "$vsix_file"
-
-    if [[ $? -eq 0 ]]; then
+    if "$code_path" --install-extension "$vsix_file"; then
         echo "$editor 插件安装成功！请完全退出 $editor 并重新启动以使更改生效。"
         return 0
     else
         echo "$editor 插件安装失败，请检查错误信息。"
         return 1
     fi
-    echo ""
 }
 
 # 主程序
 main() {
+    # 检查所需命令
+    for cmd in node yarn vsce; do
+        if ! command_exists "$cmd"; then
+            echo "错误: 需要 '$cmd' 命令，但未找到。请先安装它。"
+            exit 1
+        fi
+    done
+
     # 更新版本号
     update_version
 
     # 打包插件
     package_extension
 
-    if [[ $? -eq 0 ]]; then
-        # 获取新生成的 .vsix 文件名
-        vsix_file=$(ls flutter-plugins-*.vsix)
-
-        # 读取插件 ID
-        extension_id=$(node -p "require('./package.json').publisher + '.' + require('./package.json').name")
-
-        # VSCode路径
-        vscode_path="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
-
-        # Cursor路径
-        cursor_path="/Applications/Cursor.app/Contents/Resources/app/bin/code"
-
-        # Trae路径
-        trae_path="/Applications/Trae.app/Contents/Resources/app/bin/marscode"
-
-        # 安装到VSCode
-        if [ -f "$vscode_path" ]; then
-            install_extension "VSCode" "$vscode_path" "$vsix_file" "$extension_id"
-        else
-            echo "未找到VSCode安装路径，跳过VSCode安装"
-        fi
-
-        # 安装到Cursor
-        if [ -f "$cursor_path" ]; then
-            install_extension "Cursor" "$cursor_path" "$vsix_file" "$extension_id"
-        else
-            echo "未找到Cursor安装路径，跳过Cursor安装"
-        fi
-
-        # 安装到Trae
-        if [ -f "$trae_path" ]; then
-            install_extension "Trae" "$trae_path" "$vsix_file" "$extension_id"
-        else
-            echo "未找到Trae安装路径，跳过Trae安装"
-        fi
-
-        echo "安装过程完成！"
-    else
-        echo "打包失败，请检查错误信息。"
+    # 获取新生成的 .vsix 文件名
+    vsix_file=$(ls flutter-plugins-*.vsix | head -n 1)
+    if [ -z "$vsix_file" ]; then
+        echo "打包失败：未找到 .vsix 文件。"
+        exit 1
     fi
+
+    # 读取插件 ID
+    extension_id=$(node -p "require('./package.json').publisher + '.' + require('./package.json').name")
+
+    # 定义编辑器信息
+    editor_names=("VSCode" "Cursor" "Trae")
+    editor_paths=(
+        "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+        "/Applications/Cursor.app/Contents/Resources/app/bin/code"
+        "/Applications/Trae.app/Contents/Resources/app/bin/marscode"
+    )
+
+    # 循环安装到各个编辑器
+    for i in "${!editor_names[@]}"; do
+        editor_name="${editor_names[i]}"
+        path="${editor_paths[i]}"
+        if [ -f "$path" ]; then
+            install_extension "$editor_name" "$path" "$vsix_file" "$extension_id"
+        else
+            echo ""
+            echo "未找到 $editor_name 安装路径 ($path)，跳过安装。"
+        fi
+    done
+
+    echo ""
+    echo "所有安装过程完成！"
 }
 
 # 执行主程序
