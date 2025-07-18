@@ -575,10 +575,11 @@ class ${className}View extends BasePage<${className}Controller> {
             const scriptPath = path.join(this.context.extensionPath, 'scripts', 'compress_to_webp.sh');
             if (fs.existsSync(scriptPath)) {
                 try {
-                    execSync(`sh "${scriptPath}" "${folderPath}"`, { stdio: 'inherit' });
+                    const output = execSync(`sh "${scriptPath}" "${folderPath}"`);
                     vscode.window.showInformationMessage('Compressed to WebP successfully!');
-                } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    logger.log(`compressToWebP output: ${output.toString()}`);
+                } catch (error: any) {
+                    const errorMessage = error.stderr?.toString() || error.stdout?.toString() || (error instanceof Error ? error.message : String(error));
                     vscode.window.showErrorMessage(`Failed to compress images to webp. Error: ${errorMessage}`);
                     logger.log(`compressToWebP错误: ${errorMessage}`);
                 }
