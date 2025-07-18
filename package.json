@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "提高Flutter开发效率，快速Wrapper代码生成、快速Build Runner、快速新建Getx页面等",
-    "version": "0.0.11",
+    "version": "0.0.76",
     "publisher": "zhangzhihua",
     "author": {
         "name": "徐凤年",
@@ -10,7 +10,7 @@
     },
     "icon": "images/logo.png",
     "engines": {
-        "vscode": "^1.60.0"
+        "vscode": "^1.74.0"
     },
     "categories": [
         "Snippets",
@@ -32,7 +32,7 @@
     },
     "devDependencies": {
         "@types/node": "^14.x",
-        "@types/vscode": "^1.60.0",
+        "@types/vscode": "^1.74.0",
         "@typescript-eslint/eslint-plugin": "^4.x",
         "@typescript-eslint/parser": "^4.x",
         "eslint": "^7.x",
@@ -47,9 +47,32 @@
         "url": "https://github.com/ke112/vscode_plugins/issues"
     },
     "files": [
-        "images"
+        "images",
+        "out",
+        "scripts"
     ],
     "contributes": {
+        "configuration": {
+            "title": "FNPlugin",
+            "properties": {
+                "fnplugin.logging.enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable or disable logging for the FNPlugin extension."
+                },
+                "fnplugin.flutter.excludedWidgets": {
+                    "type": "array",
+                    "default": [
+                        "Container",
+                        "SizedBox",
+                        "Padding",
+                        "Row",
+                        "Column"
+                    ],
+                    "description": "List of widget names to be excluded from the 'Wrap with...' commands."
+                }
+            }
+        },
         "commands": [
             {
                 "command": "extension.compressToWebP",
@@ -60,8 +83,8 @@
                 "title": "★ Create getx binding page"
             },
             {
-                "command": "extension.createGetxBindingCustomPage",
-                "title": "★ Create getx binding page by custom"
+                "command": "extension.createGetxBasePage",
+                "title": "★ Create getx and goRouter page"
             },
             {
                 "command": "extension.buildRunner",
@@ -78,6 +101,70 @@
             {
                 "command": "extension.generateAssets",
                 "title": "★ Quickly generate lib/gen (image/font)"
+            },
+            {
+                "command": "extension.wrapWithAfterLayout",
+                "title": "Wrap with AfterLayout"
+            },
+            {
+                "command": "extension.wrapWithAnnotatedRegion",
+                "title": "Wrap with AnnotatedRegion"
+            },
+            {
+                "command": "extension.wrapWithAnimatedBuilder",
+                "title": "Wrap with AnimatedBuilder"
+            },
+            {
+                "command": "extension.wrapWithClipRRect",
+                "title": "Wrap with ClipRRect"
+            },
+            {
+                "command": "extension.wrapWithGestureDetector",
+                "title": "Wrap with GestureDetector"
+            },
+            {
+                "command": "extension.wrapWithInkWell",
+                "title": "Wrap with InkWell"
+            },
+            {
+                "command": "extension.wrapWithLayoutBuilder",
+                "title": "Wrap with LayoutBuilder"
+            },
+            {
+                "command": "extension.wrapWithMeasureSize",
+                "title": "Wrap with MeasureSize"
+            },
+            {
+                "command": "extension.wrapWithMediaQuery",
+                "title": "Wrap with MediaQuery"
+            },
+            {
+                "command": "extension.wrapWithObx",
+                "title": "Wrap with Obx"
+            },
+            {
+                "command": "extension.wrapWithPreferredSize",
+                "title": "Wrap with PreferredSize"
+            },
+            {
+                "command": "extension.wrapWithStack",
+                "title": "Wrap with Stack"
+            },
+            {
+                "command": "extension.wrapWithTheme",
+                "title": "Wrap with Theme"
+            },
+            {
+                "command": "extension.wrapWithValueListenableBuilder",
+                "title": "Wrap with ValueListenableBuilder"
+            },
+            {
+                "command": "extension.wrapWithValueListenableListBuilder",
+                "title": "Wrap with ValueListenableListBuilder"
+            },
+            {
+                "command": "extension.wrapWithVisibilityDetector",
+                "title": "Wrap with VisibilityDetector"
             }
         ],
         "menus": {
@@ -99,7 +186,7 @@
                 },
                 {
                     "when": "explorerResourceIsFolder",
-                    "command": "extension.createGetxBindingCustomPage",
+                    "command": "extension.createGetxBasePage",
                     "group": "navigation"
                 },
                 {
@@ -116,6 +203,13 @@
                     "when": "true",
                     "command": "extension.generateAssets",
                     "group": "navigation"
+                }
+            ],
+            "editor/context": [
+                {
+                    "when": "resourceLangId == dart",
+                    "command": "editor.action.refactor",
+                    "group": "1_modification"
                 }
             ]
         }

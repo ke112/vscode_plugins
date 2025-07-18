@@ -2,7 +2,7 @@ import { exec, execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { log } from './logger';
+import { logger } from './logger';
 
 export class QuickActionsManager {
     private context: vscode.ExtensionContext;
@@ -27,9 +27,9 @@ export class QuickActionsManager {
             this.createPageStructure(uri);
         });
 
-        //创建Getx Binding界面 (内部)
-        const createCustomPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingCustomPage', (uri: vscode.Uri) => {
-            this.createCustomPageStructure(uri);
+        //创建Getx 继承基类封装
+        const createGetBasePageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBasePage', (uri: vscode.Uri) => {
+            this.createGetBasePageStructure(uri);
         });
 
         //生成iOS所有icon
@@ -45,7 +45,7 @@ export class QuickActionsManager {
             this.generateAssets();
         });
 
-        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createCustomPageStructureDisposable, generateAppIconsDisposable, compressToWebP, generateAssetsDisposable);
+        this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createGetBasePageStructureDisposable, generateAppIconsDisposable, compressToWebP, generateAssetsDisposable);
     }
 
     private async buildRunnerQuick(uri: vscode.Uri) {
@@ -56,6 +56,7 @@ export class QuickActionsManager {
             vscode.window.showErrorMessage('Quick Build Runner only works with Dart files or directories.');
             return;
         }
+        let tmpDir: string | undefined;
         try {
             const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
             if (!workspaceFolder) {
@@ -63,8 +64,12 @@ export class QuickActionsManager {
                 return;
             }
             const projectRoot = workspaceFolder.uri.fsPath;
-            // 修改 tmpDir 的位置
-            const tmpDir = isDirectory ? path.join(fsPath, '.tmp') : path.join(path.dirname(fsPath), '.tmp');
+            tmpDir = isDirectory ? path.join(fsPath, '.tmp') : path.join(path.dirname(fsPath), '.tmp');
+            try {
+                await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true, useTrash: false });
+            } catch (error) {
+                // 如果目录不存在，忽略错误
+            }
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
             const originalDir = isDirectory ? fsPath : path.dirname(fsPath);
             if (isDirectory) {
@@ -81,6 +86,15 @@ export class QuickActionsManager {
                 const originalFilename = path.basename(fsPath);
                 await vscode.workspace.fs.copy(uri, vscode.Uri.file(path.join(tmpDir, originalFilename)));
             }
+
+            // 在运行 build_runner 之前，删除临时目录中可能存在的旧 .g.dart 文件
+            const tmpFilesInDir = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
+            for (const [file, type] of tmpFilesInDir) {
+                if (type === vscode.FileType.File && file.endsWith('.g.dart')) {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(path.join(tmpDir, file)));
+                }
+            }
+
             await this.runBuildRunnerQuick(tmpDir, isDirectory);
             const tmpFiles = await vscode.workspace.fs.readDirectory(vscode.Uri.file(tmpDir));
             for (const [file, type] of tmpFiles) {
@@ -94,32 +108,21 @@ export class QuickActionsManager {
                     );
                 }
             }
-            await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
-
-            // 为偶尔误删除的 .g.dart 文件添加 git 恢复操作
-            await new Promise((resolve, reject) => {
-                const relativeTmpDir = path.relative(projectRoot, tmpDir);
-                const command = `git status --porcelain | grep '^ D .*\\.g\\.dart$' | while read -r line; do
-                    file_path=$(echo "$line" | awk '{print $2}')
-                    if [[ "$file_path" == *"${relativeTmpDir}"* ]]; then
-                        git restore "$file_path"
-                    fi
-                done`;
-
-                exec(command, { cwd: workspaceFolder?.uri.fsPath }, (error, stdout, stderr) => {
-                    if (error && error.code !== 1) { //当未找到匹配项时，grep 将返回 1，这对我们来说不是错误
-                        console.error(`Error during git restore: ${error}`);
-                        reject(error);
-                        return;
-                    }
-                    resolve(void 0);
-                });
-            });
 
             vscode.window.showInformationMessage('Quick Build Runner Completed Successfully');
         } catch (error) {
-            log(`quickBuildRunner错误: ${error}`);
-            vscode.window.showErrorMessage(`Error during Quick Build Runner: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`quickBuildRunner错误: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error during Quick Build Runner: ${errorMessage}`);
+        } finally {
+            if (tmpDir) {
+                try {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(tmpDir), { recursive: true });
+                } catch (finallyError) {
+                    const errorMessage = finallyError instanceof Error ? finallyError.message : String(finallyError);
+                    logger.log(`删除临时目录 ${tmpDir} 失败: ${errorMessage}`);
+                }
+            }
         }
     }
 
@@ -132,26 +135,11 @@ export class QuickActionsManager {
         const projectRoot = workspaceFolder.uri.fsPath;
         try {
             await this.runBuildRunnerCommand(projectRoot);
-            // 为偶尔误删除的 .g.dart 文件添加 git 恢复操作
-            await new Promise((resolve, reject) => {
-                const command = `git status --porcelain | grep '^ D .*\\.g\\.dart$' | while read -r line; do
-                    file_path=$(echo "$line" | awk '{print $2}')
-                    git restore "$file_path"
-                done`;
-
-                exec(command, { cwd: workspaceFolder?.uri.fsPath }, (error, stdout, stderr) => {
-                    if (error && error.code !== 1) { //当未找到匹配项时，grep 将返回 1，这对我们来说不是错误
-                        console.error(`Error during git restore: ${error}`);
-                        reject(error);
-                        return;
-                    }
-                    resolve(void 0);
-                });
-            });
             vscode.window.showInformationMessage('Build Runner Completed Successfully');
         } catch (error) {
-            vscode.window.showErrorMessage(`Error during Build Runner: ${error}`);
-            log(`buildRunner错误: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Error during Build Runner: ${errorMessage}`);
+            logger.log(`buildRunner错误: ${errorMessage}`);
         }
     }
 
@@ -167,7 +155,7 @@ export class QuickActionsManager {
 
     private async getBuildCommand(projectRoot: string): Promise<string> {
         const hasFvm = await this.checkFvmExists(projectRoot);
-        log(`getBuildCommand 是否有FVM: ${hasFvm}`);
+        logger.log(`getBuildCommand 是否有FVM: ${hasFvm}`);
         return hasFvm ? 'fvm dart run build_runner build' : 'dart run build_runner build';
     }
 
@@ -182,14 +170,15 @@ export class QuickActionsManager {
             const relativePath = path.relative(projectRoot, workingDir);
             const buildFilter = `${relativePath}/*`;
             const baseCommand = await this.getBuildCommand(projectRoot);
-            const command = `${baseCommand} --delete-conflicting-outputs --build-filter=${buildFilter}`;
+            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
+            const command = `${baseCommand} --build-filter=${buildFilter}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    log(`runBuildRunnerQuick错误: ${error}`);
+                    logger.log(`runBuildRunnerQuick错误: ${error}`);
                     reject(error);
                     return;
                 }
-                log(`runBuildRunnerQuick标准输出: ${stdout}`);
+                logger.log(`runBuildRunnerQuick标准输出: ${stdout}`);
                 resolve();
             });
         });
@@ -198,14 +187,15 @@ export class QuickActionsManager {
     private async runBuildRunnerCommand(projectRoot: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const baseCommand = await this.getBuildCommand(projectRoot);
-            const command = `${baseCommand} --delete-conflicting-outputs`;
+            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
+            const command = `${baseCommand}`;
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
-                    log(`runBuildRunnerCommand错误: ${error}`);
+                    logger.log(`runBuildRunnerCommand错误: ${error}`);
                     reject(error);
                     return;
                 }
-                log(`runBuildRunnerQuick标准输出: ${stdout}`);
+                logger.log(`runBuildRunnerQuick标准输出: ${stdout}`);
                 resolve();
             });
         });
@@ -238,8 +228,9 @@ export class QuickActionsManager {
             }
             vscode.window.showInformationMessage(`Page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
-            log(`createPageStructure错误: ${error}`);
-            vscode.window.showErrorMessage(`Error creating page structure: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`createPageStructure错误: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error creating page structure: ${errorMessage}`);
         }
     }
 
@@ -265,6 +256,8 @@ class ${className}Binding extends Bindings {
 }
 `;
     }
+
+
 
     private generateControllerContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
@@ -292,6 +285,120 @@ class ${className}Controller extends GetxController {
 `;
     }
 
+    private generateLogicContent(pageName: string, stateFilePath: string): string {
+        const className = this.toPascalCase(pageName);
+        return `import '${stateFilePath}';
+import 'package:go_router/go_router.dart';
+
+class ${className}Controller extends BaseController {
+  final GoRouterState? _routeState;
+  ${className}Controller(this._routeState);
+  static const String _logTag = '${className}Controller';  
+
+  final pageState = ${className}State();
+
+  @override
+  void onInit() {
+    super.onInit();
+    _initRouteParams();
+  }
+  
+  void _initRouteParams() {
+    if (_routeState?.extra != null) {
+      final params = _routeState!.extra as Map?;
+      if (params != null) {
+        // TODO: 处理路由参数
+      }
+    }
+  }
+
+  @override
+  void onClose() {
+    // TODO: 添加控制器资源释放逻辑
+    super.onClose();
+  }
+}
+`;
+    }
+
+    private generateStateContent(pageName: string): string {
+        const className = this.toPascalCase(pageName);
+        return `class ${className}State {
+  ${className}State() {
+    ///Initialize variables
+  }
+}
+`;
+    }
+
+
+    private generateGetViewContent(pageName: string, controllerFilePath: string, stateFilePath: string): string {
+        const className = this.toPascalCase(pageName);
+        return `import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+import '${controllerFilePath}';
+import '${stateFilePath}';
+
+class ${className}View extends BasePage<${className}Controller> implements CommonHandler {
+  final String _tag;
+
+  @override
+  String get tag => _tag;
+
+  String? get _getXTag => tag.isEmpty ? null : tag;
+
+  /// 从路由参数中获取tag值，如果没有则返回空字符串
+  static String _getTagFromRoute(GoRouterState? routeState) {
+    if (routeState?.extra is Map) {
+      final extra = routeState!.extra as Map;
+      return extra['tag']?.toString() ?? '';
+    }
+    return '';
+  }
+  
+  ${className}View(GoRouterState? routeState, {super.key}) : _tag = _getTagFromRoute(routeState) {
+    if (!Get.isRegistered<${className}Controller>(tag: _getXTag)) {
+      Get.put(${className}Controller(routeState), tag: _getXTag);
+    }
+  }
+  
+  @override
+  List<GetControllerRecycler> provideRecyclers() {
+    return [GetControllerRecycler(run: () => Get.delete<${className}Controller>(tag: _getXTag))];
+  }
+  
+  ${className}State get state => controller.pageState;
+
+  @override
+  PreferredSizeWidget createAppBar() {
+    return createCommonAppBar(title: '消息');
+  }
+  
+  @override
+  List<Widget> createBody() {
+    return [
+      _buildContent(),
+    ];
+  }
+
+  Widget _buildContent() {
+    return Directionality(
+      textDirection: Directionality.of(context),
+      child: Container(
+        padding: EdgeInsetsDirectional.all(16.w),
+        child: const Center(
+          child: Text(
+            '内容区域',
+          ),
+        ),
+      ),
+    );
+  }
+}
+`;
+    }
+
     private generateViewContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
         return `import 'package:flutter/material.dart';
@@ -306,31 +413,37 @@ class ${className}View extends GetView<${className}Controller> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '${className}Title',
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontFamily: 'PingFang SC',
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF000818),
-            height: 1.3,
+    return Directionality(
+      textDirection: Directionality.of(context),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            '${className}Title',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontFamily: 'PingFang SC',
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF000818),
+              height: 1.3,
+            ),
           ),
+          centerTitle: true,
+          elevation: 0,
+          leading: Builder(builder: (context) {
+            return GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () async {
+                Navigator.maybeOf(context)?.pop();
+              },
+              child: const Icon(Icons.arrow_back, color: Colors.black),
+            );
+          }),
         ),
-        centerTitle: true,
-        elevation: 0,
-        leading: Builder(builder: (context) {
-          return GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () async {
-              Navigator.maybeOf(context)?.pop();
-            },
-            child: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          );
-        }),
+        body: Container(
+          padding: EdgeInsetsDirectional.all(16.w),
+          child: const Text('Content goes here'),
+        ),
       ),
-      body: Container(),
     );
   }
 }
@@ -341,10 +454,10 @@ class ${className}View extends GetView<${className}Controller> {
         return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
     }
 
-    private async createCustomPageStructure(uri: vscode.Uri) {
+    private async createGetBasePageStructure(uri: vscode.Uri) {
         const pageName = await vscode.window.showInputBox({
-            prompt: "Enter the page name",
-            placeHolder: "e.g. HomePage or homePage"
+            prompt: "",
+            placeHolder: "输入类名  eg: HomePage or homePage"
         });
         if (!pageName) {
             return;
@@ -353,25 +466,32 @@ class ${className}View extends GetView<${className}Controller> {
         const pageDir = path.join(uri.fsPath, snakeCaseName);
         try {
             await vscode.workspace.fs.createDirectory(vscode.Uri.file(pageDir));
-            const subDirs = ['bindings', 'views', 'controllers', 'widgets'];
+            const subDirs = ['controller', 'state', 'view', 'widget'];
             for (const dir of subDirs) {
                 await vscode.workspace.fs.createDirectory(vscode.Uri.file(path.join(pageDir, dir)));
             }
+
+            // const stateFilePath = `${vscode.Uri.file(pageDir)}/${snakeCaseName}/state/${snakeCaseName}_state.dart`;
+            const stateFilePath = `../state/${snakeCaseName}_state.dart`;
+            const controllerFilePath = `../controller/${snakeCaseName}_controller.dart`;
+
             const files = [
-                { name: `${snakeCaseName}_binding.dart`, dir: 'bindings', content: this.generateBindingContent(snakeCaseName) },
-                { name: `${snakeCaseName}_controller.dart`, dir: 'controllers', content: this.generateControllerContent(snakeCaseName) },
-                { name: `${snakeCaseName}_view.dart`, dir: 'views', content: this.generateCustomViewContent(snakeCaseName) }
+                { name: `${snakeCaseName}_controller.dart`, dir: 'controller', content: this.generateLogicContent(snakeCaseName, stateFilePath) },
+                { name: `${snakeCaseName}_state.dart`, dir: 'state', content: this.generateStateContent(snakeCaseName) },
+                { name: `${snakeCaseName}_view.dart`, dir: 'view', content: this.generateGetViewContent(snakeCaseName, controllerFilePath, stateFilePath) }
             ];
             for (const file of files) {
                 const filePath = path.join(pageDir, file.dir, file.name);
                 await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(file.content));
             }
-            vscode.window.showInformationMessage(`Custom page structure for ${snakeCaseName} created successfully.`);
+            vscode.window.showInformationMessage(`Get界面 for ${snakeCaseName} 创建完成.`);
         } catch (error) {
-            log(`createCustomPageStructure错误: ${error}`);
-            vscode.window.showErrorMessage(`Error creating custom page structure: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`createGetBasePageStructure错误: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error creating custom page structure: ${errorMessage}`);
         }
     }
+
 
     private generateCustomViewContent(pageName: string): string {
         const className = this.toPascalCase(pageName);
@@ -407,39 +527,45 @@ class ${className}View extends BasePage<${className}Controller> {
             return;
         }
         try {
-            log(`generateAppIcons: filePath = ${filePath}`);
+            logger.log(`generateAppIcons: filePath = ${filePath}`);
             const dimensions = await this.getImageDimensions(filePath);
             if (dimensions.width !== 1024 || dimensions.height !== 1024) {
                 vscode.window.showWarningMessage('The selected image is not 1024x1024.');
                 return;
             }
             const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
-            log(`generateAppIcons: scriptPath = ${scriptPath}`);
+            logger.log(`generateAppIcons: scriptPath = ${scriptPath}`);
             exec(`sh "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
                 if (error) {
                     vscode.window.showErrorMessage(`Error generating app icons: ${error.message}`);
-                    log(`generateAppIcons: error = ${error.message}`);
+                    logger.log(`generateAppIcons: error = ${error.message}`);
                     return;
                 }
-                log(`generateAppIcons标准输出: ${stdout}`);
+                logger.log(`generateAppIcons标准输出: ${stdout}`);
                 vscode.window.showInformationMessage('iOS logo generated successfully');
             });
         } catch (error) {
-            log(`generateAppIcons错误: ${error}`);
-            vscode.window.showErrorMessage(`Error processing image: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`generateAppIcons错误: ${errorMessage}`);
+            vscode.window.showErrorMessage(`Error processing image: ${errorMessage}`);
         }
     }
 
     private getImageDimensions(filePath: string): Promise<{ width: number, height: number }> {
         return new Promise((resolve, reject) => {
-            const sizeOf = require('image-size');
-            sizeOf(filePath, (error: Error, dimensions: { width: number, height: number }) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(dimensions);
-                }
-            });
+            try {
+                const sizeOf = require('image-size');
+                sizeOf(filePath, (error: Error, dimensions: { width: number, height: number }) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(dimensions);
+                    }
+                });
+            } catch (e) {
+                vscode.window.showErrorMessage('The "image-size" package is not installed. Please run "npm install image-size" in the extension directory.');
+                reject(new Error('"image-size" package not found'));
+            }
         });
     }
 
@@ -449,11 +575,13 @@ class ${className}View extends BasePage<${className}Controller> {
             const scriptPath = path.join(this.context.extensionPath, 'scripts', 'compress_to_webp.sh');
             if (fs.existsSync(scriptPath)) {
                 try {
-                    execSync(`bash "${scriptPath}" "${folderPath}"`, { stdio: 'inherit' });
+                    const output = execSync(`sh "${scriptPath}" "${folderPath}"`);
                     vscode.window.showInformationMessage('Compressed to WebP successfully!');
-                } catch (error) {
-                    vscode.window.showErrorMessage('Failed to compress images to webp.');
-                    log(`compressToWebP错误: ${error}`);
+                    logger.log(`compressToWebP output: ${output.toString()}`);
+                } catch (error: any) {
+                    const errorMessage = error.stderr?.toString() || error.stdout?.toString() || (error instanceof Error ? error.message : String(error));
+                    vscode.window.showErrorMessage(`Failed to compress images to webp. Error: ${errorMessage}`);
+                    logger.log(`compressToWebP错误: ${errorMessage}`);
                 }
             } else {
                 vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
@@ -474,7 +602,6 @@ class ${className}View extends BasePage<${className}Controller> {
             const projectRoot = workspaceFolder.uri.fsPath;
             const genDir = path.join(projectRoot, 'lib', 'gen');
 
-            // 检查 gen 目录是否存在
             try {
                 await vscode.workspace.fs.stat(vscode.Uri.file(genDir));
             } catch {
@@ -482,7 +609,6 @@ class ${className}View extends BasePage<${className}Controller> {
                 return;
             }
 
-            // 删除 lib/gen 目录下的所有 .gen.dart 文件
             const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(genDir));
             for (const [file, type] of files) {
                 if (type === vscode.FileType.File && file.endsWith('.gen.dart')) {
@@ -490,10 +616,10 @@ class ${className}View extends BasePage<${className}Controller> {
                 }
             }
 
-            // 运行 build_runner
             const baseCommand = await this.getBuildCommand(projectRoot);
-            const command = `${baseCommand} --delete-conflicting-outputs --build-filter=lib/gen/*`;
-            log(`${command}`);
+            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
+            const command = `${baseCommand} --build-filter=lib/gen/*`;
+            logger.log(`${command}`);
 
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
@@ -503,7 +629,8 @@ class ${className}View extends BasePage<${className}Controller> {
                 vscode.window.showInformationMessage('Assets generated successfully');
             });
         } catch (error) {
-            vscode.window.showErrorMessage(`Error during assets generation: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage(`Error during assets generation: ${errorMessage}`);
         }
     }
 }

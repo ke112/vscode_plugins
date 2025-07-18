@@ -1,24 +1,9 @@
 import * as vscode from 'vscode';
-import { log } from './logger';
+import { configManager } from './config';
+import { logger } from './logger';
 
 export class FlutterWrapperManager {
     private wrappers: Map<string, (widget: string, indentation: string) => string> = new Map();
-    private cachedCodeActions: Map<string, vscode.CodeAction[]> = new Map();
-    private lastCacheCleanTime: number = Date.now();
-    private readonly CACHE_CLEANUP_INTERVAL = 1000 * 60 * 5; // 5分钟清理一次缓存
-    private readonly EXCLUDED_WIDGETS = new Set([
-        'StatelessWidget',
-        'StatefulWidget',
-        'Widget',
-        'BuildContext',
-        'NeverScrollableScrollPhysics',
-        'EdgeInsets',
-        'Axis',
-        'Size',
-        'Colors',
-        'Get',
-        // 可以添加其他需要排除的基础 Widget 类型
-    ]);
 
     constructor() {
         this.initializeWrappers();
@@ -38,10 +23,13 @@ export class FlutterWrapperManager {
         this.wrappers.set('Obx', this.wrapWithObx);
         this.wrappers.set('PreferredSize', this.wrapWithPreferredSize);
         this.wrappers.set('Stack', this.wrapWithStack);
+        this.wrappers.set('SizedBox.square', this.wrapWithSizedBoxSquare);
         this.wrappers.set('Theme', this.wrapWithTheme);
         this.wrappers.set('ValueListenableBuilder', this.wrapWithValueListenableBuilder);
         this.wrappers.set('ValueListenableListBuilder', this.wrapWithValueListenableListBuilder);
         this.wrappers.set('VisibilityDetector', this.wrapWithVisibilityDetector);
+        this.wrappers.set('Directionality', this.wrapWithDirectionality);
+        this.wrappers.set('PositionedDirectional', this.wrapWithPositionedDirectional);
     }
 
     registerCommands(context: vscode.ExtensionContext) {
@@ -68,40 +56,26 @@ export class FlutterWrapperManager {
         if (widgetIndex > 0 && lineText[widgetIndex - 1] === '.' ||
             widgetIndex > 0 && lineText[widgetIndex - 1] === '<'
         ) {
-            log(`已排除前边是.的情况`);
+            logger.log(`已排除前边是.的情况`);
             return [];
         }
 
         // 检查是否为方法声明
         const trimmedLeft = lineText.substring(0, range.start.character).trimLeft();
         if (trimmedLeft.startsWith('void ') || trimmedLeft.startsWith('async ')) {
-            log(`已排除前边是void 的情况`);
+            logger.log(`已排除前边是void 的情况`);
             return [];
         }
 
         // 确保 widgetName 是完整的字符串匹配
-        if (this.EXCLUDED_WIDGETS.has(widgetName)) {
-            log('已排除预先排除组件:', widgetName);
+        if (configManager.excludedWidgets.has(widgetName)) {
+            logger.log('已排除预先排除组件:', widgetName);
             return [];
         } else {
-            log('不是预先排除的组件:', widgetName);
+            logger.log('不是预先排除的组件:', widgetName);
         }
 
-        // 检查缓存
-        const cacheKey = `${widgetName}`;
-        const cachedActions = this.cachedCodeActions.get(cacheKey);
-        if (cachedActions) {
-            return this.updateCachedActionArguments(cachedActions, document, range);
-        }
-
-        // 清理过期缓存
-        this.cleanupCacheIfNeeded();
-
-        // 如果不是潜在的 Widget，直接返回空数组
-        if (!this.isPotentialWidget(widgetName)) {
-            return [];
-        }
-
+        // 直接创建和返回代码操作，不使用缓存
         const actions: vscode.CodeAction[] = [];
         this.wrappers.forEach((_, name) => {
             const action = new vscode.CodeAction(`Wrap with ${name}`, vscode.CodeActionKind.RefactorRewrite);
@@ -113,36 +87,7 @@ export class FlutterWrapperManager {
             actions.push(action);
         });
 
-        // 缓存结果
-        this.cachedCodeActions.set(cacheKey, actions);
-
         return actions;
-    }
-
-    private updateCachedActionArguments(
-        cachedActions: vscode.CodeAction[],
-        document: vscode.TextDocument,
-        range: vscode.Range
-    ): vscode.CodeAction[] {
-        return cachedActions.map(action => {
-            const newAction = new vscode.CodeAction(
-                action.title!,
-                action.kind
-            );
-            newAction.command = {
-                ...action.command!,
-                arguments: [document, range]
-            };
-            return newAction;
-        });
-    }
-
-    private cleanupCacheIfNeeded() {
-        const now = Date.now();
-        if (now - this.lastCacheCleanTime > this.CACHE_CLEANUP_INTERVAL) {
-            this.cachedCodeActions.clear();
-            this.lastCacheCleanTime = now;
-        }
     }
 
     private extractWidgetName(lineText: string, cursorPosition: number): string {
@@ -150,6 +95,7 @@ export class FlutterWrapperManager {
         const editor = vscode.window.activeTextEditor;
         if (editor && !editor.selection.isEmpty) {
             const selectedText = editor.document.getText(editor.selection).trim();
+            logger.log(`选中的文本: ${selectedText}`);
             return selectedText;
         }
 
@@ -158,7 +104,8 @@ export class FlutterWrapperManager {
         const afterCursor = lineText.slice(cursorPosition);
 
         // 向前匹配到单词开始
-        const beforeMatch = beforeCursor.match(/\b(_?[a-zA-Z][a-zA-Z0-9_]*)$/);
+        // 放宽正则表达式以适应更多的组件名称模式
+        const beforeMatch = beforeCursor.match(/\b([a-zA-Z][a-zA-Z0-9_]*)$/);
         const beforePart = beforeMatch ? beforeMatch[1] : '';
 
         // 向后匹配到空格、左括号或小数点
@@ -166,26 +113,8 @@ export class FlutterWrapperManager {
         const afterPart = afterMatch ? afterMatch[1] : '';
 
         const extractedName = beforePart + afterPart;
+        logger.log(`提取的组件名: ${extractedName}`);
         return extractedName;
-    }
-
-    private isPotentialWidget(name: string): boolean {
-        return true;
-        // 快速检查常见的非 widget 情况
-        const nonWidgetPrefixes = ['on', 'get', 'set', 'is', 'has'];
-        if (nonWidgetPrefixes.some(prefix => name.toLowerCase().startsWith(prefix))) {
-            log('名称包含非小部件前缀:', name);
-            return false;
-        }
-
-        // 排除非大写开头的名称
-        if (!/^[A-Z][a-zA-Z0-9]*$/.test(name)) {
-            log('名称不符合 Widget 命名规范:', name);
-            return false;
-        }
-
-        // 通过所有检查，认为是潜在的 Widget
-        return true;
     }
 
     private wrapWidget(document: vscode.TextDocument, range: vscode.Range, wrapFunction: (widget: string, indentation: string) => string) {
@@ -217,7 +146,7 @@ export class FlutterWrapperManager {
         const endIndex = document.offsetAt(range.end);
 
         let widgetStart = startIndex;
-        while (widgetStart > 0 && /[a-zA-Z]/.test(text[widgetStart - 1])) {
+        while (widgetStart > 0 && /[a-zA-Z_]/.test(text[widgetStart - 1])) {
             widgetStart--;
         }
 
@@ -362,9 +291,9 @@ ${indentation})`;
     private wrapWithClipRRect(widget: string, indentation: string): string {
         return `ClipRRect(
 ${indentation}  // borderRadius: BorderRadius.circular(16.w),
-${indentation}  borderRadius: BorderRadius.only(
-${indentation}    topLeft: Radius.circular(16.w),
-${indentation}    topRight: Radius.circular(16.w),
+${indentation}  borderRadius: BorderRadiusDirectional.only(
+${indentation}    topStart: Radius.circular(16.w),
+${indentation}    topEnd: Radius.circular(16.w),
 ${indentation}  ),
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
@@ -436,6 +365,13 @@ ${indentation}  ],
 ${indentation})`;
     }
 
+    private wrapWithSizedBoxSquare(widget: string, indentation: string): string {
+        return `SizedBox.square(
+${indentation}  dimension: 100.w,
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
     private wrapWithTheme(widget: string, indentation: string): string {
         return `Theme(
 ${indentation}  data: ThemeData(
@@ -467,10 +403,25 @@ ${indentation})`;
 
     private wrapWithVisibilityDetector(widget: string, indentation: string): string {
         return `VisibilityDetector(
-${indentation}  key: Key(),
+${indentation}  key: Key(''),
 ${indentation}  onVisibilityChanged: (VisibilityInfo info) {
 ${indentation}    double value = info.visibleFraction;
 ${indentation}  },
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithDirectionality(widget: string, indentation: string): string {
+        return `Directionality(
+${indentation}  textDirection: TextDirection.ltr, // Change to rtl for Arabic
+${indentation}  child: ${widget.trim()},
+${indentation})`;
+    }
+
+    private wrapWithPositionedDirectional(widget: string, indentation: string): string {
+        return `PositionedDirectional(
+${indentation}  top: 0,
+${indentation}  start: 0, // Use start instead of left for RTL support
 ${indentation}  child: ${widget.trim()},
 ${indentation})`;
     }

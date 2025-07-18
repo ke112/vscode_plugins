@@ -11,15 +11,15 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       snippet: `Container($1)`,
       description: 'Container'
     },
-    'fsb 设置宽高': {
+    'sb 设置宽高': {
       snippet: `SizedBox(width: 16.w, height: 16.w),`,
       description: '固定大小的 SizedBox'
     },
-    'fsbh 设置高度': {
+    'sbh 设置高度': {
       snippet: `SizedBox(height: 16.w),`,
       description: '固定高度的 SizedBox'
     },
-    'fsbw 设置宽度': {
+    'sbw 设置宽度': {
       snippet: `SizedBox(width: 16.w),`,
       description: '固定宽度的 SizedBox'
     },
@@ -63,7 +63,7 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       snippet: `crossAxisAlignment: CrossAxisAlignment.start,`,
       description: '设置交叉轴方式'
     },
-    'faddPostFrameCallback 获取当前帧结束后回调': {
+    'fpostFrameCallback 获取当前帧结束后回调': {
       snippet: `WidgetsBinding.instance.addPostFrameCallback((_) {
   $0
 });`,
@@ -80,44 +80,44 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: 'await 延迟执行'
     },
     'fedgeInsets only 生成间距': {
-      snippet: `EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
+      snippet: `EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '生成间距'
     },
     'fedgeInsets all 生成间距': {
-      snippet: `EdgeInsets.all(16.w)`,
+      snippet: `EdgeInsetsDirectional.all(16.w)`,
       description: '生成间距'
     },
     'fmargin all 设置外边距': {
-      snippet: `margin: EdgeInsets.all(16.w)`,
+      snippet: `margin: EdgeInsetsDirectional.all(16.w)`,
       description: '设置外边距'
     },
     'fmargin only 设置外边距': {
-      snippet: `margin: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
+      snippet: `margin: EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置外边距'
     },
     'fpadding all 设置内边距': {
-      snippet: `padding: EdgeInsets.all(16.w)`,
+      snippet: `padding: EdgeInsetsDirectional.all(16.w)`,
       description: '设置内边距'
     },
     'fpadding only 设置内边距': {
-      snippet: `padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 16.w, bottom: 16.w)`,
+      snippet: `padding: EdgeInsetsDirectional.only(start: 16.w, end: 16.w, top: 16.w, bottom: 16.w)`,
       description: '设置内边距'
     },
     'ftop 设置顶部': {
       snippet: `top: 16.w,`,
       description: '设置顶部'
     },
-    'fleft 设置左边': {
-      snippet: `left: 16.w,`,
-      description: '设置左边'
+    'fstart 设置开始边': {
+      snippet: `start: 16.w,`,
+      description: '设置开始边'
     },
     'fbottom 设置底部': {
       snippet: `bottom: 16.w,`,
       description: '设置底部'
     },
-    'fright 设置右边': {
-      snippet: `right: 16.w,`,
-      description: '设置右边'
+    'fend 设置结束边': {
+      snippet: `end: 16.w,`,
+      description: '设置结束边'
     },
     'fcolor 设置红色': {
       snippet: `color: Colors.red,`,
@@ -214,13 +214,12 @@ export class SnippetManager implements vscode.CompletionItemProvider {
       description: '生成富文本'
     },
     'foverlay 添加悬浮窗口': {
-      snippet: `if (controller.overlayEntry != null) return; // 防止重复插入
-OverlayState? overlayState = Overlay.of(context);
+      snippet: `OverlayState? overlayState = Overlay.of(context);
 controller.overlayEntry = OverlayEntry(
   builder: (context) {
-    return Positioned(
+    return PositionedDirectional(
       top: 200.w,
-      left: 200.w,
+      start: 200.w,
       width: 100.w,
       height: 100.w,
       child: const Text('悬浮窗口'),
@@ -239,30 +238,12 @@ overlayState.insert(controller.overlayEntry!);`,
       description: '打开弹起界面'
     },
     'fpop 关闭界面': {
-      snippet: `Navigator.maybeOf(context)?.pop();`,
+      snippet: `if (mounted) Navigator.maybeOf(context)?.pop();`,
       description: '关闭界面'
     },
     'fpop 关闭界面并传递数据': {
-      snippet: `Navigator.maybeOf(context)?.pop(data);`,
+      snippet: `if (mounted) Navigator.maybeOf(context)?.pop(data);`,
       description: '关闭界面并传递数据'
-    },
-    'fgetx pop 关闭界面': {
-      snippet: `Get.back();`,
-      description: '关闭界面'
-    },
-    'fgetx pop 关闭界面并传递数据': {
-      snippet: `Get.back(result: data);`,
-      description: '关闭界面并传递数据'
-    },
-    'fgetx context ': {
-      snippet: `Get.context!`,
-      description: 'Get context 全局对象'
-    },
-    'fgetx find 获取实例': {
-      snippet: `if (Get.isRegistered<$${0}>()) {
-  Get.find<$${0}>();
-}`,
-      description: 'getx find 获取实例'
     },
     'fgetx init 初始化': {
       snippet: `@override
@@ -296,9 +277,13 @@ debugPrint('沙盒路径: \${directory.path}');`,
 });`,
       description: '定时器'
     },
-    'funfocus cancel keyboard 取消键盘': {
-      snippet: `FocusManager.instance.primaryFocus?.unfocus();`,
-      description: '取消焦点'
+    'fisIOS 判断是否为iOS': {
+      snippet: `Platform.isIOS`,
+      description: '判断是否为iOS'
+    },
+    'fisAndroid 判断是否为Android': {
+      snippet: `Platform.isAndroid`,
+      description: '判断是否为Android'
     },
     'fdebugPrint 调试打印': {
       snippet: `debugPrint('$${1}');`,
@@ -371,7 +356,7 @@ debugPrint('沙盒路径: \${directory.path}');`,
       description: 'sliver adapter with child 适配器'
     },
     'ftypedef callback 定义回调': {
-      snippet: `typedef Callback = void Function(String res);`,
+      snippet: `typedef Callback = void Function(String msg);`,
       description: '定义回调'
     },
     'ftypedef enum 定义枚举': {
@@ -381,6 +366,22 @@ debugPrint('沙盒路径: \${directory.path}');`,
     'fsetState 安全刷新状态': {
       snippet: `if (mounted) setState(() {});`,
       description: '判断是否挂载，并设置状态'
+    },
+    'frx int': {
+      snippet: `final RxInt count = 0.obs;`,
+      description: 'getx Rx int类型的状态'
+    },
+    'frx string': {
+      snippet: `final RxString name = ''.obs;`,
+      description: 'getx Rx string类型的状态'
+    },
+    'frx double': {
+      snippet: `final RxDouble value = 0.0.obs;`,
+      description: 'getx Rx double类型的状态'
+    },
+    'frx bool': {
+      snippet: `final RxBool status = false.obs;`,
+      description: 'getx Rx bool类型的状态'
     },
     'fwantKeepAlive 保持状态': {
       snippet: `@override
@@ -467,7 +468,7 @@ return false;
     },
     'ficon 自定义图标事件': {
       snippet: `IconButton(
-  icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+  icon: const Icon(Icons.arrow_back, color: Colors.white),
   onPressed: () => Navigator.of(context).pop(),
 )`,
       description: 'icon 自定义图标事件'
@@ -478,7 +479,7 @@ return false;
   appBar: AppBar(
     title: const Text('标题', style: TextStyle(color: Colors.white)),
     leading: IconButton(
-      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+      icon: const Icon(Icons.arrow_back, color: Colors.white),
       onPressed: () => Navigator.of(context).pop(),
     ),
     elevation: 0,
@@ -491,7 +492,7 @@ return false;
     },
     'flistview builder 列表': {
       snippet: `ListView.builder(
-  padding: EdgeInsets.zero,
+  padding: EdgeInsetsDirectional.zero,
   scrollDirection: Axis.vertical,
   shrinkWrap: true,
   // physics: const NeverScrollableScrollPhysics(),
@@ -506,7 +507,7 @@ return false;
     },
     'flistview separated 列表': {
       snippet: `ListView.separated(
-  padding: EdgeInsets.zero,
+  padding: EdgeInsetsDirectional.zero,
   scrollDirection: Axis.vertical,
   shrinkWrap: true,
   // physics: const NeverScrollableScrollPhysics(),
@@ -584,6 +585,7 @@ return false;
     'fwrap 自动换行': {
       snippet: `Wrap(
   direction: Axis.horizontal,
+  textDirection: TextDirection.ltr,
   runSpacing: 20.w,
   spacing: 20.w,
   alignment: WrapAlignment.start,
@@ -609,7 +611,7 @@ return false;
     'fdecoration 设置修饰': {
       snippet: `decoration: BoxDecoration(
   color: Colors.white,
-  border: Border.all(width: 0.5.w, color: const Color(0xFF999999)),
+  border: Border.all(width: 1.w, color: const Color(0xFF999999)),
   borderRadius: BorderRadius.all(Radius.circular(8.w)),
 ),`, description: 'decoration 设置修饰边框'
     },
@@ -620,15 +622,15 @@ return false;
       description: 'constraints 设置约束'
     },
     'fborder 设置全部边框': {
-      snippet: `border: Border.all(width: 0.5.w, color: Color(0xFF333333)),`,
+      snippet: `border: Border.all(width: 1.w, color: const Color(0xFF333333)),`,
       description: 'border 设置全部边框'
     },
     'fborder 设置各个边框': {
-      snippet: `border: Border(
-  top: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
-  bottom: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
-  left: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
-  right: BorderSide(width: 0.5.w, color: Color(0xFFE5E4E3)),
+      snippet: `border: BorderDirectional(
+  top: BorderSide(width: 1.w, color: const Color(0xFFE5E4E3)),
+  bottom: BorderSide(width: 1.w, color: const Color(0xFFE5E4E3)),
+  start: BorderSide(width: 1.w, color: const Color(0xFFE5E4E3)),
+  end: BorderSide(width: 1.w, color: const Color(0xFFE5E4E3)),
 ),`,
       description: 'border 设置各个边框'
     },
@@ -637,11 +639,11 @@ return false;
       description: 'borderRadius 设置全部圆角'
     },
     'fborderRadius 设置单个圆角': {
-      snippet: `borderRadius: BorderRadius.only(
-  topLeft: Radius.circular(4.w),
-  topRight: Radius.circular(4.w),
-  bottomLeft: Radius.circular(4.w),
-  bottomRight: Radius.circular(4.w),
+      snippet: `borderRadius: BorderRadiusDirectional.only(
+  topStart: Radius.circular(4.w),
+  topEnd: Radius.circular(4.w),
+  bottomStart: Radius.circular(4.w),
+  bottomEnd: Radius.circular(4.w),
 ),`,
       description: 'borderRadius 设置单个圆角'
     },
@@ -776,7 +778,7 @@ animation = Tween(begin: 0.0, end: 1.0)
     ];
   },
   body: ListView.builder(
-    padding: EdgeInsets.zero,
+    padding: EdgeInsetsDirectional.zero,
     scrollDirection: Axis.vertical,
     itemCount: 30,
     itemExtent: 100,
@@ -831,7 +833,7 @@ animation = Tween(begin: 0.0, end: 1.0)
         flexibleSpace: FlexibleSpaceBar(
           collapseMode: CollapseMode.pin,
           background: Container(
-            padding: EdgeInsets.only(bottom: middleWeightH),
+            padding: EdgeInsetsDirectional.only(bottom: middleWeightH),
             color: Colors.green,
             alignment: Alignment.center,
             child: const Text('第一排文案'),
@@ -850,7 +852,7 @@ animation = Tween(begin: 0.0, end: 1.0)
     ];
   },
   body: ListView.builder(
-    padding: EdgeInsets.zero,
+    padding: EdgeInsetsDirectional.zero,
     scrollDirection: Axis.vertical,
     addAutomaticKeepAlives: false,
     addRepaintBoundaries: false,
@@ -981,6 +983,10 @@ while (i < 10) {
       snippet: `SystemNavigator.pop();`,
       description: 'channel 退出app安卓'
     },
+    'fchannel cancel keyboard 取消键盘': {
+      snippet: `SystemChannels.textInput.invokeMethod('TextInput.hide');`,
+      description: '取消键盘'
+    },
     'fvalue notifier 不为空': {
       snippet: `ValueNotifier<int> lister = ValueNotifier<int>(0);`,
       description: 'value notifier 不为空'
@@ -1051,11 +1057,11 @@ class $${1} {
       description: 'image assets package 图片'
     },
     'fcopy 复制': {
-      snippet: `Clipboard.setData(ClipboardData(text: '我是复制内容'));`,
+      snippet: `Clipboard.setData(ClipboardData(text: '测试复制'));`,
       description: 'copy 复制'
     },
     'ftoast 吐司': {
-      snippet: `ToastUtil.showTip('我是吐司');`,
+      snippet: `ToastUtil.showTip('测试提示');`,
       description: 'toast 吐司'
     },
     'ffeed back 反馈': {
@@ -1065,6 +1071,36 @@ class $${1} {
   HapticFeedback.vibrate(duration: 30, amplitude: 128);
 }`,
       description: 'feed back 反馈'
+    },
+    'frtl directionality RTL布局': {
+      snippet: `Directionality(
+  textDirection: TextDirection.rtl,
+  child: $0,
+)`,
+      description: 'RTL directionality RTL布局'
+    },
+    'fltr directionality LTR布局': {
+      snippet: `Directionality(
+  textDirection: TextDirection.ltr,
+  child: $0,
+)`,
+      description: 'LTR directionality LTR布局'
+    },
+    'flocale 阿拉伯语区域设置': {
+      snippet: `Locale('ar', 'SA')`,
+      description: 'Arabic locale 阿拉伯语区域设置'
+    },
+    'flocale 英语区域设置': {
+      snippet: `Locale('en', 'US')`,
+      description: 'English locale 英语区域设置'
+    },
+    'fintl bidi 双向文本': {
+      snippet: `import 'package:intl/intl.dart' as intl;
+
+String getBidiText(String text) {
+  return intl.Bidi.stripHtmlIfNeeded(text);
+}`,
+      description: 'intl bidi 双向文本处理'
     },
   };
 

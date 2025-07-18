@@ -1,126 +1,128 @@
 #!/bin/bash
 
+# 检查 cwebp 是否安装，如果未安装则尝试使用 Homebrew 自动安装
+if ! command -v cwebp &> /dev/null
+then
+    echo "cwebp could not be found. Checking for Homebrew to install it..."
+    # 检查当前是否为 macOS
+    if [[ "$(uname)" == "Darwin" ]] && command -v brew &> /dev/null; then
+        echo "Homebrew found. Attempting to install webp..."
+        if brew install webp; then
+            echo "webp has been installed successfully."
+            # 重新检查 cwebp 是否可用
+            if ! command -v cwebp &> /dev/null; then
+                echo "Error: webp was installed, but cwebp command is still not available. Please check your PATH."
+                exit 1
+            fi
+        else
+            echo "Error: Failed to install webp using Homebrew. Please install it manually."
+            exit 1
+        fi
+    else
+        echo "Error: Homebrew is not available. Please install webp manually."
+        echo "On macOS, you can use Homebrew: brew install webp"
+        exit 1
+    fi
+fi
+
 # 定义要处理的图片文件夹路径
 image_dir=$1
+if [ -z "$image_dir" ]; then
+    echo "Error: Please provide a directory path."
+    exit 1
+fi
 
 # 定义压缩后的质量 (针对webp)
 quality="75"
 
-# 图片总个数
+# 统计变量
 imageNum=0
 pngNum=0
 jpgNum=0
 jpegNum=0
 webpNum=0
 heicNum=0
-
-# 压缩了的个数
 compressNum=0
+failNum=0
 
-function handle_file() {
-  echo "$file"
-  if [[ "$file" == *.png || "$file" == *.jpg || "$file" == *.jpeg || "$file" == *.webp || "$file" == *.HEIC ]]; then
-    imageNum=$(($imageNum + 1))
-    if [[ "$file" == *.png ]]; then
-      pngNum=$(($pngNum + 1))
-      newfile="${file%.png}.webp"
-      cwebp -quiet -q "$quality" "$file" -o "$newfile"
-      rm -rf $file
-      compressNum=$(($compressNum + 1))
-      echo "Converted $file to $newfile"
-    fi
-    if [[ "$file" == *.jpg ]]; then
-      jpgNum=$(($jpgNum + 1))
-      newfile="${file%.jpg}.webp"
-      cwebp -quiet -q "$quality" -mt "$file" -o "$newfile"
-      rm -rf $file
-      compressNum=$(($compressNum + 1))
-      echo "Converted $file to $newfile"
-    fi
-    if [[ "$file" == *.jpeg ]]; then
-      jpegNum=$(($jpegNum + 1))
-      newfile="${file%.jpeg}.webp"
-      cwebp -quiet -q "$quality" -mt "$file" -o "$newfile"
-      rm -rf $file
-      compressNum=$(($compressNum + 1))
-      echo "Converted $file to $newfile"
-    fi
-    if [[ "$file" == *.HEIC ]]; then
-      heicNum=$(($heicNum + 1))
-      newfile="${file%.HEIC}.webp"
-      cwebp -quiet -q "$quality" -mt "$file" -o "$newfile"
-      rm -rf $file
-      compressNum=$(($compressNum + 1))
-      echo "Converted $file to $newfile"
-    fi
-    if [[ "$file" == *.webp ]]; then
-      webpNum=$(($webpNum + 1))
-      # cwebp -quiet -q "$quality" -mt "$file" -o "$file"
-      # compressNum=$(($compressNum + 1))
-    fi
-  fi
-}
+echo "Starting image compression in: $image_dir"
+echo "=========================================="
 
-# 定义递归遍历函数
-function traverse() {
-  for file in "$1"/*; do
-    if [[ -d "$file" ]]; then
-      traverse "$file"
-    else
-      handle_file
-    fi
-  done
-}
-function log() {
-  echo "\033[42;97m $* \033[0m"
-}
-function showTime() {
-  endTime=$(date +%Y-%m-%d-%H:%M:%S)
-  endTime_s=$(date +%s)
-  sumTime=$(($endTime_s - $startTime_s))
-  log "==== 开始时间: $startTime"
-  log "==== 结束时间: $endTime"
-  endDes='==== 总共用时:'
-  if (($sumTime > 60)); then
-    hour=$(expr ${sumTime} / 60)
-    used=$(expr ${hour} \* 60)
-    left=$(expr ${sumTime} - ${used})
-    log "${endDes} ${hour}分${left}秒"
-  else
-    log "${endDes} ${sumTime}秒"
-  fi
-}
+# 使用 find 和 while read 循环来安全地处理所有文件名，包括带空格的文件
+# -iname 是忽略大小写的匹配
+find "$image_dir" \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.heic" \) -type f -print0 | while IFS= read -r -d '' file; do
+  # 获取文件扩展名的小写形式
+  extension="${file##*.}"
+  extension_lower=$(echo "$extension" | tr '[:upper:]' '[:lower:]')
+  
+  original_file="$file" # 保存原始文件名
+  temp_file="" # 用于跟踪临时文件
 
-startTime=$(date +%Y-%m-%d-%H:%M:%S)
-startTime_s=$(date +%s)
+  # 检查是否是支持的图片格式
+  case "$extension_lower" in
+    png|jpg|jpeg|heic)
+      # 对于 HEIC 文件，先使用 sips 转换为 png (仅在 macOS 上)
+      if [[ "$extension_lower" == "heic" ]]; then
+        if [[ "$(uname)" == "Darwin" ]] && command -v sips &> /dev/null; then
+          temp_file="${original_file%.*}.heic.png"
+          # sips 会在同目录下创建一个新的png文件
+          if sips -s format png "$original_file" --out "$temp_file" >/dev/null 2>&1; then
+            echo "Temporarily converted HEIC to PNG: $temp_file"
+            file="$temp_file" # 更新要处理的文件为新创建的png
+          else
+            echo "Error: Failed to convert HEIC to PNG: $original_file"
+            failNum=$(($failNum + 1))
+            continue # 跳过此文件
+          fi
+        else
+          echo "Warning: Cannot convert HEIC file on this system. 'sips' command not found (macOS only)."
+          failNum=$(($failNum + 1))
+          continue # 跳过此文件
+        fi
+      fi
 
-# 显示压缩前的文件夹大小
-r1=$(du -sh $image_dir)
-start=$(echo $r1 | cut -d ' ' -f 1)
+      # 统计图片数量
+      imageNum=$(($imageNum + 1))
+      case "$extension_lower" in
+          png) pngNum=$(($pngNum + 1));;
+          jpg) jpgNum=$(($jpgNum + 1));;
+          jpeg) jpegNum=$(($jpegNum + 1));;
+          heic) heicNum=$(($heicNum + 1));;
+      esac
 
-# 调用递归遍历函数
-if [ -d "$image_dir" ]; then
-  traverse "$image_dir"
-elif [ -f "$image_dir" ]; then
-  file=$image_dir
-  handle_file
-fi
+      # 定义新的webp文件名 (基于原始文件名)
+      newfile="${original_file%.*}.webp"
+      
+      # 执行转换
+      if cwebp -quiet -q "$quality" -mt "$file" -o "$newfile"; then
+        compressNum=$(($compressNum + 1))
+        echo "SUCCESS: Converted $original_file -> $newfile"
+        rm -f "$original_file" # 删除原始文件
+        if [ -n "$temp_file" ]; then
+          rm -f "$temp_file" # 删除临时png文件
+        fi
+      else
+        failNum=$(($failNum + 1))
+        echo "ERROR: Failed to convert $original_file"
+        # 如果转换失败，也要清理临时文件
+        if [ -n "$temp_file" ]; then
+          rm -f "$temp_file"
+        fi
+      fi
+      ;;
+    *)
+      # 由于 find 命令已经做了筛选，这里理论上不会执行
+      ;;
+  esac
+done
 
-# 显示压缩后的文件夹大小
-r2=$(du -sh $image_dir)
-end=$(echo $r2 | cut -d ' ' -f 1)
+# 统计已经存在的webp文件数量
+webpNum=$(find "$image_dir" -type f -iname "*.webp" | wc -l | tr -d ' ')
 
-# 统计压缩了的个数
-echo ""
-echo ""
-log "==== 本次共检索到${imageNum}张图片,压缩处理了${compressNum}张"
-log "==== 本次共检索到${pngNum}张png图片"
-log "==== 本次共检索到${jpgNum}张jpg图片"
-log "==== 本次共检索到${jpegNum}张jpeg图片"
-log "==== 本次共检索到${webpNum}张webp图片"
-log "==== 本次共检索到${heicNum}张HEIC图片"
-log "==== 压缩前大小:$start"
-log "==== 压缩后大小:$end"
-showTime
-echo ""
-echo ""
+# 最终的统计报告
+echo "=========================================="
+echo "Compression complete."
+echo "Summary:"
+echo " - Total images found: $imageNum (PNG: $pngNum, JPG: $jpgNum, JPEG: $jpegNum, HEIC: $heicNum, WebP: $webpNum)"
+echo " - Successfully converted: $compressNum"
+echo " - Failed or skipped: $failNum"

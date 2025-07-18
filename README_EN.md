@@ -7,6 +7,7 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
 ## 1. Widget Extend
 
 - Expand the Flutter base library but add components that are often used in actual development but are not convenient to use.
+- ✨ **Full RTL Layout Support** - All generated code uses RTL-friendly components and properties
 
 ### How to use
 
@@ -16,12 +17,14 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
     - `AnnotatedRegion`
     - `AnimatedBuilder`
     - `ClipRRect`
+    - `Directionality` ✨ RTL Support
     - `GestureDetector`
     - `InkWell`
     - `LayoutBuilder`
     - `MeasureSize`
     - `MediaQuery`
     - `Obx`
+    - `PositionedDirectional` ✨ RTL Support
     - `PreferredSize`
     - `Stack`
     - `Theme`
@@ -48,6 +51,15 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
 ## 3. Snippet
 
 - Very efficient code snippets, can greatly improve your development efficiency.
+- ✨ **Full RTL Layout Support** - Uses `EdgeInsetsDirectional`, `BorderRadiusDirectional`, `PositionedDirectional` and other RTL-friendly components
+- 🌍 **Multi-language Support** - Includes code snippets for Arabic, English and other locale settings
+
+### RTL Support Features
+
+- Uses `start/end` instead of `left/right` properties
+- Supports `EdgeInsetsDirectional` and `BorderRadiusDirectional`
+- Includes `Directionality` component for text direction control
+- Provides bidirectional text processing code snippets
 
 ### How to use
 
