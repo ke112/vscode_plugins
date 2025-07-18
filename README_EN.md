@@ -1,6 +1,6 @@
-# Flutter Plugins
+# FN Flutter Plugins
 
-Flutter Plugins can help you improve your development efficiency. If you can’t find a perfect plugin for yourself, create your own.
+FN Flutter Plugins can help you improve your development efficiency. If you can’t find a perfect plugin for yourself, create your own.
 
 If you want to read the Chinese version of README, [点击这里查看中文版本](/README_CN.md)
 
@@ -63,7 +63,7 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
 
 ### How to use
 
-1. Natural output keywords, such as `fsb` for `SizedBox`, `fspacer` for `Spacer`, etc.
+1. Natural output keywords, such as `sbw` for `SizedBox(width: 16.w),`, `fspacer` for `const Spacer(),`, etc.
 2. Currently, all embedded code snippets have Chinese descriptions
 
 ## Contribution
@@ -84,6 +84,7 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 
 | Date       | Version | Update Content                                                             |
 | ---------- | ------- | -------------------------------------------------------------------------- |
+| 2025-07-18 | v0.0.12 | Update code robustness and efficiency.                                     |
 | 2025-01-11 | v0.0.11 | Update code robustness and efficiency.                                     |
 | 2024-11-13 | v0.0.10 | Update the shortcut function for generating lib/gen resources.             |
 | 2024-11-11 | v0.0.9  | Update one-click generation of all iOS logo sizes, image compression webp. |

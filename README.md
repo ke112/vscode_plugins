@@ -1,6 +1,6 @@
-# Flutter Plugins
+# FN Flutter Plugins
 
-Flutter Plugins 能帮助你提高开发效率，找不到一个完美的插件适合自己，那就自己创造。
+FN Flutter Plugins 能帮助你提高开发效率，找不到一个完美的插件适合自己，那就自己创造。
 
 If you want to read the English version of README, [click here to view the English version](/README_EN.md)
 
@@ -63,7 +63,7 @@ If you want to read the English version of README, [click here to view the Engli
 
 ### 使用方法
 
-1. 自然的输出关键词，比如 `fsb` 代表 `SizedBox`， `fspacer` 代表 `Spacer` 等。
+1. 自然的输出关键词，比如 `sbw` 代表 `SizedBox(width: 16.w),`， `fspacer` 代表 `const Spacer(),` 等。
 2. 目前的内嵌代码片段，都会有中文的描述
 
 ## 贡献
@@ -84,6 +84,7 @@ If you want to read the English version of README, [click here to view the Engli
 
 | 日期       | 版本    | 更新内容                                       |
 | ---------- | ------- | ---------------------------------------------- |
+| 2025-07-18 | v0.0.12 | 更新代码健壮性和效率。                         |
 | 2025-01-11 | v0.0.11 | 更新代码健壮性和效率。                         |
 | 2024-11-13 | v0.0.10 | 更新生成lib/gen资源的快捷功能。                |
 | 2024-11-11 | v0.0.9  | 更新一键生成iOS所有尺寸logo，图片压缩webp。    |
