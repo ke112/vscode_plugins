@@ -1086,22 +1086,6 @@ class $${1} {
 )`,
       description: 'LTR directionality LTR布局'
     },
-    'flocale 阿拉伯语区域设置': {
-      snippet: `Locale('ar', 'SA')`,
-      description: 'Arabic locale 阿拉伯语区域设置'
-    },
-    'flocale 英语区域设置': {
-      snippet: `Locale('en', 'US')`,
-      description: 'English locale 英语区域设置'
-    },
-    'fintl bidi 双向文本': {
-      snippet: `import 'package:intl/intl.dart' as intl;
-
-String getBidiText(String text) {
-  return intl.Bidi.stripHtmlIfNeeded(text);
-}`,
-      description: 'intl bidi 双向文本处理'
-    },
   };
 
   // 预处理的补全项缓存
