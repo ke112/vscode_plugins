@@ -339,40 +339,24 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '${controllerFilePath}';
 import '${stateFilePath}';
+import 'package:skywork_client/src/common/page/base_page.dart';
 
-class ${className}View extends BasePage<${className}Controller> implements CommonHandler {
-  final String _tag;
-
-  @override
-  String get tag => _tag;
-
-  String? get _getXTag => tag.isEmpty ? null : tag;
-
-  /// 从路由参数中获取tag值，如果没有则返回空字符串
-  static String _getTagFromRoute(GoRouterState? routeState) {
-    if (routeState?.extra is Map) {
-      final extra = routeState!.extra as Map;
-      return extra['tag']?.toString() ?? '';
-    }
-    return '';
+class ${className}View extends BasePage<${className}Controller> with CommonHandler {
+  /// 构造函数,接收路由传参 state
+  ${className}View(GoRouterState extra, {super.key}) {
+    Get.put(${className}Controller(extra));
   }
-  
-  ${className}View(GoRouterState? routeState, {super.key}) : _tag = _getTagFromRoute(routeState) {
-    if (!Get.isRegistered<${className}Controller>(tag: _getXTag)) {
-      Get.put(${className}Controller(routeState), tag: _getXTag);
-    }
-  }
-  
+
   @override
   List<GetControllerRecycler> provideRecyclers() {
-    return [GetControllerRecycler(run: () => Get.delete<${className}Controller>(tag: _getXTag))];
+    return [GetControllerRecycler(run: () => Get.delete<${className}Controller>())];
   }
-  
-  ${className}State get state => controller.pageState;
+
+  ${className}State get pageState => controller.pageState;
 
   @override
   PreferredSizeWidget createAppBar() {
-    return createCommonAppBar(title: '消息');
+    return createCommonAppBar(title: '新界面');
   }
   
   @override
@@ -383,17 +367,15 @@ class ${className}View extends BasePage<${className}Controller> implements Commo
   }
 
   Widget _buildContent() {
-    return Directionality(
-      textDirection: Directionality.of(context),
-      child: Container(
-        padding: EdgeInsetsDirectional.all(16.w),
-        child: const Center(
-          child: Text(
-            '内容区域',
-          ),
+    return Builder(builder: (context) {
+      return Directionality(
+        textDirection: Directionality.of(context),
+        child: Container(
+          padding: EdgeInsetsDirectional.all(16),
+          child: const Center(child: Text('内容区域')),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 `;
