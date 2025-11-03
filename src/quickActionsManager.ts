@@ -13,36 +13,86 @@ export class QuickActionsManager {
 
     registerCommands() {
         //快速build runner
-        const buildRunnerQuickDisposable = vscode.commands.registerCommand('extension.buildRunnerQuick', (uri: vscode.Uri) => {
-            this.buildRunnerQuick(uri);
+        const buildRunnerQuickDisposable = vscode.commands.registerCommand('extension.buildRunnerQuick', async (uri: vscode.Uri) => {
+            vscode.window.showInformationMessage('🔄 正在快速执行 Build Runner...');
+            try {
+                await this.buildRunnerQuick(uri);
+                vscode.window.showInformationMessage('✅ Quick Build Runner Completed Successfully');
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`❌ Quick Build Runner 失败: ${errorMessage}`);
+            }
         });
 
         //全量build runner
-        const buildRunnerDisposable = vscode.commands.registerCommand('extension.buildRunner', () => {
-            this.buildRunner();
+        const buildRunnerDisposable = vscode.commands.registerCommand('extension.buildRunner', async () => {
+            vscode.window.showInformationMessage('🔄 正在执行全量 Build Runner...');
+            try {
+                await this.buildRunner();
+                vscode.window.showInformationMessage('✅ Build Runner Completed Successfully');
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`❌ Build Runner 失败: ${errorMessage}`);
+            }
         });
 
         //创建Getx Binding界面
-        const createPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingPage', (uri: vscode.Uri) => {
-            this.createPageStructure(uri);
+        const createPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingPage', async (uri: vscode.Uri) => {
+            vscode.window.showInformationMessage('🔄 正在创建 Getx Binding 页面结构...');
+            try {
+                await this.createPageStructure(uri);
+                vscode.window.showInformationMessage('✅ Getx Binding 页面结构创建成功');
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`❌ 创建 Getx Binding 页面结构失败: ${errorMessage}`);
+            }
         });
 
         //创建Getx 继承基类封装
-        const createGetBasePageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBasePage', (uri: vscode.Uri) => {
-            this.createGetBasePageStructure(uri);
+        const createGetBasePageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBasePage', async (uri: vscode.Uri) => {
+            vscode.window.showInformationMessage('🔄 正在创建 Getx 基类页面结构...');
+            try {
+                await this.createGetBasePageStructure(uri);
+                vscode.window.showInformationMessage('✅ Getx 基类页面结构创建成功');
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`❌ 创建 Getx 基类页面结构失败: ${errorMessage}`);
+            }
         });
 
         //生成iOS所有icon
-        const generateAppIconsDisposable = vscode.commands.registerCommand('extension.generateIOSAppIcons', (uri: vscode.Uri) => {
-            this.generateAppIcons(uri);
+        const generateAppIconsDisposable = vscode.commands.registerCommand('extension.generateIOSAppIcons', async (uri: vscode.Uri) => {
+            vscode.window.showInformationMessage('🔄 正在生成 iOS App Icons...');
+            try {
+                await this.generateAppIcons(uri);
+                vscode.window.showInformationMessage('✅ iOS logo 生成成功');
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`❌ iOS logo 生成失败: ${errorMessage}`);
+            }
         });
 
         //将图片转成webp
-        const compressToWebP = vscode.commands.registerCommand('extension.compressToWebP', this.compressToWebP.bind(this));
+        const compressToWebP = vscode.commands.registerCommand('extension.compressToWebP', async (uri: vscode.Uri) => {
+            vscode.window.showInformationMessage('🔄 正在压缩图片为 WebP...');
+            try {
+                await this.compressToWebP(uri);
+                vscode.window.showInformationMessage('✅ 图片已成功压缩为 WebP');
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`❌ 图片压缩为 WebP 失败: ${errorMessage}`);
+            }
+        });
 
         // 生成 Assets
-        const generateAssetsDisposable = vscode.commands.registerCommand('extension.generateAssets', () => {
-            this.generateAssets();
+        const generateAssetsDisposable = vscode.commands.registerCommand('extension.generateAssets', async () => {
+            vscode.window.showInformationMessage('🔄 正在生成 Assets...');
+            try {
+                await this.generateAssets();
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                vscode.window.showErrorMessage(`❌ Assets 生成失败: ${errorMessage}`);
+            }
         });
 
         this.context.subscriptions.push(buildRunnerQuickDisposable, buildRunnerDisposable, createPageStructureDisposable, createGetBasePageStructureDisposable, generateAppIconsDisposable, compressToWebP, generateAssetsDisposable);
@@ -582,33 +632,81 @@ class ${className}View extends BasePage<${className}Controller> {
 
         try {
             const projectRoot = workspaceFolder.uri.fsPath;
+            const pubspecPath = path.join(projectRoot, 'pubspec.yaml');
             const genDir = path.join(projectRoot, 'lib', 'gen');
 
+            // 检查 pubspec.yaml 是否存在
             try {
-                await vscode.workspace.fs.stat(vscode.Uri.file(genDir));
+                await vscode.workspace.fs.stat(vscode.Uri.file(pubspecPath));
             } catch {
-                vscode.window.showErrorMessage('gen directory does not exist');
+                vscode.window.showErrorMessage('当前目录不是Flutter项目 (pubspec.yaml不存在)');
                 return;
             }
 
-            const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(genDir));
-            for (const [file, type] of files) {
-                if (type === vscode.FileType.File && file.endsWith('.gen.dart')) {
-                    await vscode.workspace.fs.delete(vscode.Uri.file(path.join(genDir, file)));
+            // 检查 gen 目录是否存在
+            let genDirExists = true;
+            try {
+                await vscode.workspace.fs.stat(vscode.Uri.file(genDir));
+            } catch {
+                genDirExists = false;
+            }
+
+            if (!genDirExists) {
+                vscode.window.showWarningMessage('gen目录不存在，跳过 asset generation');
+                return;
+            }
+
+            // 只删除资源相关的 .gen.dart 文件
+            const assetGenFiles = [
+                'assets.gen.dart',
+                'fonts.gen.dart',
+                'images.gen.dart'
+            ];
+            for (const file of assetGenFiles) {
+                const filePath = path.join(genDir, file);
+                try {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(filePath));
+                } catch {
+                    // 文件不存在时忽略
                 }
             }
 
-            const baseCommand = await this.getBuildCommand(projectRoot);
-            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
-            const command = `${baseCommand} --build-filter=lib/gen/*`;
-            logger.log(`${command}`);
+            vscode.window.showInformationMessage('🔄 强制重新构建 lib/gen 内的生成文件...');
 
-            exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
+            // 构建命令
+            const baseCommand = await this.getBuildCommand(projectRoot);
+            const command = `${baseCommand} --build-filter=lib/gen/**`;
+            logger.log(`🚀 开始构建 assets...\n命令: ${command}`);
+
+            exec(command, { cwd: projectRoot }, async (error, stdout, stderr) => {
                 if (error) {
                     vscode.window.showErrorMessage(`Error generating assets: ${error.message}`);
+                    logger.log(`generateAssets错误: ${error.message}`);
                     return;
                 }
-                vscode.window.showInformationMessage('Assets generated successfully');
+                logger.log(`generateAssets标准输出: ${stdout}`);
+
+                // 构建完成后统计 .gen.dart 文件数量
+                let genFilesCount = 0;
+                let genFilesList: string[] = [];
+                try {
+                    const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(genDir));
+                    for (const [file, type] of files) {
+                        if (type === vscode.FileType.File && file.endsWith('.gen.dart')) {
+                            genFilesCount++;
+                            genFilesList.push(file);
+                        }
+                    }
+                } catch (e) {
+                    // 忽略统计错误
+                }
+
+                vscode.window.showInformationMessage(`✅ Assets 构建完成！生成了 ${genFilesCount} 个 .gen.dart 文件`);
+
+                if (genFilesCount > 0) {
+                    const fileListMsg = genFilesList.sort().map(f => `📄 ${f}`).join('\n');
+                    vscode.window.showInformationMessage(`📋 生成的文件列表:\n${fileListMsg}`);
+                }
             });
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
