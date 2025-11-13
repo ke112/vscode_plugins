@@ -357,14 +357,14 @@ class ${className}Controller extends BaseController {
     if (_routeState?.extra != null) {
       final params = _routeState!.extra as Map?;
       if (params != null) {
-        // TODO: 处理路由参数
+        // 处理路由参数
       }
     }
   }
 
   @override
   void onClose() {
-    // TODO: 添加控制器资源释放逻辑
+    pageState.dispose();
     super.onClose();
   }
 }
@@ -375,7 +375,11 @@ class ${className}Controller extends BaseController {
         const className = this.toPascalCase(pageName);
         return `class ${className}State {
   ${className}State() {
-    ///Initialize variables
+    //
+  }
+
+  void dispose() {
+    //
   }
 }
 `;
@@ -394,7 +398,9 @@ import 'package:skywork_client/src/common/page/base_page.dart';
 class ${className}View extends BasePage<${className}Controller> with CommonHandler {
   /// 构造函数,接收路由传参 state
   ${className}View(GoRouterState extra, {super.key}) {
-    Get.put(${className}Controller(extra));
+    if (!Get.isRegistered<${className}Controller>()) {
+      Get.put(${className}Controller(extra));
+    }
   }
 
   @override
@@ -406,26 +412,25 @@ class ${className}View extends BasePage<${className}Controller> with CommonHandl
 
   @override
   PreferredSizeWidget createAppBar() {
-    return createCommonAppBar(title: '新界面');
+    return createCommonAppBar(title: '标题');
   }
   
   @override
   List<Widget> createBody() {
     return [
-      _buildContent(),
+      GetBuilder<${className}Controller>(
+        builder: (_) {
+          return _buildContent();
+        },
+      )
     ];
   }
 
   Widget _buildContent() {
-    return Builder(builder: (context) {
-      return Directionality(
-        textDirection: Directionality.of(context),
-        child: Container(
-          padding: EdgeInsetsDirectional.all(16),
-          child: const Center(child: Text('内容区域')),
-        ),
-      );
-    });
+    return Container(
+      padding: EdgeInsetsDirectional.all(16),
+      child: const Center(child: Text('内容区域')),
+    );
   }
 }
 `;
