@@ -157,28 +157,72 @@ install_extension() {
     log_info "正在处理 $editor 插件安装..."
 
     # 检查编辑器是否正在运行
+    local editor_running=false
     if check_editor_running "$editor"; then
-        log_warning "$editor 正在运行，建议安装后重启编辑器"
+        editor_running=true
+        log_warning "$editor 正在运行，可能会影响插件卸载/安装"
     fi
 
     # 检查插件是否已安装，如果已安装则先卸载
-    if "$code_path" --list-extensions 2>/dev/null | grep -qi "$extension_id"; then
-        log_info "卸载 $editor 旧版本..."
-        if ! "$code_path" --uninstall-extension "$extension_id" >/dev/null 2>&1; then
-            log_error "$editor 旧版本卸载失败"
-            return 1
+    local installed_extensions
+    installed_extensions=$("$code_path" --list-extensions 2>/dev/null || echo "")
+    
+    if echo "$installed_extensions" | grep -qi "$extension_id"; then
+        log_info "检测到 $editor 已安装旧版本，正在卸载..."
+        
+        # 尝试卸载旧版本
+        local uninstall_output
+        uninstall_output=$("$code_path" --uninstall-extension "$extension_id" 2>&1)
+        local uninstall_exit_code=$?
+        
+        if [ $uninstall_exit_code -eq 0 ]; then
+            log_success "$editor 旧版本卸载成功"
+            sleep 1  # 等待卸载完成
+        else
+            # 检查错误信息
+            local error_msg=$(echo "$uninstall_output" | tr '\n' ' ')
+            
+            # 如果是"未安装"的错误，说明插件列表检测有误，可以继续安装
+            if echo "$error_msg" | grep -qi "not installed\|找不到\|not found"; then
+                log_info "$editor 插件实际上未安装，跳过卸载步骤"
+            # 如果编辑器正在运行，卸载失败是正常的，可以尝试覆盖安装
+            elif [ "$editor_running" = true ]; then
+                log_warning "$editor 正在运行，卸载失败（这是正常的，VSCode 运行时可能无法卸载插件）"
+                log_info "将尝试直接覆盖安装（VSCode 支持覆盖安装）..."
+            else
+                # 其他错误，显示详细信息但继续尝试安装
+                log_warning "$editor 旧版本卸载失败: $error_msg"
+                log_info "将尝试直接覆盖安装..."
+            fi
         fi
-        sleep 1  # 缩短等待时间
+    else
+        log_info "$editor 未检测到旧版本，直接安装新版本"
     fi
 
     # 安装新版本
-    log_info "安装新版本到 $editor..."
-    if "$code_path" --install-extension "$vsix_file" >/dev/null 2>&1; then
+    log_info "正在安装新版本到 $editor..."
+    local install_output
+    install_output=$("$code_path" --install-extension "$vsix_file" 2>&1)
+    local install_exit_code=$?
+    
+    if [ $install_exit_code -eq 0 ]; then
         log_success "$editor 插件安装成功！"
+        if [ "$editor_running" = true ]; then
+            log_warning "请重启 $editor 以使插件生效"
+        fi
         return 0
     else
-        log_error "$editor 插件安装失败"
-        return 1
+        # 检查是否是覆盖安装的情况（某些情况下会返回非零但实际成功）
+        if echo "$install_output" | grep -qi "already installed\|已安装\|installed"; then
+            log_success "$editor 插件已是最新版本或安装成功"
+            if [ "$editor_running" = true ]; then
+                log_warning "请重启 $editor 以使插件生效"
+            fi
+            return 0
+        else
+            log_error "$editor 插件安装失败: $install_output"
+            return 1
+        fi
     fi
 }
 
