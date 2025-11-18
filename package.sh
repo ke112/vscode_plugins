@@ -89,7 +89,13 @@ update_version() {
 compile_project() {
     log_info "正在编译 TypeScript 代码..."
     
-    if yarn run compile; then
+    # 检查 tsconfig.json 是否存在
+    if [ ! -f "tsconfig.json" ]; then
+        log_error "tsconfig.json 文件不存在"
+        return 1
+    fi
+    
+    if npm run compile; then
         log_success "编译完成"
         return 0
     else
@@ -176,6 +182,43 @@ install_extension() {
     fi
 }
 
+# 函数: 检查并安装 npm 依赖
+check_npm_dependencies() {
+    log_info "检查 npm 项目依赖..."
+    
+    # 检查 package.json 是否存在
+    if [ ! -f "package.json" ]; then
+        log_error "package.json 文件不存在"
+        return 1
+    fi
+    
+    # 检查 node_modules 是否存在
+    if [ ! -d "node_modules" ]; then
+        log_warning "node_modules 目录不存在，正在安装依赖..."
+        if ! npm install; then
+            log_error "npm 依赖安装失败，请检查网络连接或 npm 配置"
+            return 1
+        fi
+        log_success "npm 依赖安装完成"
+        return 0
+    fi
+    
+    # 检查 package.json 中的依赖是否都已安装
+    # 使用 npm list 检查，如果有缺失依赖会返回非零退出码
+    if ! npm list --production --depth=0 --silent >/dev/null 2>&1; then
+        log_warning "检测到缺失的 npm 依赖，正在安装..."
+        if ! npm install; then
+            log_error "npm 依赖安装失败，请检查网络连接或 npm 配置"
+            return 1
+        fi
+        log_success "npm 依赖安装完成"
+        return 0
+    fi
+    
+    log_success "npm 项目依赖检查通过"
+    return 0
+}
+
 # 函数: 检查依赖
 check_dependencies() {
     log_info "检查依赖环境..."
@@ -183,7 +226,7 @@ check_dependencies() {
     local missing_deps=()
     
     # 检查所需命令
-    for cmd in node yarn vsce; do
+    for cmd in node npm vsce; do
         if ! command_exists "$cmd"; then
             missing_deps+=("$cmd")
         fi
@@ -197,7 +240,7 @@ check_dependencies() {
         echo ""
         echo "请安装缺少的依赖后重试："
         echo "  node: https://nodejs.org/"
-        echo "  yarn: npm install -g yarn"
+        echo "  npm: 通常随 node 一起安装"
         echo "  vsce: npm install -g vsce"
         return 1
     fi
@@ -233,6 +276,10 @@ main() {
     
     # 检查依赖
     check_dependencies || exit 1
+    echo ""
+    
+    # 检查并安装 npm 项目依赖
+    check_npm_dependencies || exit 1
     echo ""
     
     # 更新版本号
