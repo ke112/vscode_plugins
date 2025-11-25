@@ -187,7 +187,20 @@ export class QuickActionsManager {
         }
         const projectRoot = workspaceFolder.uri.fsPath;
         try {
+            // 1. 删除所有 .g.dart 文件
+            logger.log('开始删除所有 .g.dart 文件...');
+            await this.deleteAllGeneratedFiles(projectRoot);
+            logger.log('已删除所有 .g.dart 文件');
+
+            // 2. 执行 build_runner clean
+            logger.log('执行 build_runner clean...');
+            await this.runBuildRunnerClean(projectRoot);
+            logger.log('build_runner clean 完成');
+
+            // 3. 执行 build_runner build --delete-conflicting-outputs
+            logger.log('执行 build_runner build...');
             await this.runBuildRunnerCommand(projectRoot);
+            logger.log('build_runner build 完成');
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             logger.log(`buildRunner错误: ${errorMessage}`);
@@ -220,10 +233,10 @@ export class QuickActionsManager {
             }
             const projectRoot = workspaceFolder.uri.fsPath;
             const relativePath = path.relative(projectRoot, workingDir);
-            const buildFilter = `${relativePath}/*`;
+            const buildFilter = `${relativePath}/**`;
             const baseCommand = await this.getBuildCommand(projectRoot);
-            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
-            const command = `${baseCommand} --build-filter=${buildFilter}`;
+            const command = `${baseCommand} --build-filter="${buildFilter}" --delete-conflicting-outputs`;
+            logger.log(`runBuildRunnerQuick 命令: ${command}`);
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
                     logger.log(`runBuildRunnerQuick错误: ${error}`);
@@ -239,18 +252,73 @@ export class QuickActionsManager {
     private async runBuildRunnerCommand(projectRoot: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const baseCommand = await this.getBuildCommand(projectRoot);
-            // 移除 --delete-conflicting-outputs 标志，以避免意外删除项目中的其他 .g.dart 文件
-            const command = `${baseCommand}`;
+            const command = `${baseCommand} --delete-conflicting-outputs`;
+            logger.log(`runBuildRunnerCommand 命令: ${command}`);
             exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
                 if (error) {
                     logger.log(`runBuildRunnerCommand错误: ${error}`);
                     reject(error);
                     return;
                 }
-                logger.log(`runBuildRunnerQuick标准输出: ${stdout}`);
+                logger.log(`runBuildRunnerCommand标准输出: ${stdout}`);
                 resolve();
             });
         });
+    }
+
+    private async runBuildRunnerClean(projectRoot: string): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            const hasFvm = await this.checkFvmExists(projectRoot);
+            const command = hasFvm ? 'fvm dart run build_runner clean' : 'dart run build_runner clean';
+            logger.log(`runBuildRunnerClean 命令: ${command}`);
+            exec(command, { cwd: projectRoot }, (error, stdout, stderr) => {
+                if (error) {
+                    logger.log(`runBuildRunnerClean错误: ${error}`);
+                    reject(error);
+                    return;
+                }
+                logger.log(`runBuildRunnerClean标准输出: ${stdout}`);
+                resolve();
+            });
+        });
+    }
+
+    /**
+     * 递归删除项目中所有 .g.dart 文件
+     * 实现类似 shell 命令: find . -name "*.g.dart" -type f -delete
+     */
+    private async deleteAllGeneratedFiles(dirPath: string): Promise<void> {
+        const dirUri = vscode.Uri.file(dirPath);
+        let entries: [string, vscode.FileType][];
+        
+        try {
+            entries = await vscode.workspace.fs.readDirectory(dirUri);
+        } catch {
+            return; // 目录不存在或无法访问，跳过
+        }
+
+        for (const [name, type] of entries) {
+            const fullPath = path.join(dirPath, name);
+
+            // 跳过隐藏目录和常见的不需要扫描的目录
+            if (name.startsWith('.') || name === 'build' || name === 'ios' || name === 'android' || name === 'web' || name === 'macos' || name === 'linux' || name === 'windows') {
+                continue;
+            }
+
+            if (type === vscode.FileType.Directory) {
+                // 递归处理子目录
+                await this.deleteAllGeneratedFiles(fullPath);
+            } else if (type === vscode.FileType.File && name.endsWith('.g.dart')) {
+                // 删除 .g.dart 文件
+                try {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(fullPath));
+                    logger.log(`已删除文件: ${fullPath}`);
+                } catch (error) {
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    logger.log(`删除文件失败 ${fullPath}: ${errorMessage}`);
+                }
+            }
+        }
     }
 
     private async createPageStructure(uri: vscode.Uri) {
