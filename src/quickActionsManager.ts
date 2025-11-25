@@ -20,7 +20,8 @@ export class QuickActionsManager {
                 vscode.window.showInformationMessage('✅ Quick Build Runner Completed Successfully');
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                vscode.window.showErrorMessage(`❌ Quick Build Runner 失败: ${errorMessage}`);
+                logger.log(`Quick Build Runner 失败: ${errorMessage}`);
+                vscode.window.showErrorMessage('❌ Quick Build Runner 失败');
             }
         });
 
@@ -32,7 +33,8 @@ export class QuickActionsManager {
                 vscode.window.showInformationMessage('✅ Build Runner Completed Successfully');
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                vscode.window.showErrorMessage(`❌ Build Runner 失败: ${errorMessage}`);
+                logger.log(`Build Runner 失败: ${errorMessage}`);
+                vscode.window.showErrorMessage('❌ Build Runner 失败');
             }
         });
 
@@ -44,7 +46,8 @@ export class QuickActionsManager {
                 vscode.window.showInformationMessage('✅ Getx Binding 页面结构创建成功');
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                vscode.window.showErrorMessage(`❌ 创建 Getx Binding 页面结构失败: ${errorMessage}`);
+                logger.log(`创建 Getx Binding 页面结构失败: ${errorMessage}`);
+                vscode.window.showErrorMessage('❌ 创建 Getx Binding 页面结构失败');
             }
         });
 
@@ -56,7 +59,8 @@ export class QuickActionsManager {
                 vscode.window.showInformationMessage('✅ Getx 基类页面结构创建成功');
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                vscode.window.showErrorMessage(`❌ 创建 Getx 基类页面结构失败: ${errorMessage}`);
+                logger.log(`创建 Getx 基类页面结构失败: ${errorMessage}`);
+                vscode.window.showErrorMessage('❌ 创建 Getx 基类页面结构失败');
             }
         });
 
@@ -68,7 +72,8 @@ export class QuickActionsManager {
                 vscode.window.showInformationMessage('✅ iOS logo 生成成功');
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                vscode.window.showErrorMessage(`❌ iOS logo 生成失败: ${errorMessage}`);
+                logger.log(`iOS logo 生成失败: ${errorMessage}`);
+                vscode.window.showErrorMessage('❌ iOS logo 生成失败');
             }
         });
 
@@ -80,7 +85,8 @@ export class QuickActionsManager {
                 vscode.window.showInformationMessage('✅ 图片已成功压缩为 WebP');
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                vscode.window.showErrorMessage(`❌ 图片压缩为 WebP 失败: ${errorMessage}`);
+                logger.log(`图片压缩为 WebP 失败: ${errorMessage}`);
+                vscode.window.showErrorMessage('❌ 图片压缩为 WebP 失败');
             }
         });
 
@@ -89,9 +95,11 @@ export class QuickActionsManager {
             vscode.window.showInformationMessage('🔄 正在生成 Assets...');
             try {
                 await this.generateAssets();
+                vscode.window.showInformationMessage('✅ Assets 生成完成');
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                vscode.window.showErrorMessage(`❌ Assets 生成失败: ${errorMessage}`);
+                logger.log(`Assets 生成失败: ${errorMessage}`);
+                vscode.window.showErrorMessage('❌ Assets 生成失败');
             }
         });
 
@@ -103,15 +111,13 @@ export class QuickActionsManager {
         const stats = await vscode.workspace.fs.stat(uri);
         const isDirectory = stats.type === vscode.FileType.Directory;
         if (!isDirectory && !fsPath.endsWith('.dart')) {
-            vscode.window.showErrorMessage('Quick Build Runner only works with Dart files or directories.');
-            return;
+            throw new Error('Quick Build Runner only works with Dart files or directories.');
         }
         let tmpDir: string | undefined;
         try {
             const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
             if (!workspaceFolder) {
-                vscode.window.showErrorMessage('Unable to determine project root directory');
-                return;
+                throw new Error('Unable to determine project root directory');
             }
             const projectRoot = workspaceFolder.uri.fsPath;
             tmpDir = isDirectory ? path.join(fsPath, '.tmp') : path.join(path.dirname(fsPath), '.tmp');
@@ -158,12 +164,10 @@ export class QuickActionsManager {
                     );
                 }
             }
-
-            vscode.window.showInformationMessage('Quick Build Runner Completed Successfully');
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             logger.log(`quickBuildRunner错误: ${errorMessage}`);
-            vscode.window.showErrorMessage(`Error during Quick Build Runner: ${errorMessage}`);
+            throw error;
         } finally {
             if (tmpDir) {
                 try {
@@ -179,17 +183,15 @@ export class QuickActionsManager {
     private async buildRunner() {
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
         if (!workspaceFolder) {
-            vscode.window.showErrorMessage('No workspace folder found');
-            return;
+            throw new Error('No workspace folder found');
         }
         const projectRoot = workspaceFolder.uri.fsPath;
         try {
             await this.runBuildRunnerCommand(projectRoot);
-            vscode.window.showInformationMessage('Build Runner Completed Successfully');
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            vscode.window.showErrorMessage(`Error during Build Runner: ${errorMessage}`);
             logger.log(`buildRunner错误: ${errorMessage}`);
+            throw error;
         }
     }
 
@@ -276,11 +278,10 @@ export class QuickActionsManager {
                 const filePath = path.join(pageDir, file.dir, file.name);
                 await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(file.content));
             }
-            vscode.window.showInformationMessage(`Page structure for ${snakeCaseName} created successfully.`);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             logger.log(`createPageStructure错误: ${errorMessage}`);
-            vscode.window.showErrorMessage(`Error creating page structure: ${errorMessage}`);
+            throw error;
         }
     }
 
@@ -521,11 +522,10 @@ class ${className}View extends GetView<${className}Controller> {
                 const filePath = path.join(pageDir, file.dir, file.name);
                 await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(file.content));
             }
-            vscode.window.showInformationMessage(`Get界面 for ${snakeCaseName} 创建完成.`);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             logger.log(`createGetBasePageStructure错误: ${errorMessage}`);
-            vscode.window.showErrorMessage(`Error creating custom page structure: ${errorMessage}`);
+            throw error;
         }
     }
 
@@ -553,39 +553,33 @@ class ${className}View extends BasePage<${className}Controller> {
 `;
     }
 
-    private async generateAppIcons(uri: vscode.Uri) {
+    private async generateAppIcons(uri: vscode.Uri): Promise<void> {
         if (!uri) {
-            vscode.window.showErrorMessage('Please select a PNG file.');
-            return;
+            throw new Error('Please select a PNG file.');
         }
         const filePath = uri.fsPath;
         if (!filePath.toLowerCase().endsWith('.png')) {
-            vscode.window.showErrorMessage('The selected file is not a PNG image.');
-            return;
+            throw new Error('The selected file is not a PNG image.');
         }
-        try {
-            logger.log(`generateAppIcons: filePath = ${filePath}`);
-            const dimensions = await this.getImageDimensions(filePath);
-            if (dimensions.width !== 1024 || dimensions.height !== 1024) {
-                vscode.window.showWarningMessage('The selected image is not 1024x1024.');
-                return;
-            }
-            const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
-            logger.log(`generateAppIcons: scriptPath = ${scriptPath}`);
+        logger.log(`generateAppIcons: filePath = ${filePath}`);
+        const dimensions = await this.getImageDimensions(filePath);
+        if (dimensions.width !== 1024 || dimensions.height !== 1024) {
+            throw new Error('The selected image is not 1024x1024.');
+        }
+        const scriptPath = path.join(this.context.extensionPath, 'scripts', 'generate_app_icons.sh');
+        logger.log(`generateAppIcons: scriptPath = ${scriptPath}`);
+        
+        return new Promise((resolve, reject) => {
             exec(`sh "${scriptPath}" "${filePath}"`, (error, stdout, stderr) => {
                 if (error) {
-                    vscode.window.showErrorMessage(`Error generating app icons: ${error.message}`);
-                    logger.log(`generateAppIcons: error = ${error.message}`);
+                    logger.log(`generateAppIcons错误: ${error.message}`);
+                    reject(error);
                     return;
                 }
                 logger.log(`generateAppIcons标准输出: ${stdout}`);
-                vscode.window.showInformationMessage('iOS logo generated successfully');
+                resolve();
             });
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            logger.log(`generateAppIcons错误: ${errorMessage}`);
-            vscode.window.showErrorMessage(`Error processing image: ${errorMessage}`);
-        }
+        });
     }
 
     private getImageDimensions(filePath: string): Promise<{ width: number, height: number }> {
@@ -600,122 +594,112 @@ class ${className}View extends BasePage<${className}Controller> {
                     }
                 });
             } catch (e) {
-                vscode.window.showErrorMessage('The "image-size" package is not installed. Please run "npm install image-size" in the extension directory.');
+                logger.log('The "image-size" package is not installed.');
                 reject(new Error('"image-size" package not found'));
             }
         });
     }
 
-    private compressToWebP(uri: vscode.Uri) {
-        if (uri && uri.fsPath) {
-            const folderPath = uri.fsPath;
-            const scriptPath = path.join(this.context.extensionPath, 'scripts', 'compress_to_webp.sh');
-            if (fs.existsSync(scriptPath)) {
-                try {
-                    const output = execSync(`sh "${scriptPath}" "${folderPath}"`);
-                    vscode.window.showInformationMessage('Compressed to WebP successfully!');
-                    logger.log(`compressToWebP output: ${output.toString()}`);
-                } catch (error: any) {
-                    const errorMessage = error.stderr?.toString() || error.stdout?.toString() || (error instanceof Error ? error.message : String(error));
-                    vscode.window.showErrorMessage(`Failed to compress images to webp. Error: ${errorMessage}`);
-                    logger.log(`compressToWebP错误: ${errorMessage}`);
-                }
-            } else {
-                vscode.window.showErrorMessage('compress_to_webp.sh script not found.');
-            }
-        } else {
-            vscode.window.showErrorMessage('Please select a folder to compress images.');
+    private compressToWebP(uri: vscode.Uri): void {
+        if (!uri || !uri.fsPath) {
+            throw new Error('Please select a folder to compress images.');
+        }
+        const folderPath = uri.fsPath;
+        const scriptPath = path.join(this.context.extensionPath, 'scripts', 'compress_to_webp.sh');
+        if (!fs.existsSync(scriptPath)) {
+            throw new Error('compress_to_webp.sh script not found.');
+        }
+        try {
+            const output = execSync(`sh "${scriptPath}" "${folderPath}"`);
+            logger.log(`compressToWebP output: ${output.toString()}`);
+        } catch (error: any) {
+            const errorMessage = error.stderr?.toString() || error.stdout?.toString() || (error instanceof Error ? error.message : String(error));
+            logger.log(`compressToWebP错误: ${errorMessage}`);
+            throw new Error('Failed to compress images to webp.');
         }
     }
 
-    private async generateAssets() {
+    private async generateAssets(): Promise<void> {
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
         if (!workspaceFolder) {
-            vscode.window.showErrorMessage('No workspace folder found');
+            throw new Error('No workspace folder found');
+        }
+
+        const projectRoot = workspaceFolder.uri.fsPath;
+        const pubspecPath = path.join(projectRoot, 'pubspec.yaml');
+        const genDir = path.join(projectRoot, 'lib', 'gen');
+
+        // 检查 pubspec.yaml 是否存在
+        try {
+            await vscode.workspace.fs.stat(vscode.Uri.file(pubspecPath));
+        } catch {
+            throw new Error('当前目录不是Flutter项目 (pubspec.yaml不存在)');
+        }
+
+        // 检查 gen 目录是否存在
+        let genDirExists = true;
+        try {
+            await vscode.workspace.fs.stat(vscode.Uri.file(genDir));
+        } catch {
+            genDirExists = false;
+        }
+
+        if (!genDirExists) {
+            logger.log('gen目录不存在，跳过 asset generation');
             return;
         }
 
-        try {
-            const projectRoot = workspaceFolder.uri.fsPath;
-            const pubspecPath = path.join(projectRoot, 'pubspec.yaml');
-            const genDir = path.join(projectRoot, 'lib', 'gen');
+        // 删除 lib/gen 下除了 env 目录之外的所有文件
+        await this.deleteFilesExceptEnv(genDir);
+        logger.log('已删除 lib/gen 下除 env 目录之外的所有文件');
 
-            // 检查 pubspec.yaml 是否存在
-            try {
-                await vscode.workspace.fs.stat(vscode.Uri.file(pubspecPath));
-            } catch {
-                vscode.window.showErrorMessage('当前目录不是Flutter项目 (pubspec.yaml不存在)');
-                return;
-            }
+        // 构建命令，增加 --delete-conflicting-outputs 参数
+        const baseCommand = await this.getBuildCommand(projectRoot);
+        const command = `${baseCommand} --delete-conflicting-outputs --build-filter="lib/gen/**"`;
+        logger.log(`开始构建 assets, 命令: ${command}`);
 
-            // 检查 gen 目录是否存在
-            let genDirExists = true;
-            try {
-                await vscode.workspace.fs.stat(vscode.Uri.file(genDir));
-            } catch {
-                genDirExists = false;
-            }
-
-            if (!genDirExists) {
-                vscode.window.showWarningMessage('gen目录不存在，跳过 asset generation');
-                return;
-            }
-
-            // 只删除资源相关的 .gen.dart 文件
-            const assetGenFiles = [
-                'assets.gen.dart',
-                'fonts.gen.dart',
-                'images.gen.dart'
-            ];
-            for (const file of assetGenFiles) {
-                const filePath = path.join(genDir, file);
-                try {
-                    await vscode.workspace.fs.delete(vscode.Uri.file(filePath));
-                } catch {
-                    // 文件不存在时忽略
-                }
-            }
-
-            vscode.window.showInformationMessage('🔄 强制重新构建 lib/gen 内的生成文件...');
-
-            // 构建命令
-            const baseCommand = await this.getBuildCommand(projectRoot);
-            const command = `${baseCommand} --build-filter=lib/gen/**`;
-            logger.log(`🚀 开始构建 assets...\n命令: ${command}`);
-
+        return new Promise((resolve, reject) => {
             exec(command, { cwd: projectRoot }, async (error, stdout, stderr) => {
                 if (error) {
-                    vscode.window.showErrorMessage(`Error generating assets: ${error.message}`);
                     logger.log(`generateAssets错误: ${error.message}`);
+                    reject(error);
                     return;
                 }
                 logger.log(`generateAssets标准输出: ${stdout}`);
-
-                // 构建完成后统计 .gen.dart 文件数量
-                let genFilesCount = 0;
-                let genFilesList: string[] = [];
-                try {
-                    const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(genDir));
-                    for (const [file, type] of files) {
-                        if (type === vscode.FileType.File && file.endsWith('.gen.dart')) {
-                            genFilesCount++;
-                            genFilesList.push(file);
-                        }
-                    }
-                } catch (e) {
-                    // 忽略统计错误
-                }
-
-                vscode.window.showInformationMessage(`✅ Assets 构建完成！生成了 ${genFilesCount} 个 .gen.dart 文件`);
-
-                if (genFilesCount > 0) {
-                    const fileListMsg = genFilesList.sort().map(f => `📄 ${f}`).join('\n');
-                    vscode.window.showInformationMessage(`📋 生成的文件列表:\n${fileListMsg}`);
-                }
+                resolve();
             });
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            vscode.window.showErrorMessage(`Error during assets generation: ${errorMessage}`);
+        });
+    }
+
+    /**
+     * 递归删除目录下的所有文件，但保留 env 子目录及其内容
+     * 实现类似 shell 命令: find lib/gen -path "lib/gen/env" -prune -o -type f -exec rm -f {} \;
+     */
+    private async deleteFilesExceptEnv(dirPath: string): Promise<void> {
+        const dirUri = vscode.Uri.file(dirPath);
+        const entries = await vscode.workspace.fs.readDirectory(dirUri);
+
+        for (const [name, type] of entries) {
+            const fullPath = path.join(dirPath, name);
+
+            // 跳过 env 目录
+            if (name === 'env' && type === vscode.FileType.Directory) {
+                continue;
+            }
+
+            if (type === vscode.FileType.Directory) {
+                // 递归处理子目录
+                await this.deleteFilesExceptEnv(fullPath);
+            } else if (type === vscode.FileType.File) {
+                // 删除文件
+                try {
+                    await vscode.workspace.fs.delete(vscode.Uri.file(fullPath));
+                    logger.log(`已删除文件: ${fullPath}`);
+                } catch (error) {
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    logger.log(`删除文件失败 ${fullPath}: ${errorMessage}`);
+                }
+            }
         }
     }
 }
