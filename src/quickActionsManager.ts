@@ -11,11 +11,49 @@ export class QuickActionsManager {
         this.context = context;
     }
 
+    /**
+     * 检测当前工作区是否是 Flutter 项目
+     * 判断标准：pubspec.yaml 存在且包含 flutter: 配置节（行首无缩进）
+     */
+    static async isFlutterProject(): Promise<boolean> {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            logger.log('isFlutterProject: 没有工作区文件夹');
+            return false;
+        }
+        const pubspecPath = path.join(workspaceFolder.uri.fsPath, 'pubspec.yaml');
+        logger.log(`isFlutterProject: 检查路径 ${pubspecPath}`);
+        try {
+            const content = await vscode.workspace.fs.readFile(vscode.Uri.file(pubspecPath));
+            const text = Buffer.from(content).toString('utf-8');
+            // 检查是否包含 flutter: 配置节（Flutter 项目特征）
+            // 匹配行首的 flutter:（无缩进），后面跟换行或空格
+            const isFlutter = /^flutter\s*:/m.test(text);
+            logger.log(`isFlutterProject: 检测结果 ${isFlutter}`);
+            return isFlutter;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.log(`isFlutterProject: 读取 pubspec.yaml 失败 - ${errorMessage}`);
+            return false;
+        }
+    }
+
+    /**
+     * 检查是否是 Flutter 项目，非 Flutter 项目时抛出错误
+     */
+    private async checkFlutterProjectOrThrow(): Promise<void> {
+        const isFlutter = await QuickActionsManager.isFlutterProject();
+        if (!isFlutter) {
+            throw new Error('此命令仅适用于 Flutter 项目');
+        }
+    }
+
     registerCommands() {
         //快速build runner
         const buildRunnerQuickDisposable = vscode.commands.registerCommand('extension.buildRunnerQuick', async (uri: vscode.Uri) => {
-            vscode.window.showInformationMessage('🔄 正在快速执行 Build Runner...');
             try {
+                await this.checkFlutterProjectOrThrow();
+                vscode.window.showInformationMessage('🔄 正在快速执行 Build Runner...');
                 await this.buildRunnerQuick(uri);
                 vscode.window.showInformationMessage('✅ Quick Build Runner Completed Successfully');
             } catch (error) {
@@ -27,8 +65,9 @@ export class QuickActionsManager {
 
         //全量build runner
         const buildRunnerDisposable = vscode.commands.registerCommand('extension.buildRunner', async () => {
-            vscode.window.showInformationMessage('🔄 正在执行全量 Build Runner...');
             try {
+                await this.checkFlutterProjectOrThrow();
+                vscode.window.showInformationMessage('🔄 正在执行全量 Build Runner...');
                 await this.buildRunner();
                 vscode.window.showInformationMessage('✅ Build Runner Completed Successfully');
             } catch (error) {
@@ -40,8 +79,9 @@ export class QuickActionsManager {
 
         //创建Getx Binding界面
         const createPageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBindingPage', async (uri: vscode.Uri) => {
-            vscode.window.showInformationMessage('🔄 正在创建 Getx Binding 页面结构...');
             try {
+                await this.checkFlutterProjectOrThrow();
+                vscode.window.showInformationMessage('🔄 正在创建 Getx Binding 页面结构...');
                 await this.createPageStructure(uri);
                 vscode.window.showInformationMessage('✅ Getx Binding 页面结构创建成功');
             } catch (error) {
@@ -53,8 +93,9 @@ export class QuickActionsManager {
 
         //创建Getx 继承基类封装
         const createGetBasePageStructureDisposable = vscode.commands.registerCommand('extension.createGetxBasePage', async (uri: vscode.Uri) => {
-            vscode.window.showInformationMessage('🔄 正在创建 Getx 基类页面结构...');
             try {
+                await this.checkFlutterProjectOrThrow();
+                vscode.window.showInformationMessage('🔄 正在创建 Getx 基类页面结构...');
                 await this.createGetBasePageStructure(uri);
                 vscode.window.showInformationMessage('✅ Getx 基类页面结构创建成功');
             } catch (error) {
@@ -66,8 +107,9 @@ export class QuickActionsManager {
 
         //生成iOS所有icon
         const generateAppIconsDisposable = vscode.commands.registerCommand('extension.generateIOSAppIcons', async (uri: vscode.Uri) => {
-            vscode.window.showInformationMessage('🔄 正在生成 iOS App Icons...');
             try {
+                await this.checkFlutterProjectOrThrow();
+                vscode.window.showInformationMessage('🔄 正在生成 iOS App Icons...');
                 await this.generateAppIcons(uri);
                 vscode.window.showInformationMessage('✅ iOS logo 生成成功');
             } catch (error) {
@@ -79,8 +121,9 @@ export class QuickActionsManager {
 
         //将图片转成webp
         const compressToWebP = vscode.commands.registerCommand('extension.compressToWebP', async (uri: vscode.Uri) => {
-            vscode.window.showInformationMessage('🔄 正在压缩图片为 WebP...');
             try {
+                await this.checkFlutterProjectOrThrow();
+                vscode.window.showInformationMessage('🔄 正在压缩图片为 WebP...');
                 await this.compressToWebP(uri);
                 vscode.window.showInformationMessage('✅ 图片已成功压缩为 WebP');
             } catch (error) {
@@ -92,8 +135,9 @@ export class QuickActionsManager {
 
         // 生成 Assets
         const generateAssetsDisposable = vscode.commands.registerCommand('extension.generateAssets', async () => {
-            vscode.window.showInformationMessage('🔄 正在生成 Assets...');
             try {
+                await this.checkFlutterProjectOrThrow();
+                vscode.window.showInformationMessage('🔄 正在生成 Assets...');
                 await this.generateAssets();
                 vscode.window.showInformationMessage('✅ Assets 生成完成');
             } catch (error) {
