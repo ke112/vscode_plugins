@@ -77,7 +77,7 @@
         "commands": [
             {
                 "command": "extension.compressToWebP",
-                "title": "★ Convert to webp images"
+                "title": "★ Convert all images to webp"
             },
             {
                 "command": "extension.createGetxBindingPage",

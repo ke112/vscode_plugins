@@ -457,8 +457,9 @@ class ${className}Controller extends BaseController {
   final GoRouterState? _routeState;
   ${className}Controller(this._routeState);
   static const String _logTag = '${className}Controller';  
-
-  final pageState = ${className}State();
+  
+  @override
+  final ${className}State state = ${className}State();
 
   @override
   void onInit() {
@@ -521,7 +522,7 @@ class ${className}View extends BasePage<${className}Controller> with CommonHandl
     return [GetControllerRecycler(run: () => Get.delete<${className}Controller>())];
   }
 
-  ${className}State get pageState => controller.pageState;
+  ${className}State get state => controller.state;
 
   @override
   PreferredSizeWidget createAppBar() {
