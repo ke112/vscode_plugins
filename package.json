@@ -2,7 +2,7 @@
     "name": "flutter-plugins-zhangzhihua",
     "displayName": "Flutter Plugins",
     "description": "提高Flutter开发效率，快速Wrapper代码生成、快速Build Runner、快速新建Getx页面等",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "publisher": "zhangzhihua",
     "author": {
         "name": "徐凤年",
@@ -19,7 +19,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:dart"
+        "onLanguage:dart",
+        "workspaceContains:**/pubspec.yaml"
     ],
     "main": "./out/extension.js",
     "scripts": {
@@ -76,7 +77,7 @@
         "commands": [
             {
                 "command": "extension.compressToWebP",
-                "title": "★ Convert to webp images"
+                "title": "★ Convert all images to webp"
             },
             {
                 "command": "extension.createGetxBindingPage",
@@ -170,37 +171,37 @@
         "menus": {
             "explorer/context": [
                 {
-                    "when": "resourceLangId == dart || explorerResourceIsFolder",
+                    "when": "(resourceLangId == dart || explorerResourceIsFolder) && flutter-plugins.isFlutterProject",
                     "command": "extension.buildRunnerQuick",
                     "group": "navigation"
                 },
                 {
-                    "when": "resourceLangId == dart || explorerResourceIsFolder",
+                    "when": "(resourceLangId == dart || explorerResourceIsFolder) && flutter-plugins.isFlutterProject",
                     "command": "extension.buildRunner",
                     "group": "navigation"
                 },
                 {
-                    "when": "explorerResourceIsFolder",
+                    "when": "explorerResourceIsFolder && flutter-plugins.isFlutterProject",
                     "command": "extension.createGetxBindingPage",
                     "group": "navigation"
                 },
                 {
-                    "when": "explorerResourceIsFolder",
+                    "when": "explorerResourceIsFolder && flutter-plugins.isFlutterProject",
                     "command": "extension.createGetxBasePage",
                     "group": "navigation"
                 },
                 {
-                    "when": "true",
+                    "when": "flutter-plugins.isFlutterProject",
                     "command": "extension.generateIOSAppIcons",
                     "group": "navigation"
                 },
                 {
-                    "when": "explorerResourceIsFolder",
+                    "when": "explorerResourceIsFolder && flutter-plugins.isFlutterProject",
                     "command": "extension.compressToWebP",
                     "group": "navigation"
                 },
                 {
-                    "when": "true",
+                    "when": "flutter-plugins.isFlutterProject",
                     "command": "extension.generateAssets",
                     "group": "navigation"
                 }

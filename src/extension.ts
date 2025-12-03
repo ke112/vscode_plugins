@@ -4,11 +4,30 @@ import { logger } from './logger';
 import { QuickActionsManager } from './quickActionsManager';
 import { SnippetManager } from './snippetManager';
 
+/**
+ * 更新 Flutter 项目上下文变量
+ * 用于控制菜单项的显示/隐藏
+ */
+async function updateFlutterProjectContext(): Promise<void> {
+    const isFlutter = await QuickActionsManager.isFlutterProject();
+    await vscode.commands.executeCommand('setContext', 'flutter-plugins.isFlutterProject', isFlutter);
+    logger.log(`Flutter 项目检测: ${isFlutter}`);
+}
+
 export function activate(context: vscode.ExtensionContext) {
     logger.log('FNPlugin activated');
     const flutterWrapperManager = new FlutterWrapperManager();
     const quickActionsManager = new QuickActionsManager(context);
     const snippetManager = new SnippetManager();
+
+    // 检测并设置 Flutter 项目上下文
+    updateFlutterProjectContext();
+
+    // 监听工作区变化，动态更新上下文
+    const workspaceFoldersWatcher = vscode.workspace.onDidChangeWorkspaceFolders(() => {
+        updateFlutterProjectContext();
+    });
+    context.subscriptions.push(workspaceFoldersWatcher);
 
     // 注册flutter包裹组件命令
     flutterWrapperManager.registerCommands(context);

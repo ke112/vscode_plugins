@@ -13,24 +13,24 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
 
 1. Select the components you want to include, then press the `Extract List` shortcut key and select `Expand Components`
 2. Currently supported components are: (in alphabetical order)
-    - `AfterLayout`
-    - `AnnotatedRegion`
-    - `AnimatedBuilder`
-    - `ClipRRect`
-    - `Directionality` ✨ RTL Support
-    - `GestureDetector`
-    - `InkWell`
-    - `LayoutBuilder`
-    - `MeasureSize`
-    - `MediaQuery`
-    - `Obx`
-    - `PositionedDirectional` ✨ RTL Support
-    - `PreferredSize`
-    - `Stack`
-    - `Theme`
-    - `ValueListenableBuilder`
-    - `ValueListenableListBuilder`
-    - `VisibilityDetector`
+   - `AfterLayout`
+   - `AnnotatedRegion`
+   - `AnimatedBuilder`
+   - `ClipRRect`
+   - `Directionality` ✨ RTL Support
+   - `GestureDetector`
+   - `InkWell`
+   - `LayoutBuilder`
+   - `MeasureSize`
+   - `MediaQuery`
+   - `Obx`
+   - `PositionedDirectional` ✨ RTL Support
+   - `PreferredSize`
+   - `Stack`
+   - `Theme`
+   - `ValueListenableBuilder`
+   - `ValueListenableListBuilder`
+   - `VisibilityDetector`
 
 ## 2. Quick Functions
 
@@ -44,7 +44,7 @@ If you want to read the Chinese version of README, [点击这里查看中文版�
    - `★ Create Getx Page (Internal use)` Applicable to quickly create a page - Right-click the directory only
    - `★ Create Getx Page (Binding method)` Applicable to quickly create an internal basic class page - Right-click the directory only
    - `★ Generate Assets (Quick update lib/gen)` Applicable to generating local resources under lib/gen, faster
-   - `★ Generate iOS App Icon (png images of various sizes)` Applicable to generating icons of various sizes required by iOS - Only 1024*1024.png - Right-click the directory|file
+   - `★ Generate iOS App Icon (png images of various sizes)` Applicable to generating icons of various sizes required by iOS - Only 1024\*1024.png - Right-click the directory|file
    - `★ Generate Part (Local fast json/retrofit)` Generate model, repository for local files/directories, faster
    - `★ Generate Project (Full project build)` Applicable to general generation of model, repository, and image resources
 
@@ -72,8 +72,8 @@ If you find it helpful, please star it.
 
 This project will be continuously updated. If you have new ideas, welcome to submit issues or pull requests to [GitHub Repository](https://github.com/ke112/vscode_plugins). I will add new features when I am free.
 
-
 ## Contact
+
 Flower Name : 徐凤年
 
 Weixin ID : zhang1102d
@@ -84,6 +84,7 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 
 | Date       | Version | Update Content                                                             |
 | ---------- | ------- | -------------------------------------------------------------------------- |
+| 2025-12-03 | v0.0.13 | Update code robustness and efficiency.                                     |
 | 2025-07-18 | v0.0.12 | Update code robustness and efficiency.                                     |
 | 2025-01-11 | v0.0.11 | Update code robustness and efficiency.                                     |
 | 2024-11-13 | v0.0.10 | Update the shortcut function for generating lib/gen resources.             |
@@ -97,6 +98,6 @@ Facebook : https://www.facebook.com/zhihua.zhang.3958
 | 2024-09-09 | v0.0.2  | Update fast generation command support.                                    |
 | 2024-09-06 | v0.0.1  | Update 8 component support.                                                |
 
-
 ## Marketplace
+
 [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=zhangzhihua.flutter-plugins-zhangzhihua)

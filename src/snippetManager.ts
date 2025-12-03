@@ -612,7 +612,7 @@ return false;
       snippet: `decoration: BoxDecoration(
   color: Colors.white,
   border: Border.all(width: 1.w, color: const Color(0xFF999999)),
-  borderRadius: BorderRadius.all(Radius.circular(8.w)),
+  borderRadius: BorderRadiusDirectional.all(Radius.circular(8.w)),
 ),`, description: 'decoration 设置修饰边框'
     },
     'fconstraints 设置约束': {
@@ -635,7 +635,7 @@ return false;
       description: 'border 设置各个边框'
     },
     'fborderRadius 设置全部圆角': {
-      snippet: `borderRadius: BorderRadius.circular(4.w),`,
+      snippet: `borderRadius: BorderRadiusDirectional.circular(4.w),`,
       description: 'borderRadius 设置全部圆角'
     },
     'fborderRadius 设置单个圆角': {
@@ -705,7 +705,7 @@ return false;
   context: context,
   builder: (context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.w)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadiusDirectional.circular(8.w)),
       child: Container(
         width: 200.w,
         height: 200.w,
@@ -1085,22 +1085,6 @@ class $${1} {
   child: $0,
 )`,
       description: 'LTR directionality LTR布局'
-    },
-    'flocale 阿拉伯语区域设置': {
-      snippet: `Locale('ar', 'SA')`,
-      description: 'Arabic locale 阿拉伯语区域设置'
-    },
-    'flocale 英语区域设置': {
-      snippet: `Locale('en', 'US')`,
-      description: 'English locale 英语区域设置'
-    },
-    'fintl bidi 双向文本': {
-      snippet: `import 'package:intl/intl.dart' as intl;
-
-String getBidiText(String text) {
-  return intl.Bidi.stripHtmlIfNeeded(text);
-}`,
-      description: 'intl bidi 双向文本处理'
     },
   };
 
