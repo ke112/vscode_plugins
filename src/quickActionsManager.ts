@@ -478,7 +478,7 @@ class ${className}Controller extends BaseController {
 
   @override
   void onClose() {
-    pageState.dispose();
+    state.dispose();
     super.onClose();
   }
 }
