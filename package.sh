@@ -207,22 +207,91 @@ install_extension() {
     
     if [ $install_exit_code -eq 0 ]; then
         log_success "$editor 插件安装成功！"
-        if [ "$editor_running" = true ]; then
-            log_warning "请重启 $editor 以使插件生效"
-        fi
         return 0
     else
         # 检查是否是覆盖安装的情况（某些情况下会返回非零但实际成功）
         if echo "$install_output" | grep -qi "already installed\|已安装\|installed"; then
             log_success "$editor 插件已是最新版本或安装成功"
-            if [ "$editor_running" = true ]; then
-                log_warning "请重启 $editor 以使插件生效"
-            fi
             return 0
         else
             log_error "$editor 插件安装失败: $install_output"
             return 1
         fi
+    fi
+}
+
+# 函数: 重载编辑器窗口（让插件生效，无需完全重启）
+# 优化策略：
+#   1. 使用 AppleScript 剪贴板方式发送 Reload Window 命令
+#   2. 避免直接键盘输入文字，防止输入法乱码问题
+reload_editor() {
+    local editor_name=$1
+    local editor_path=$2
+
+    log_info "正在重载 $editor_name 窗口..."
+
+    # 获取编辑器的 app 名称（用于 AppleScript）
+    local app_name
+    case $editor_name in
+        "VSCode")  app_name="Visual Studio Code" ;;
+        "Cursor")  app_name="Cursor" ;;
+        "Trae")    app_name="Trae" ;;
+        *)         app_name="$editor_name" ;;
+    esac
+
+    if [ "$(uname)" != "Darwin" ]; then
+        log_warning "自动重载仅支持 macOS，请手动重启 $editor_name"
+        return
+    fi
+
+    local reload_success=false
+
+    # 使用剪贴板方式发送 Reload Window 命令
+    # 先切换到编辑器，通过快捷键打开命令面板，用剪贴板粘贴命令
+    log_info "使用剪贴板方式发送 Reload Window 命令..."
+
+    osascript -e "
+        -- 保存当前剪贴板内容
+        set oldClipboard to the clipboard
+
+        -- 将 Reload Window 命令放入剪贴板
+        set the clipboard to \">Reload Window\"
+
+        -- 激活编辑器
+        tell application \"$app_name\"
+            activate
+        end tell
+        delay 0.5
+
+        tell application \"System Events\"
+            tell process \"$app_name\"
+                -- 打开命令面板 (Cmd+Shift+P) 使用 key code 避免输入法问题
+                key code 35 using {command down, shift down}
+                delay 0.8
+
+                -- 全选命令面板中已有的文字并粘贴（Cmd+A 然后 Cmd+V）
+                keystroke \"a\" using {command down}
+                delay 0.1
+                keystroke \"v\" using {command down}
+                delay 0.5
+
+                -- 按回车执行
+                key code 36
+            end tell
+        end tell
+
+        -- 恢复剪贴板
+        delay 0.3
+        set the clipboard to oldClipboard
+    " >/dev/null 2>&1
+
+    if [ $? -eq 0 ]; then
+        reload_success=true
+        log_success "$editor_name 窗口已发送重载指令"
+    fi
+
+    if [ "$reload_success" = false ]; then
+        log_warning "$editor_name 自动重载失败，请手动执行: Cmd+Shift+P → 输入 Reload Window → 回车"
     fi
 }
 
@@ -388,8 +457,22 @@ main() {
     echo "========================================"
     log_success "插件部署完成！"
     echo "成功安装: $success_count/$total_count 个编辑器"
+
     if [ $success_count -gt 0 ]; then
-        log_warning "请重启已安装插件的编辑器以使更改生效"
+        # 收集正在运行的已安装编辑器，尝试自动 reload
+        local reloaded=false
+        for i in "${!editor_names[@]}"; do
+            local editor_name="${editor_names[i]}"
+            local editor_path="${editor_paths[i]}"
+            if [ -f "$editor_path" ] && check_editor_running "$editor_name"; then
+                reload_editor "$editor_name" "$editor_path"
+                reloaded=true
+            fi
+        done
+
+        if [ "$reloaded" = false ]; then
+            log_info "没有检测到正在运行的编辑器需要重载"
+        fi
     fi
     echo "========================================"
 }
