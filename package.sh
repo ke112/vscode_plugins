@@ -41,6 +41,20 @@ check_file_exists() {
     return 0
 }
 
+# 函数: 读取 package.json 中的 name
+read_package_name() {
+    if ! package_name=$(node -p "require('./package.json').name" 2>/dev/null); then
+        log_error "无法读取 package.json 中的 name"
+        return 1
+    fi
+    if [ -z "$package_name" ]; then
+        log_error "package.json 中的 name 为空"
+        return 1
+    fi
+    echo "$package_name"
+}
+
+
 # 函数: 更新版本号
 update_version() {
     log_info "正在更新版本号..."
@@ -109,9 +123,14 @@ package_extension() {
     log_info "正在打包 VSCode 插件..."
     
     # 删除旧版本的 .vsix 文件
-    if ls flutter-plugins-*.vsix 1> /dev/null 2>&1; then
+    if [ -z "${vsix_pattern:-}" ]; then
+        log_error "VSIX 匹配模式未设置"
+        return 1
+    fi
+
+    if ls $vsix_pattern 1> /dev/null 2>&1; then
         log_warning "删除旧的 .vsix 文件..."
-        rm -f flutter-plugins-*.vsix
+        rm -f $vsix_pattern
     fi
 
     # 编译项目
@@ -180,7 +199,7 @@ install_extension() {
             
             if [ $uninstall_exit_code -eq 0 ]; then
                 log_success "$editor 旧版本卸载成功"
-                sleep 1  # 等待卸载完成
+                # sleep 1  # 等待卸载完成
             else
                 # 检查错误信息
                 local error_msg=$(echo "$uninstall_output" | tr '\n' ' ')
@@ -311,7 +330,12 @@ check_dependencies() {
 
 # 函数: 获取 VSIX 文件
 get_vsix_file() {
-    local vsix_files=(flutter-plugins-*.vsix)
+    if [ -z "${vsix_pattern:-}" ]; then
+        log_error "VSIX 匹配模式未设置"
+        return 1
+    fi
+
+    local vsix_files=($vsix_pattern)
     
     if [ ! -e "${vsix_files[0]}" ]; then
         log_error "未找到 .vsix 文件"
@@ -341,13 +365,17 @@ main() {
     # 检查并安装 npm 项目依赖
     check_npm_dependencies || exit 1
     echo ""
+     
+    # 读取包名并生成 VSIX 匹配模式
+    package_name=$(read_package_name) || exit 1
+    vsix_pattern="${package_name}-*.vsix"
     
     # 更新版本号
-    update_version || {
-        log_error "版本更新失败"
-        exit 1
-    }
-    echo ""
+    # update_version || {
+    #     log_error "版本更新失败"
+    #     exit 1
+    # }
+    # echo ""
 
     # 打包插件
     package_extension || {
