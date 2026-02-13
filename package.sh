@@ -160,43 +160,43 @@ install_extension() {
     local editor_running=false
     if check_editor_running "$editor"; then
         editor_running=true
-        log_warning "$editor 正在运行，可能会影响插件卸载/安装"
+        log_info "$editor 正在运行，将直接覆盖安装（保持旧插件活跃以触发自动重载）"
     fi
 
-    # 检查插件是否已安装，如果已安装则先卸载
-    local installed_extensions
-    installed_extensions=$("$code_path" --list-extensions 2>/dev/null || echo "")
-    
-    if echo "$installed_extensions" | grep -qi "$extension_id"; then
-        log_info "检测到 $editor 已安装旧版本，正在卸载..."
+    # 仅在编辑器未运行时尝试卸载旧版本
+    # 编辑器运行时跳过卸载，避免旧插件被停用导致自动重载的文件监听器失效
+    if [ "$editor_running" = false ]; then
+        # 检查插件是否已安装，如果已安装则先卸载
+        local installed_extensions
+        installed_extensions=$("$code_path" --list-extensions 2>/dev/null || echo "")
         
-        # 尝试卸载旧版本
-        local uninstall_output
-        uninstall_output=$("$code_path" --uninstall-extension "$extension_id" 2>&1)
-        local uninstall_exit_code=$?
-        
-        if [ $uninstall_exit_code -eq 0 ]; then
-            log_success "$editor 旧版本卸载成功"
-            sleep 1  # 等待卸载完成
-        else
-            # 检查错误信息
-            local error_msg=$(echo "$uninstall_output" | tr '\n' ' ')
+        if echo "$installed_extensions" | grep -qi "$extension_id"; then
+            log_info "检测到 $editor 已安装旧版本，正在卸载..."
             
-            # 如果是"未安装"的错误，说明插件列表检测有误，可以继续安装
-            if echo "$error_msg" | grep -qi "not installed\|找不到\|not found"; then
-                log_info "$editor 插件实际上未安装，跳过卸载步骤"
-            # 如果编辑器正在运行，卸载失败是正常的，可以尝试覆盖安装
-            elif [ "$editor_running" = true ]; then
-                log_warning "$editor 正在运行，卸载失败（这是正常的，VSCode 运行时可能无法卸载插件）"
-                log_info "将尝试直接覆盖安装（VSCode 支持覆盖安装）..."
+            # 尝试卸载旧版本
+            local uninstall_output
+            uninstall_output=$("$code_path" --uninstall-extension "$extension_id" 2>&1)
+            local uninstall_exit_code=$?
+            
+            if [ $uninstall_exit_code -eq 0 ]; then
+                log_success "$editor 旧版本卸载成功"
+                sleep 1  # 等待卸载完成
             else
-                # 其他错误，显示详细信息但继续尝试安装
-                log_warning "$editor 旧版本卸载失败: $error_msg"
-                log_info "将尝试直接覆盖安装..."
+                # 检查错误信息
+                local error_msg=$(echo "$uninstall_output" | tr '\n' ' ')
+                
+                # 如果是"未安装"的错误，说明插件列表检测有误，可以继续安装
+                if echo "$error_msg" | grep -qi "not installed\|找不到\|not found"; then
+                    log_info "$editor 插件实际上未安装，跳过卸载步骤"
+                else
+                    # 其他错误，显示详细信息但继续尝试安装
+                    log_warning "$editor 旧版本卸载失败: $error_msg"
+                    log_info "将尝试直接覆盖安装..."
+                fi
             fi
+        else
+            log_info "$editor 未检测到旧版本，直接安装新版本"
         fi
-    else
-        log_info "$editor 未检测到旧版本，直接安装新版本"
     fi
 
     # 安装新版本
@@ -220,77 +220,24 @@ install_extension() {
     fi
 }
 
-# 函数: 重载编辑器窗口（让插件生效，无需完全重启）
-# 优化策略：
-#   1. 使用 AppleScript 剪贴板方式发送 Reload Window 命令
-#   2. 避免直接键盘输入文字，防止输入法乱码问题
+# 函数: 触发编辑器窗口自动重载（让插件生效，无需完全重启）
+# 原理：修改 ~/.flutter-plugins-zhangzhihua/.reload-trigger 的 mtime，
+#       插件内部通过 fs.watchFile 检测到变化后自动执行 workbench.action.reloadWindow
+# 优势：不依赖键盘模拟、不依赖 URI Scheme、不受窗口焦点/输入法/用户操作影响
 reload_editor() {
     local editor_name=$1
     local editor_path=$2
 
-    log_info "正在重载 $editor_name 窗口..."
+    local trigger_dir="$HOME/.flutter-plugins-zhangzhihua"
+    local trigger_file="$trigger_dir/.reload-trigger"
 
-    # 获取编辑器的 app 名称（用于 AppleScript）
-    local app_name
-    case $editor_name in
-        "VSCode")  app_name="Visual Studio Code" ;;
-        "Cursor")  app_name="Cursor" ;;
-        "Trae")    app_name="Trae" ;;
-        *)         app_name="$editor_name" ;;
-    esac
+    # 确保目录存在
+    mkdir -p "$trigger_dir" 2>/dev/null
 
-    if [ "$(uname)" != "Darwin" ]; then
-        log_warning "自动重载仅支持 macOS，请手动重启 $editor_name"
-        return
-    fi
-
-    local reload_success=false
-
-    # 使用剪贴板方式发送 Reload Window 命令
-    # 先切换到编辑器，通过快捷键打开命令面板，用剪贴板粘贴命令
-    log_info "使用剪贴板方式发送 Reload Window 命令..."
-
-    osascript -e "
-        -- 保存当前剪贴板内容
-        set oldClipboard to the clipboard
-
-        -- 将 Reload Window 命令放入剪贴板
-        set the clipboard to \">Reload Window\"
-
-        -- 激活编辑器
-        tell application \"$app_name\"
-            activate
-        end tell
-        delay 0.5
-
-        tell application \"System Events\"
-            tell process \"$app_name\"
-                -- 打开命令面板 (Cmd+Shift+P) 使用 key code 避免输入法问题
-                key code 35 using {command down, shift down}
-                delay 0.8
-
-                -- 全选命令面板中已有的文字并粘贴（Cmd+A 然后 Cmd+V）
-                keystroke \"a\" using {command down}
-                delay 0.1
-                keystroke \"v\" using {command down}
-                delay 0.5
-
-                -- 按回车执行
-                key code 36
-            end tell
-        end tell
-
-        -- 恢复剪贴板
-        delay 0.3
-        set the clipboard to oldClipboard
-    " >/dev/null 2>&1
-
-    if [ $? -eq 0 ]; then
-        reload_success=true
-        log_success "$editor_name 窗口已发送重载指令"
-    fi
-
-    if [ "$reload_success" = false ]; then
+    # touch 修改 mtime，触发插件的 fs.watchFile 回调
+    if touch "$trigger_file" 2>/dev/null; then
+        log_success "$editor_name 已触发自动重载（文件监听机制）"
+    else
         log_warning "$editor_name 自动重载失败，请手动执行: Cmd+Shift+P → 输入 Reload Window → 回车"
     fi
 }
