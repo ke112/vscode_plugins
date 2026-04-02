@@ -411,22 +411,22 @@ main() {
     )
 
     # 安装计数器
-    local success_count=0
-    local total_count=${#editor_names[@]}
+    # local success_count=0
+    # local total_count=${#editor_names[@]}
 
-    # 循环安装到各个编辑器
-    for i in "${!editor_names[@]}"; do
-        local editor_name="${editor_names[i]}"
-        local editor_path="${editor_paths[i]}"
+    # # 循环安装到各个编辑器
+    # for i in "${!editor_names[@]}"; do
+    #     local editor_name="${editor_names[i]}"
+    #     local editor_path="${editor_paths[i]}"
         
-        if [ -f "$editor_path" ]; then
-            if install_extension "$editor_name" "$editor_path" "$vsix_file" "$extension_id"; then
-                success_count=$((success_count + 1))
-            fi
-        else
-            log_warning "未找到 $editor_name 安装路径: $editor_path"
-        fi
-    done
+    #     if [ -f "$editor_path" ]; then
+    #         if install_extension "$editor_name" "$editor_path" "$vsix_file" "$extension_id"; then
+    #             success_count=$((success_count + 1))
+    #         fi
+    #     else
+    #         log_warning "未找到 $editor_name 安装路径: $editor_path"
+    #     fi
+    # done
 
     echo ""
     echo "========================================"
