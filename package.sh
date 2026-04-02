@@ -431,7 +431,7 @@ main() {
     echo ""
     echo "========================================"
     log_success "插件部署完成！"
-    echo "成功安装: $success_count/$total_count 个编辑器"
+    # echo "成功安装: $success_count/$total_count 个编辑器"
 
     if [ $success_count -gt 0 ]; then
         # 收集正在运行的已安装编辑器，尝试自动 reload
